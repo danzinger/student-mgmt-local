@@ -1,0 +1,55 @@
+<ion-header>
+    <ion-navbar color="stdt-mgmt-theme">
+        <ion-title *ngIf="!registerMode">Meine Studenten</ion-title>
+        <ion-title *ngIf="registerMode">Registrierung aktiv</ion-title>
+        <ion-buttons end>
+            <button *ngIf="!registerMode && students && courses && courses.length > 0" ion-button icon-only (click)="toggleRegisterMode(registerMode)">
+                <ion-icon name="clipboard"></ion-icon>
+            </button>
+            <button *ngIf="registerMode" ion-button icon-only (click)="toggleRegisterMode(registerMode)">
+                <ion-icon name="done-all"></ion-icon>
+            </button>
+            <button *ngIf="!registerMode" ion-button icon-only (click)="addStudents()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="ENV == 'dev'" ion-button icon-only (click)="printInfo()">
+                <ion-icon name="information-circle"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        <div *ngIf="students">
+            <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche"></ion-searchbar>
+            <ion-item class="item" *ngIf="registerMode && courses && courses.length > 0">
+                <text-avatar class="avatar" [text]="'+'" item-left></text-avatar>
+                <ion-label>Kurs auswählen</ion-label>
+                <ion-select [compareWith]="compareFn"  class="select" [(ngModel)]="selected_course" (ngModelChange)="onCourseSelect(selected_course)" multiple="false" cancelText="Abbrechen" okText="Ok">
+                    <ion-option *ngFor="let course of courses | orderBy : ['name']" [value]="course">{{course.name}}</ion-option>
+                </ion-select>
+                <p *ngIf="courses.length < 1">Erstelle in der Kursansicht einen Kurs.</p>
+            </ion-item>
+            <ion-item-sliding #slidingItem *ngFor="let student of students | filter:term | orderBy : 'firstname'">
+                <button ion-item *ngIf="!registerMode" (click)="goToStudentDetail(student)">
+                <text-avatar [text]="student.firstname"  item-left></text-avatar>
+                <ion-label>{{student.firstname}} {{student.lastname}}</ion-label>
+            </button>
+                <button ion-item *ngIf="registerMode">
+                <text-avatar [text]="student.firstname"  item-left></text-avatar>
+                <ion-label>{{student.firstname}} {{student.lastname}}</ion-label>
+                <ion-toggle *ngIf="registerMode && studentRegistered(student)" (ngModelChange)="toggleStudentsCourseRegistration(student)" [(ngModel)]="student.registered" color="secondary"></ion-toggle>
+            </button>
+                <ion-item-options>
+                    <button large style="width:75px;" ion-button color="danger" (click)="deleteStudent(student); closeSlidingItem(slidingItem)">
+                          <ion-icon  name="trash"></ion-icon>
+                      </button>
+                    <button large style="width:75px;" ion-button color="primary" (click)="presentStudentUpdateModal(student) ; closeSlidingItem(slidingItem)">
+                          <ion-icon name="create"></ion-icon>
+                      </button>
+                </ion-item-options>
+            </ion-item-sliding>
+        </div>
+    </ion-list>
+</ion-content>

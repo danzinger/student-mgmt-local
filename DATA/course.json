@@ -1,0 +1,149 @@
+{
+        "_id" : ObjectId("5a833ff4ea034d408afa070f"),
+        "name" : "test",
+        "time" : "",
+        "location" : "",
+        "institution" : "boku",
+        "teacher_id" : "59dbea8564314a165605e4b7",
+        "performanceCategories" : [
+                {
+                        "_id" : ObjectId("5a8357e60cc9f306eb6aae05"),
+                        "course_id" : "5a833ff4ea034d408afa070f",
+                        "teacher_id" : "59dbea8564314a165605e4b7",
+                        "name" : "gr1",
+                        "description" : "gdfgfd",
+                        "point_maximum" : "",
+                        "category_weight" : "0.5",
+                        "percentage_points_per_unit" : "",
+                        "type" : "group",
+                        "children" : [
+                                {
+                                        "children" : [ ],
+                                        "name" : "100-0,5",
+                                        "type" : "max_and_weight",
+                                        "point_maximum" : "100",
+                                        "category_weight" : "0.5",
+                                        "parent_id" : "5a8357e60cc9f306eb6aae05",
+                                        "_id" : ObjectId("5a8358030cc9f306eb6aae06")
+                                },
+                                {
+                                        "children" : [
+                                                {
+                                                        "children" : [ ],
+                                                        "name" : "21-100-0,5",
+                                                        "type" : "max_and_weight",
+                                                        "point_maximum" : "100",
+                                                        "category_weight" : "0.5",
+                                                        "parent_id" : "5a8358190cc9f306eb6aae07",
+                                                        "_id" : ObjectId("5a83588f0cc9f306eb6aae0a")
+                                                },
+                                                {
+                                                        "children" : [
+                                                                {
+                                                                        "children" : [ ],
+                                                                        "type" : "max_and_weight",
+                                                                        "name" : "31-100-0,5",
+                                                                        "point_maximum" : "100",
+                                                                        "category_weight" : "0.5",
+                                                                        "parent_id" : "5a8359550cc9f306eb6aae10",
+                                                                        "_id" : ObjectId("5a8359730cc9f306eb6aae11")
+                                                                },
+                                                                {
+                                                                        "children" : [ ],
+                                                                        "name" : "31-100-0,5",
+                                                                        "type" : "max_and_weight",
+                                                                        "point_maximum" : "100",
+                                                                        "category_weight" : "0.5",
+                                                                        "parent_id" : "5a8359550cc9f306eb6aae10",
+                                                                        "_id" : ObjectId("5a8359860cc9f306eb6aae12")
+                                                                },
+                                                                {
+                                                                        "children" : [ ],
+                                                                        "name" : "inc3",
+                                                                        "type" : "incremental",
+                                                                        "percentage_points_per_unit" : "0.025",
+                                                                        "parent_id" : "5a8359550cc9f306eb6aae10",
+                                                                        "_id" : ObjectId("5a83625205501e4118801c42")
+                                                                }
+                                                        ],
+                                                        "type" : "group",
+                                                        "name" : "3",
+                                                        "category_weight" : "0.5",
+                                                        "parent_id" : "5a8358190cc9f306eb6aae07",
+                                                        "_id" : ObjectId("5a8359550cc9f306eb6aae10")
+                                                }
+                                        ],
+                                        "type" : "group",
+                                        "category_weight" : "0.5",
+                                        "name" : "2-0,5",
+                                        "parent_id" : "5a8357e60cc9f306eb6aae05",
+                                        "_id" : ObjectId("5a8358190cc9f306eb6aae07")
+                                }
+                        ]
+                },
+                {
+                        "_id" : ObjectId("5a84887c76951b320c0ee83d"),
+                        "course_id" : "5a833ff4ea034d408afa070f",
+                        "teacher_id" : "59dbea8564314a165605e4b7",
+                        "name" : "toplevel1",
+                        "description" : null,
+                        "point_maximum" : 100,
+                        "category_weight" : "0.25",
+                        "percentage_points_per_unit" : false,
+                        "type" : "max_and_weight",
+                        "children" : [ ]
+                },
+                {
+                        "_id" : ObjectId("5a84915d76951b320c0ee842"),
+                        "course_id" : "5a833ff4ea034d408afa070f",
+                        "teacher_id" : "59dbea8564314a165605e4b7",
+                        "name" : "fsdfs",
+                        "description" : null,
+                        "point_maximum" : 100,
+                        "category_weight" : 0.25,
+                        "percentage_points_per_unit" : false,
+                        "type" : "max_and_weight",
+                        "children" : [ ]
+                }
+        ],
+        "participants" : [
+                ObjectId("5a834010ea034d408afa0716"),
+                ObjectId("5a834010ea034d408afa071b"),
+                ObjectId("5a834010ea034d408afa0714"),
+                ObjectId("5a834010ea034d408afa0719"),
+                ObjectId("5a834010ea034d408afa0723"),
+                ObjectId("5a834010ea034d408afa0715"),
+                ObjectId("5a834010ea034d408afa0729"),
+                ObjectId("5a834010ea034d408afa071f"),
+                ObjectId("5a834010ea034d408afa071a"),
+                ObjectId("5a834010ea034d408afa0713"),
+                ObjectId("5a834010ea034d408afa0718"),
+                ObjectId("5a834010ea034d408afa071d"),
+                ObjectId("5a834010ea034d408afa0722"),
+                ObjectId("5a834010ea034d408afa0727"),
+                ObjectId("5a834010ea034d408afa072c"),
+                ObjectId("5a834010ea034d408afa0731"),
+                ObjectId("5a834010ea034d408afa0712"),
+                ObjectId("5a834010ea034d408afa0717"),
+                ObjectId("5a834010ea034d408afa071c"),
+                ObjectId("5a834010ea034d408afa0721"),
+                ObjectId("5a834010ea034d408afa0726"),
+                ObjectId("5a834010ea034d408afa0730"),
+                ObjectId("5a834010ea034d408afa071e"),
+                ObjectId("5a834010ea034d408afa0720"),
+                ObjectId("5a834010ea034d408afa0725"),
+                ObjectId("5a834010ea034d408afa072a"),
+                ObjectId("5a834010ea034d408afa072f"),
+                ObjectId("5a834010ea034d408afa0724"),
+                ObjectId("5a834010ea034d408afa0728"),
+                ObjectId("5a834010ea034d408afa072d"),
+                ObjectId("5a834010ea034d408afa072b"),
+                ObjectId("5a834010ea034d408afa072e"),
+                ObjectId("5a834258ea034d408afa073f"),
+                ObjectId("5a8358e20cc9f306eb6aae0b"),
+                ObjectId("5a835e2105501e4118801c30"),
+                ObjectId("5a835eaf05501e4118801c36"),
+                ObjectId("5a83627d05501e4118801c43"),
+                ObjectId("5a84a28813204b6b57f097c6")
+        ]
+}

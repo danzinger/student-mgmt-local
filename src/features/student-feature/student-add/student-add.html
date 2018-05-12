@@ -1,0 +1,40 @@
+<!--
+  Generated template for the StudentAddPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+    <ion-navbar>
+        <ion-title>Studenten Hinzufügen</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <h3>Einzeln hinzufügen</h3>
+    <form [formGroup]="form">
+        <ion-list>
+            <ion-item>
+                <ion-label color="primary" floating>Vorname</ion-label>
+                <ion-input type="text" formControlName="firstname"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label color="primary" floating>Nachname</ion-label>
+                <ion-input type="text" formControlName="lastname"></ion-input>
+            </ion-item>
+            <ion-list>
+                <button ion-button color="primary" block (click)="addStudent(form.value)">Student Hinzufügen</button>
+            </ion-list>
+        </ion-list>
+    </form>
+    <h3>Aus Datei hinzufügen</h3>
+    <!-- TODO: Check if the csv File is in valid Format -->
+    <p>Die .csv Datei sollte das Folgende Format haben:</p>
+    <pre>
+      firstname,lastname
+      Max, Mustermann 
+      Alex, Mcmillian
+  </pre>
+    <ng2-file-input [drop-text]="' '" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
+
+</ion-content>

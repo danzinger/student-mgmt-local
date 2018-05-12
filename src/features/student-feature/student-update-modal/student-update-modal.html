@@ -1,0 +1,43 @@
+<!--
+  Generated template for the StudentUpdateModalPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="stdt-mgmt-theme">
+      <ion-title >{{student.firstname}} {{student.lastname}}</ion-title>
+      <ion-buttons start>
+          <button ion-button (click)="cancel()">
+        <span color="primary" showWhen="ios">
+          Cancel
+        </span>
+        <ion-icon style="font-size:25px" name="md-close" showWhen="android,windows"></ion-icon>
+      </button>
+      </ion-buttons>
+      <ion-buttons end>
+          <button ion-button (click)="done()"  strong>
+              <span color="primary" showWhen="ios">
+                Done
+              </span>
+              <ion-icon style="font-size:25px" name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+            </button>
+          </ion-buttons>
+        </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <form>
+      <ion-list>
+          <ion-item>
+              <ion-label color="primary" floating>Vorname</ion-label>
+              <ion-input [(ngModel)]="student.firstname" name="name" type="text" value="">fdsf</ion-input>
+          </ion-item>
+          <ion-item>
+              <ion-label color="primary" floating>Nachname</ion-label>
+              <ion-input [(ngModel)]="student.lastname" name="time" type="text" value="">fsdfsd</ion-input>
+          </ion-item>
+      </ion-list>
+  </form>
+</ion-content>

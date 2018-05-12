@@ -1,0 +1,38 @@
+page-student-detail {
+    .item-profile {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        background-size: cover;
+        height: 250px;
+        background-color: lightblue;
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .toplevel-button {
+
+    }
+    .toplevel-grouplabel {
+       font-weight: bold;
+       color: #001970;
+    }
+    .subgroup-grouplabel {
+      font-weight: bolder;
+      margin-left:20px;
+    }
+    .subgroup-button {
+      margin-left: 20px;
+    }
+
+    .subsubgroup-button {
+      margin-left: 30px;
+    }
+    .subsubgroup-grouplabel {
+      font-weight: bolder;
+      margin-left: 30px; 
+    }
+    .subsubsubgroup-button{
+      margin-left: 40px;
+    }
+}

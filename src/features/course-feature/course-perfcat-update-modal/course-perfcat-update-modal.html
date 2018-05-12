@@ -1,0 +1,149 @@
+<ion-header>
+    <ion-navbar color="stdt-mgmt-theme">
+        <ion-title>Leistungskategorie Bearbeiten</ion-title>
+        <ion-buttons end>
+            <button ion-button (click)="cancel()" strong>
+        <span color="primary" showWhen="ios">
+          Cancel
+        </span>
+        <ion-icon style="font-size:25px" name="close" showWhen="core,android,windows"></ion-icon>
+      </button>
+            <button ion-button (click)="done(performanceCategory)" strong>
+        <span color="primary" showWhen="ios">
+          Done
+        </span>
+        <ion-icon style="font-size:25px" name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <form>
+        <!-- This one updates a top level group -->
+        <div *ngIf="!addToGroup && !child">
+            Edit a top level category
+            <ion-item>
+                <ion-label floating>Name</ion-label>
+                <ion-input type="text" [(ngModel)]="performanceCategory.name" name="name"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label floating>Beschreibung</ion-label>
+                <ion-input type="text" [(ngModel)]="performanceCategory.description" name="description"></ion-input>
+            </ion-item>
+            <!-- It is NOT POSSIBLE to edit the TYPE. This would cause many problems, i.e:
+              - if a group has already subgroups and the type is changed from "group" to another. What should happen to the subgroups? What should happen to the gradings students have in this subgroup?
+              - if a "maximum_and_weight" type is changed to "incremental", what should happen to the gradings students have in this category? 
+
+              -> only feasable solution would be to delete all gradings within this category and start over. But this is more logical if the user is forced to delete the group (which deletes all gradings of all students within this category) and start over.
+                 anyway, the way a course is graded should be exactly defined, before students are graded. Otherwise this will cause many problems. 
+              -> It will only be possible to change the name, description and the Parameters of the GROUP TYPE (like defined when the category was created). Like the maximum_points / weigth in type "max_and_weight" or the percenage_points-per_unit in type "incremental". For subgroups it should always be possible to change the weigths -->
+
+            <ion-item>
+                <ion-label>Typspezifische Parameter:</ion-label>
+            </ion-item>
+            <div *ngIf="performanceCategory.type == 'max_and_weight'">
+                <ion-item>
+                    <ion-label floating>Maximale Punkte</ion-label>
+                    <ion-input [(ngModel)]="performanceCategory.point_maximum" name="point_maximum"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label floating>Gewichtung</ion-label>
+                    <ion-input [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="performanceCategory.type == 'incremental'">
+                <ion-item>
+                    <ion-label floating>Wert pro Einheit</ion-label>
+                    <ion-input [(ngModel)]="performanceCategory.percentage_points_per_unit" name="percentage_points_per_unit"></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="performanceCategory.type == 'group'">
+                <ion-item>
+                    <ion-label floating>Gewichtung</ion-label>
+                    <ion-input [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
+                </ion-item>
+            </div>
+        </div>
+        <!-- This one is for editing a child -->
+        <div *ngIf="child && !addToGroup">
+            Edit a child
+            <ion-item>
+                <ion-label floating>Name</ion-label>
+                <ion-input type="text" [(ngModel)]="child.name" name="name"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label floating>Beschreibung</ion-label>
+                <ion-input type="text" [(ngModel)]="child.description" name="description"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Typspezifische Parameter:</ion-label>
+            </ion-item>
+            <div *ngIf="child.type == 'max_and_weight'">
+                <ion-item>
+                    <ion-label floating>Maximale Punkte</ion-label>
+                    <ion-input [(ngModel)]="child.point_maximum" name="point_maximum"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label floating>Gewichtung</ion-label>
+                    <ion-input [(ngModel)]="child.category_weight" name="weight"></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="child.type == 'incremental'">
+                <ion-item>
+                    <ion-label floating>Wert pro Einheit</ion-label>
+                    <ion-input [(ngModel)]="child.percentage_points_per_unit" name="percentage_points_per_unit"></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="child.type == 'group'">
+                <ion-item>
+                    <ion-label floating>Gewichtung</ion-label>
+                    <ion-input [(ngModel)]="child.category_weight" name="category_weight"></ion-input>
+                </ion-item>
+            </div>
+        </div>
+        <!-- This one is for adding a subgroup to a child -->
+        <div *ngIf="addToGroup">
+            adding a subgroup to a top level category OR to a child
+            <ion-item>
+                <ion-label floating>Name</ion-label>
+                <ion-input value="Testerval" type="text" [(ngModel)]="subgroup.name" name="name"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label floating>Beschreibung</ion-label>
+                <ion-input type="text" [(ngModel)]="subgroup.description" name="description"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label floating>Kategorietyp</ion-label>
+                <ion-select name="type" [(ngModel)]="subgroup.type" (ngModelChange)="clearInitialSelection()" multiple="false" cancelText="Abbrechen" okText="Ok">
+                    <ion-option value="incremental">Incremental</ion-option>
+                    <ion-option value="max_and_weight">Maximum und Gewicht</ion-option>
+                    <ion-option value="group">Gruppe</ion-option>
+                </ion-select>
+            </ion-item>
+            <div *ngIf="subgroup.type == 'max_and_weight'">
+                <ion-item>
+                    <ion-label floating>Maximale Punkte</ion-label>
+                    <ion-input [(ngModel)]="subgroup.point_maximum" name="point_maximum"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label floating>Gewichtung</ion-label>
+                    <ion-input [(ngModel)]="subgroup.category_weight" name="weight"></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="subgroup.type == 'incremental'">
+                <ion-item>
+                    <ion-label floating>Wert pro Einheit</ion-label>
+                    <ion-input [(ngModel)]="subgroup.percentage_points_per_unit" name="percentage_points_per_unit"></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="subgroup.type == 'group'">
+                <ion-item>
+                    <ion-label floating>Gewichtung</ion-label>
+                    <ion-input [(ngModel)]="subgroup.category_weight" name="category_weight"></ion-input>
+                </ion-item>
+            </div>
+        </div>
+    </form>
+
+</ion-content>
