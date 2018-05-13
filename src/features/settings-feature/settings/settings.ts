@@ -33,15 +33,33 @@ export class SettingsPage {
     this.courseService.getCourses().subscribe(data => this.courses = data)
     this.studentService.getStudents().subscribe(data => this.students = data);
   }
-  addMockData() {
-    this.storage.set('courses', COURSES);
-    this.storage.set('students', STUDENTS);
+
+  addMockData(data?) {
+    if (data) {
+      this.storage.set('courses', data.courses).then(() => {
+        this.courses = data.courses;
+      });
+      this.storage.set('students', data.students).then(() => {
+        this.students = data.students;
+      });
+    } else {
+      this.storage.set('courses', COURSES).then(() => {
+        this.courses = COURSES;
+      });
+      this.storage.set('students', STUDENTS).then(() => {
+        this.students = STUDENTS;
+      });
+    }
   }
   removeStudents() {
-    this.studentService.removeStudents();
+    this.studentService.removeStudents().then(() => {
+      this.students = null;
+    });
   }
   removeCourses() {
-    this.courseService.removeCourses();
+    this.courseService.removeCourses().then(() => {
+      this.courses = null;
+    });
   }
   loadData() {
   }
@@ -68,11 +86,19 @@ export class SettingsPage {
           }
         }
         console.log(me.imported_data);
+        me.addMockData(me.imported_data);
         me.toastService.showToast('Daten erfolgreich hinzugefügt');
       }
       reader.readAsText(ev.currentFiles[0]);
     }
   }
+
+  // getStudents(){
+  //   this.studentService.getStudents().subscribe((students)=>{return students});
+  // }
+  // getCourses(){
+  //   this.courseService.getCourses().subscribe((courses)=>{return courses});
+  // }
 
   exportData() {
     let exportData = {
@@ -84,7 +110,7 @@ export class SettingsPage {
     var a = window.document.createElement("a");
     a.href = window.URL.createObjectURL(blob);
     let time = new Date().toJSON().slice(0, 23).replace(/-/g, '-');
-    a.download = "student-mgmt-"+time+".backup";
+    a.download = "student-mgmt-" + time + ".json";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
