@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, ViewController } from 'ionic-angular';
-import { ToastService } from '../../../services/toast.service';
 import { PapaParseService } from 'ngx-papaparse';
 import { MongoIdService } from '../../../services/mongo-id.service';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
@@ -30,7 +29,6 @@ export class StudentAddPage {
     public navCtrl: NavController,
     public viewCtrl:ViewController,
     public alertCtrl: AlertController,
-    public toastService: ToastService,
     public navParams: NavParams,
     private papa: PapaParseService,
     private formBuilder: FormBuilder,

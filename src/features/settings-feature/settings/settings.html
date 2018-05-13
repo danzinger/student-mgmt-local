@@ -6,29 +6,29 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Einstellungen</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <ion-title>Einstellungen</ion-title>
+    </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+    <h3>Mock Data</h3>
     <ion-list>
         <ion-item>
-        <!-- <button ion-button color="primary" block (click)="saveData()">Daten Speichern</button>
-        <button ion-button color="primary" block (click)="loadData()">Daten Laden</button> -->
-        <button ion-button color="primary" block (click)="addMockData()">Daten hinzufügen</button>
-        <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
-        <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
+            <button ion-button color="primary" block (click)="addMockData()">Daten hinzufügen</button>
+            <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
+            <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
         </ion-item>
-        <!-- <ion-item>
-            <ion-label color="primary" floating>Vorname</ion-label>
-            <ion-input [(ngModel)]="firstname" type="text" ></ion-input>
-        </ion-item>
+        <h3>File Data</h3>
+        <ion-title>Export</ion-title>
         <ion-item>
-            <ion-label color="primary" floating>Nachname</ion-label>
-            <ion-input [(ngModel)]="lastname" type="text" ></ion-input>
-        </ion-item>         -->
+            <button ion-button color="primary" block (click)="exportData()">Daten Exportieren</button>
+        </ion-item>
+        <ion-title>Import</ion-title>
+        <ion-item>
+            <ng2-file-input [drop-text]="' '" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)" ></ng2-file-input>
+        </ion-item>
     </ion-list>
 </ion-content>
