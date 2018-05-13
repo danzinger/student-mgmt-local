@@ -9,6 +9,8 @@ import { STUDENTS } from '../../../app/mock-data/students_new';
 import { PapaParseService } from 'ngx-papaparse';
 import { ToastService } from '../../../services/toast.service';
 
+import { File } from '@ionic-native/file';
+
 @IonicPage()
 @Component({
   selector: 'page-settings',
@@ -26,7 +28,8 @@ export class SettingsPage {
     private papa: PapaParseService,
     public toastService: ToastService,
     public studentService: StudentService,
-    public courseService: CourseService, ) {
+    public courseService: CourseService,
+    public file: File, ) {
   }
 
   ionViewDidLoad() {
@@ -64,6 +67,60 @@ export class SettingsPage {
   loadData() {
   }
 
+  message:String;
+  testFile(){
+    let dir = this.file.externalRootDirectory ;
+    this.message = dir;
+    this.toastService.showToast(dir);
+  }
+
+  createDir(){
+    this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt', true).then(()=>{
+      this.toastService.showToast('OK');
+    }).catch((err)=>{
+      this.toastService.showToast(err);
+    });
+  }
+  deleteDir(){
+    this.file.removeDir(this.file.externalRootDirectory, 'StudentMgmt').then(()=>{
+      this.toastService.showToast('OK');
+    }).catch((err)=>{
+      this.toastService.showToast(err);
+    });
+  }
+  checkDir(){
+    this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt').then(()=>{
+      this.toastService.showToast('OK');
+    }).catch((err)=>{
+      this.toastService.showToast(JSON.stringify(err));
+    });
+  }
+
+  writeFile(){
+    let exportData = {
+      students: this.students,
+      courses: this.courses
+    }    
+    let json_string:string = JSON.stringify(exportData);
+    var blob = new Blob([json_string]);
+    let time = new Date().toJSON().slice(0, 13).replace(/-/g, '-');
+    let filename:string = 'StudentMgmt/smb-' + time + Math.round(new Date().getTime()/1000);
+    this.file.writeFile(this.file.externalRootDirectory, filename, json_string).then(()=>{
+      this.toastService.showToast('Backup erfolgreich!');
+    }).catch((err)=>{
+      this.toastService.showToast('Fehler: '+JSON.stringify(err));
+    });
+  }
+
+  filesInDir;
+  listDir(){
+    this.file.listDir(this.file.externalRootDirectory, 'StudentMgmt').then((res)=>{
+      this.toastService.showToast('OK');
+      this.filesInDir = res;
+    }).catch((err)=>{
+      this.toastService.showToast(JSON.stringify(err));
+    });
+  }
   imported_data;
   onAction(ev) {
     // action: (src: https://github.com/bergben/ng2-file-input)

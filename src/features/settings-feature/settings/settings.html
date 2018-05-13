@@ -14,6 +14,8 @@
 
 
 <ion-content padding>
+        <p>{{message}}</p>
+        <p>{{filesInDir | json}}</p>
     <h3>Mock Data</h3>
     <ion-list>
         <ion-item>
@@ -21,7 +23,7 @@
             <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
             <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
         </ion-item>
-        <h3>File Data</h3>
+        <h3>Data (Browser)</h3>
         <ion-title>Export</ion-title>
         <ion-item>
             <button ion-button color="primary" block (click)="exportData()">Daten Exportieren</button>
@@ -30,5 +32,15 @@
         <ion-item>
             <ng2-file-input [drop-text]="' '" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)" ></ng2-file-input>
         </ion-item>
+        <h3>Data (Android)</h3>
+        <ion-title>Export</ion-title>
+        <ion-item>
+            <button ion-button color="primary" block (click)="createDir()">createDir</button>
+            <button ion-button color="primary" block (click)="deleteDir()">deleteDir</button>
+            <button ion-button color="primary" block (click)="checkDir()">checkDir</button>
+            <button ion-button color="primary" block (click)="writeFile()">WriteFile</button>
+            <button ion-button color="primary" block (click)="listDir()">ListDir</button>
+        </ion-item>
+        <ion-title>Import</ion-title>
     </ion-list>
 </ion-content>
