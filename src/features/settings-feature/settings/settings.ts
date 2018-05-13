@@ -83,7 +83,8 @@ export class SettingsPage {
     var blob = new Blob([json_string]);
     var a = window.document.createElement("a");
     a.href = window.URL.createObjectURL(blob);
-    a.download = "newdata.json";
+    let time = new Date().toJSON().slice(0, 23).replace(/-/g, '-');
+    a.download = "student-mgmt-"+time+".backup";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
