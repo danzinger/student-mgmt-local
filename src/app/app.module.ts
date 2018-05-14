@@ -14,8 +14,6 @@ import { ToastService } from '../services/toast.service';
 import { MongoIdService } from '../services/mongo-id.service';
 import { PapaParseService } from 'ngx-papaparse';
 
-//PLUGINS:
-import { File } from '@ionic-native/file';
 
 @NgModule({
   declarations: [
@@ -38,7 +36,6 @@ import { File } from '@ionic-native/file';
     ToastService,
     MongoIdService,
     PapaParseService,
-    File,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

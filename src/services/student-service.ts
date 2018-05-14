@@ -19,9 +19,11 @@ export class StudentService {
     return Observable.fromPromise(this.storage.get('students')
       .then(students_in_database => {
         if (!students_in_database) students_in_database = [];
-        students.forEach(student => {
-          students_in_database.push(student)
-        });
+        if(students && students.length > 0){
+          students.forEach(student => {
+            students_in_database.push(student)
+          });
+        }
         return this.storage.set('students', students_in_database);
       }))
   }
@@ -99,7 +101,7 @@ export class StudentService {
       ));
   }
 
-  removeStudents() {
+  removeStudents(): Promise<any> {
     return this.storage.remove('students');
   }
 

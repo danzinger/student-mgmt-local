@@ -14,33 +14,62 @@
 
 
 <ion-content padding>
-        <p>{{message}}</p>
-        <p>{{filesInDir | json}}</p>
+    <ion-item>
+        <ion-label>Android Features</ion-label>
+        <ion-toggle [(ngModel)]="show_android_features" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item>
+        <ion-label>Desktop Features</ion-label>
+        <ion-toggle [(ngModel)]="show_desktop_features" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="show_android_features">
+        <ion-label>Android Debug Functions</ion-label>
+        <ion-toggle [(ngModel)]="show_android_debug_functions" color="secondary"></ion-toggle>
+    </ion-item>
     <h3>Mock Data</h3>
     <ion-list>
-        <ion-item>
-            <button ion-button color="primary" block (click)="addMockData()">Daten hinzufügen</button>
-            <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
-            <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
-        </ion-item>
+        <button ion-button color="primary" block (click)="addMockData()">Daten hinzufügen</button>
+        <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
+        <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
+    </ion-list>
+    <ion-list *ngIf="show_desktop_features">
         <h3>Data (Browser)</h3>
         <ion-title>Export</ion-title>
         <ion-item>
-            <button ion-button color="primary" block (click)="exportData()">Daten Exportieren</button>
+            <button ion-button color="primary" block (click)="downloadDataOnBrowser()">Daten Exportieren</button>
         </ion-item>
         <ion-title>Import</ion-title>
         <ion-item>
-            <ng2-file-input [drop-text]="' '" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)" ></ng2-file-input>
+            <ng2-file-input [drop-text]="' '" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
         </ion-item>
-        <h3>Data (Android)</h3>
-        <ion-title>Export</ion-title>
-        <ion-item>
-            <button ion-button color="primary" block (click)="createDir()">createDir</button>
-            <button ion-button color="primary" block (click)="deleteDir()">deleteDir</button>
-            <button ion-button color="primary" block (click)="checkDir()">checkDir</button>
-            <button ion-button color="primary" block (click)="writeFile()">WriteFile</button>
-            <button ion-button color="primary" block (click)="listDir()">ListDir</button>
-        </ion-item>
-        <ion-title>Import</ion-title>
+    </ion-list>
+    <ion-list>
+        <div *ngIf="show_android_features">
+            <h3>Data (Android)</h3>
+            <button ion-button color="primary" block (click)="makeBackup()">Backup erstellen</button>
+            <ion-list>
+                <ion-item-sliding #slidingItem *ngFor="let file of filesInDir?.reverse()">
+                    <ion-item (click)="restoreBackupFromFileOnAndroid(file)">
+                        {{file.name}}
+                    </ion-item>
+                    <ion-item-options>
+                        <button large style="width:75px;" ion-button color="danger" (click)="deleteBackupFileOnAndroid(file);closeSlidingItem(slidingItem)">
+                                      <ion-icon name="trash"></ion-icon>
+                                  </button>
+                        <button large style="width:75px;" ion-button color="primary" (click)="restoreBackupFromFileOnAndroid(file);closeSlidingItem(slidingItem)">
+                                      <ion-icon name="checkmark"></ion-icon>
+                                  </button>
+                    </ion-item-options>
+
+                </ion-item-sliding>
+            </ion-list>
+            <div *ngIf="show_android_debug_functions">
+                <h3>Android Debug Functions</h3>
+                <button ion-button color="primary" block (click)="createDirManually()">createDir</button>
+                <button ion-button color="primary" block (click)="deleteDirManually()">deleteDir</button>
+                <button ion-button color="primary" block (click)="checkDirManually()">checkDir</button>
+                <button ion-button color="primary" block (click)="listDir()">ListDir</button>
+            </div>
+        </div>
     </ion-list>
 </ion-content>

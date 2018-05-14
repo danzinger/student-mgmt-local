@@ -27,6 +27,20 @@ export class CourseService {
     )
   }
 
+  createCourses(courses_to_add): Observable<any> {
+    return Observable.fromPromise(this.storage.get('courses')
+      .then(courses => {
+        if (!courses) courses = [];
+        if(courses_to_add && courses_to_add.length > 0){
+          courses_to_add.forEach(course => {
+            courses.push(course);
+          });
+        }
+        return this.storage.set('courses', courses)
+      })
+    )
+  }
+
   //
   // ─── READ ───────────────────────────────────────────────────────────────────────
   //

@@ -37,7 +37,7 @@
                 <ion-label>{{student.firstname}} {{student.lastname}}</ion-label>
             </button>
                 <button ion-item *ngIf="registerMode">
-                <text-avatar [text]="student.firstname"  item-left></text-avatar>
+                <!-- ICON -->
                 <ion-label>{{student.firstname}} {{student.lastname}}</ion-label>
                 <ion-toggle *ngIf="registerMode && studentRegistered(student)" (ngModelChange)="toggleStudentsCourseRegistration(student)" [(ngModel)]="student.registered" color="secondary"></ion-toggle>
             </button>

@@ -7,6 +7,11 @@ import { IonicPage} from 'ionic-angular';
 })
 export class TabsPage {
 
+// By default, the first tab will be selected 
+// upon navigation to the Tabs page. We can
+// change the selected tab by using 
+// selectedIndex on the <ion-tabs> element (IN TEMPLATE):
+
   tab1Root = 'CourseListPage';
   tab2Root = 'StudentsListPage';
   tab3Root = 'SettingsPage';
