@@ -5,6 +5,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { CourseService } from '../../../services/course.service';
 import { ToastService } from '../../../services/toast.service';
 import { MongoIdService } from '../../../services/mongo-id.service';
+import { SettingsService } from '../../../services/settings.service';
 
 
 @IonicPage()
@@ -29,17 +30,30 @@ export class CourseNewperfcatModalPage {
     public toastService: ToastService,
     public courseService: CourseService,
     public mongoIdService:MongoIdService,
+    public settingsService: SettingsService
    ) {
 
-    this.form = formBuilder.group({
-      _id:[''],
-      name: ['test'],
-      description: ['testdescription'],
-      point_maximum: ['100'],
-      category_weight: ['0.5'],
-      type: [''],
-      percentage_points_per_unit: ['0.025']
-    });
+    if(this.settingsService.ENVIRONMENT_IS_DEV){
+      this.form = formBuilder.group({
+        _id:[''],
+        name: ['test'],
+        description: ['testdescription'],
+        point_maximum: ['100'],
+        category_weight: ['0.5'],
+        type: [''],
+        percentage_points_per_unit: ['0.025']
+      });
+    }else{
+      this.form = formBuilder.group({
+        _id:[''],
+        name: [''],
+        description: [''],
+        point_maximum: [''],
+        category_weight: [''],
+        type: [''],
+        percentage_points_per_unit: ['']
+      });      
+    }
 
     this.course = navParams.get('course');
     

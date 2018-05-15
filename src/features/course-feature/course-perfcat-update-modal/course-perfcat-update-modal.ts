@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, AlertController } 
 import { CourseService } from '../../../services/course.service';
 import { ToastService } from '../../../services/toast.service';
 import { MongoIdService } from '../../../services/mongo-id.service';
+import { SettingsService } from '../../../services/settings.service';
 
 @IonicPage()
 @Component({
@@ -20,7 +21,6 @@ export class CoursePerfcatUpdateModalPage {
   parent_id;
   child;
   course;
-
   form;
 
   constructor(
@@ -30,7 +30,8 @@ export class CoursePerfcatUpdateModalPage {
     public alertCtrl: AlertController,
     public courseService: CourseService,
     public toastService: ToastService,
-    public mongoIdService: MongoIdService) {
+    public mongoIdService: MongoIdService,
+    public settingsService: SettingsService) {
 
     this.course = this.navParams.get('course');
     this.performanceCategory = navParams.get('category');
@@ -39,15 +40,17 @@ export class CoursePerfcatUpdateModalPage {
     this.child = navParams.get('child');
 
     //let category_type = 'incremental' ? this.performanceCategory.percentage_points_per_unit != false : 'max_and_weight';
-     this.subgroup = {}
-     this.subgroup = {
-      name: 'Testkategorie',
-      description: 'Testbeschreibung der Ersten',
-      type: String,
-      category_weight: 0.5,
-      point_maximum: 100,
-      percentage_points_per_unit: 0.025
-    };
+    this.subgroup = {}
+    if (this.settingsService.ENVIRONMENT_IS_DEV) {
+      this.subgroup = {
+        name: 'Testkategorie',
+        description: 'Testbeschreibung der Ersten',
+        type: String,
+        category_weight: 0.5,
+        point_maximum: 100,
+        percentage_points_per_unit: 0.025
+      };
+    }
   }
 
   cancel() {

@@ -35,6 +35,6 @@
       Max, Mustermann 
       Alex, Mcmillian
   </pre>
-    <ng2-file-input [drop-text]="' '" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
+    <ng2-file-input [drop-text]="' '" [show-previews]="false" [extensions]="['csv']" [invalid-file-text]="'Keine .csv Datei ausgewählt'" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
 
 </ion-content>

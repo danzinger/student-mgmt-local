@@ -1,30 +1,43 @@
 <ion-header>
     <ion-navbar color="stdt-mgmt-theme">
-  <ion-title>{{course.name}} Bearbeiten</ion-title>
-    <ion-buttons end>
-    </ion-buttons>
-</ion-navbar>
+        <ion-title>{{course.name}}</ion-title>
+        <ion-buttons start>
+            <button ion-button (click)="cancel()">
+          <span color="primary" showWhen="ios">
+            Cancel
+          </span>
+          <ion-icon style="font-size:25px" name="md-close" showWhen="android,windows"></ion-icon>
+        </button>
+        </ion-buttons>
+        <ion-buttons end>
+            <button ion-button (click)="done()" strong>
+                <span color="primary" showWhen="ios">
+                  Done
+                </span>
+                <ion-icon style="font-size:25px" name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+              </button>
+        </ion-buttons>
+    </ion-navbar>
 </ion-header>
 <ion-content padding>
-<form  (ngSubmit)="updateCourse(course)"> 
-    <ion-list>
-        <ion-item>
-          <ion-label color="primary" floating>Kursname</ion-label>
-          <ion-input [(ngModel)]="course.name" name="name" type="text" value="">fdsf</ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" floating >Zeit</ion-label>
-          <ion-input [(ngModel)]="course.time" name="time" type="text" value="">fsdfsd</ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" floating>Ort</ion-label>
-          <ion-input [(ngModel)]="course.location" name="location" type="text" value=""></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label color="primary" floating>Institution</ion-label>
-          <ion-input [(ngModel)]="course.institution" name="institution" type="text" value=""></ion-input>
-        </ion-item>
-      </ion-list>
-    <button  ion-button type="submit" block>Kursdetails ändern</button>
-</form>
+    <form>
+        <ion-list>
+            <ion-item>
+                <ion-label color="primary" floating>Kursname</ion-label>
+                <ion-input [(ngModel)]="course.name" name="name" type="text" value="">fdsf</ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label color="primary" floating>Zeit</ion-label>
+                <ion-input [(ngModel)]="course.time" name="time" type="text" value="">fsdfsd</ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label color="primary" floating>Ort</ion-label>
+                <ion-input [(ngModel)]="course.location" name="location" type="text" value=""></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label color="primary" floating>Institution</ion-label>
+                <ion-input [(ngModel)]="course.institution" name="institution" type="text" value=""></ion-input>
+            </ion-item>
+        </ion-list>
+    </form>
 </ion-content>

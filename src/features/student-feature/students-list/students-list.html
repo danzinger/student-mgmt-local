@@ -1,6 +1,6 @@
 <ion-header>
     <ion-navbar color="stdt-mgmt-theme">
-        <ion-title *ngIf="!registerMode">Meine Studenten</ion-title>
+        <ion-title *ngIf="!registerMode">Studenten</ion-title>
         <ion-title *ngIf="registerMode">Registrierung aktiv</ion-title>
         <ion-buttons end>
             <button *ngIf="!registerMode && students && courses && courses.length > 0" ion-button icon-only (click)="toggleRegisterMode(registerMode)">
@@ -37,7 +37,7 @@
                 <ion-label>{{student.firstname}} {{student.lastname}}</ion-label>
             </button>
                 <button ion-item *ngIf="registerMode">
-                <!-- ICON -->
+                <text-avatar [text]="student.firstname"  item-left></text-avatar>
                 <ion-label>{{student.firstname}} {{student.lastname}}</ion-label>
                 <ion-toggle *ngIf="registerMode && studentRegistered(student)" (ngModelChange)="toggleStudentsCourseRegistration(student)" [(ngModel)]="student.registered" color="secondary"></ion-toggle>
             </button>

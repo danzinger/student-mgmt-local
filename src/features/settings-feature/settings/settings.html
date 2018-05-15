@@ -7,31 +7,35 @@
 <ion-header>
 
     <ion-navbar>
-        <ion-title>Einstellungen</ion-title>
+        <ion-title>Daten</ion-title>
     </ion-navbar>
 
 </ion-header>
 
-
 <ion-content padding>
-    <ion-item>
-        <ion-label>Android Features</ion-label>
-        <ion-toggle [(ngModel)]="show_android_features" color="secondary"></ion-toggle>
-    </ion-item>
-    <ion-item>
-        <ion-label>Desktop Features</ion-label>
-        <ion-toggle [(ngModel)]="show_desktop_features" color="secondary"></ion-toggle>
-    </ion-item>
-    <ion-item *ngIf="show_android_features">
-        <ion-label>Android Debug Functions</ion-label>
-        <ion-toggle [(ngModel)]="show_android_debug_functions" color="secondary"></ion-toggle>
-    </ion-item>
-    <h3>Mock Data</h3>
-    <ion-list>
-        <button ion-button color="primary" block (click)="addMockData()">Daten hinzufügen</button>
-        <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
-        <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
-    </ion-list>
+    <div *ngIf="settingsService.ENVIRONMENT_IS_DEV">
+        <ion-item>
+            <ion-label>Android Features</ion-label>
+            <ion-toggle [(ngModel)]="show_android_features" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item>
+            <ion-label>Desktop Features</ion-label>
+            <ion-toggle [(ngModel)]="show_desktop_features" color="secondary"></ion-toggle>
+        </ion-item>
+        <h3>Mock Data</h3>
+        <ion-list>
+            <button ion-button color="primary" block (click)="addMockData()">Testdaten hinzufügen</button>
+            <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
+            <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
+        </ion-list>
+        <ion-list *ngIf="show_android_features">
+                <h3>Android Debug Functions</h3>
+            <button ion-button color="primary" block (click)="createDirManually()">createDir</button>
+            <button ion-button color="primary" block (click)="deleteDirManually()">deleteDir</button>
+            <button ion-button color="primary" block (click)="checkDirManually()">checkDir</button>
+            <button ion-button color="primary" block (click)="listDir()">ListDir</button>
+        </ion-list>
+    </div>
     <ion-list *ngIf="show_desktop_features">
         <h3>Data (Browser)</h3>
         <ion-title>Export</ion-title>
@@ -45,12 +49,13 @@
     </ion-list>
     <ion-list>
         <div *ngIf="show_android_features">
-            <h3>Data (Android)</h3>
+            <h3 *ngIf="settingsService.ENVIRONMENT_IS_DEV">Data (Android)</h3>
             <button ion-button color="primary" block (click)="makeBackup()">Backup erstellen</button>
+            <h4 *ngIf="filesInDir && filesInDir.length > 0">Verfügbare Backups:</h4>
             <ion-list>
                 <ion-item-sliding #slidingItem *ngFor="let file of filesInDir?.reverse()">
-                    <ion-item (click)="restoreBackupFromFileOnAndroid(file)">
-                        {{file.name}}
+                    <ion-item *ngIf="file.isFile" block (click)="toastService.showToast('Links-Swipe für Optionen')">
+                        <ion-icon name="document"></ion-icon>&nbsp;{{file.name}}
                     </ion-item>
                     <ion-item-options>
                         <button large style="width:75px;" ion-button color="danger" (click)="deleteBackupFileOnAndroid(file);closeSlidingItem(slidingItem)">
@@ -60,16 +65,8 @@
                                       <ion-icon name="checkmark"></ion-icon>
                                   </button>
                     </ion-item-options>
-
                 </ion-item-sliding>
             </ion-list>
-            <div *ngIf="show_android_debug_functions">
-                <h3>Android Debug Functions</h3>
-                <button ion-button color="primary" block (click)="createDirManually()">createDir</button>
-                <button ion-button color="primary" block (click)="deleteDirManually()">deleteDir</button>
-                <button ion-button color="primary" block (click)="checkDirManually()">checkDir</button>
-                <button ion-button color="primary" block (click)="listDir()">ListDir</button>
-            </div>
         </div>
     </ion-list>
 </ion-content>

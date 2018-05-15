@@ -5,6 +5,7 @@ import { ToastService } from '../../../services/toast.service';
 import { StudentService } from '../../../services/student-service';
 import { Student } from '../../../app/models/student';
 import { Course } from '../../../app/models/course';
+import { SettingsService } from '../../../services/settings.service';
 
 @IonicPage()
 @Component({
@@ -12,13 +13,13 @@ import { Course } from '../../../app/models/course';
   templateUrl: 'student-detail.html',
 })
 export class StudentDetailPage {
-  student:Student;
-  selected_course:Course;
-  courses:Course[] = [];
+  student: Student;
+  selected_course: Course;
+  courses: Course[] = [];
   view = "grade";
   computedGradings = [];
   notes;
-  ENV = 'dev';
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -26,29 +27,30 @@ export class StudentDetailPage {
     public modalCtrl: ModalController,
     public toastService: ToastService,
     public studentService: StudentService,
-    public alertCtrl: AlertController) {
+    public alertCtrl: AlertController,
+    public settingsService: SettingsService) {
 
-      //STUDENT must always be avalible (not matter from which view we come from)
-      this.student = this.navParams.get('student');
-      //course is only avalible when we come from the course-detail view
-      if (navParams.get('course')) {
-        this.selected_course = navParams.get('course');
-        this.courses = navParams.get('courses');
-      } else {
-        //if we come from the student list view, we fetch the courses from the service
-        this.getCourses();
-      }
+    //STUDENT must always be avalible (not matter from which view we come from)
+    this.student = this.navParams.get('student');
+    //course is only avalible when we come from the course-detail view
+    if (navParams.get('course')) {
+      this.selected_course = navParams.get('course');
+      this.courses = navParams.get('courses');
+    } else {
+      //if we come from the student list view, we fetch the courses from the service
+      this.getCourses();
+    }
   }
 
   ionViewDidEnter() {
     this.calculateGrade();
   }
 
-  getCourses(){
+  getCourses() {
     this.courseService.getCourses().subscribe((courses) => {
       this.courses = courses;
-      if(!this.selected_course && this.courses && this.courses[0]) this.selected_course = this.courses[0];
-    });  
+      if (!this.selected_course && this.courses && this.courses[0]) this.selected_course = this.courses[0];
+    });
   }
   //
   // ──────────────────────────────────────────────────────────────────── I ──────────
@@ -261,8 +263,8 @@ export class StudentDetailPage {
         // if(this.selected_course && grading.course_id == this.selected_course._id){
         //   this.findPoints(grading.category_id, grading.total_points)
         // }
-          this.findPoints(grading.category_id, grading.total_points)
-        
+        this.findPoints(grading.category_id, grading.total_points)
+
         //sum up these points, which is the final grading
         if (this.submarks.length > 0) {
           this.final_grade = this.submarks.reduce((a, b) => { return a + b; });
@@ -285,26 +287,26 @@ export class StudentDetailPage {
     this.search_result = {};
     //iterate through the toplevel performance categories
 
-      this.selected_course.performanceCategories.map((category) => {
-        //in this array, all weights are written that the searchbot encounters on its way to the final category
-        this.weight_array = [];
-        //if the toplevel is a (nonempty)group, first collect the weigth of this group
-        if (this.isNonEmptyGroup(category)) {
-          if (category.category_weight) {
-            this.weight_array.push(category.category_weight);
-          }
-          // ...go deeper. A group cannot be our search result, since it must be a grading
-          // where points might be written into, which is not possible in a group
-          return this.digDeeper(category, query_id, this.weight_array, total_points);
-        } else {
-          //this means the group is empty. There cannot be any rating in an empty category of type == "group".
-          //If this is the category we searched for (a toplevel-category) add the corresponding submark to the submark_array, if not just continue the search
-          if (category._id == query_id) {
-            this.weight_array = [];
-            return this.addSubmarksToSubmarksArray(category, this.weight_array, total_points)
-          }
+    this.selected_course.performanceCategories.map((category) => {
+      //in this array, all weights are written that the searchbot encounters on its way to the final category
+      this.weight_array = [];
+      //if the toplevel is a (nonempty)group, first collect the weigth of this group
+      if (this.isNonEmptyGroup(category)) {
+        if (category.category_weight) {
+          this.weight_array.push(category.category_weight);
         }
-      })
+        // ...go deeper. A group cannot be our search result, since it must be a grading
+        // where points might be written into, which is not possible in a group
+        return this.digDeeper(category, query_id, this.weight_array, total_points);
+      } else {
+        //this means the group is empty. There cannot be any rating in an empty category of type == "group".
+        //If this is the category we searched for (a toplevel-category) add the corresponding submark to the submark_array, if not just continue the search
+        if (category._id == query_id) {
+          this.weight_array = [];
+          return this.addSubmarksToSubmarksArray(category, this.weight_array, total_points)
+        }
+      }
+    })
 
   }
 
@@ -404,10 +406,6 @@ export class StudentDetailPage {
 
   compareFn(e1, e2): boolean {
     return e1 && e2 ? e1.name === e2.name : e1 === e2;
-  }
-
-  refresh() {
-    alert('Implement Refresh')
   }
 
   printInfo() {

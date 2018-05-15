@@ -10,6 +10,7 @@ import { PapaParseService } from 'ngx-papaparse';
 import { ToastService } from '../../../services/toast.service';
 
 import { File } from '@ionic-native/file';
+import { SettingsService } from '../../../services/settings.service';
 
 @IonicPage()
 @Component({
@@ -22,12 +23,9 @@ export class SettingsPage {
   courses;
   students;
 
-  d = [1,2,3,4]
-
-  show_desktop_features: boolean = false; 
+  show_desktop_features: boolean = false;
   show_android_features: boolean = true;
-  show_android_debug_functions: boolean = false;
-  autobackup_on_restore:boolean = false;
+  autobackup_on_restore: boolean = false;
 
   constructor(
     public navCtrl: NavController,
@@ -37,6 +35,7 @@ export class SettingsPage {
     public toastService: ToastService,
     public studentService: StudentService,
     public courseService: CourseService,
+    public settingsService: SettingsService,
     public file: File, ) {
   }
 
@@ -60,17 +59,19 @@ export class SettingsPage {
   addMockData() {
     this.storage.set('courses', COURSES).then(() => {
       this.courses = COURSES;
-    });
-    this.storage.set('students', STUDENTS).then(() => {
-      this.students = STUDENTS;
-    });
+    }).then(() => {
+      this.storage.set('students', STUDENTS).then(() => {
+        this.students = STUDENTS;
+      });
+    }).then(() => this.toastService.showToast('SUCCESS')
+    ).catch(() => this.toastService.showToast('ERROR'))
   }
 
-  removeCourses(){
+  removeCourses() {
     this.courseService.removeCourses().then(res => this.toastService.showToast('Löschen erfolgreich!'))
   }
 
-  removeStudents(){
+  removeStudents() {
     this.studentService.removeStudents().then(res => this.toastService.showToast('Löschen erfolgreich!'))
   }
 
@@ -123,11 +124,11 @@ export class SettingsPage {
 
   restoreBackupFromFileOnAndroid(file) {
     // Repetitive code. How to avoid this here?
-    if(this.autobackup_on_restore == true){
-      this.makeBackup().then(()=>{
+    if (this.autobackup_on_restore == true) {
+      this.makeBackup().then(() => {
         this.getBackupDataFromFileOnAndroid(file).then((parsed_data) => {
           this.restoreFromBackup(parsed_data).then(() => {
-            this.toastService.showToast('Backup restored successfully!');
+            this.toastService.showToast('Backup erfolgreich wiederhergestellt!');
           }).catch((err) => {
             this.toastService.showToast(JSON.stringify(err));
           });
@@ -135,10 +136,10 @@ export class SettingsPage {
           this.toastService.showToast(JSON.stringify(err));
         });
       }).catch((err) => this.handleError(err));
-    }else{
+    } else {
       this.getBackupDataFromFileOnAndroid(file).then((parsed_data) => {
         this.restoreFromBackup(parsed_data).then(() => {
-          this.toastService.showToast('Backup restored successfully!');
+          this.toastService.showToast('Backup erfolgreich wiederhergestellt!');
         }).catch((err) => {
           this.toastService.showToast(JSON.stringify(err));
         });
@@ -154,32 +155,32 @@ export class SettingsPage {
 
 
   makeBackup() {
-  return new Promise((resolve,reject)=>{
-    this.gatherBackupData().then(backupData => {
-      let json_string: string = JSON.stringify(backupData);
-      let time = new Date().toJSON().slice(0, 10);
-      let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000) + '.stmb';
-      this.checkDir().then(() => {
-        this.file.writeFile(this.file.externalRootDirectory, filename, json_string).then(() => {
-          this.listDir();
-          this.toastService.showToast('Backup erfolgreich angelegt!');
-          resolve();
-        }).catch(err => {
-          this.toastService.showToast('Fehler beim Anlegen des Backups');
-          reject(err);
+    return new Promise((resolve, reject) => {
+      this.gatherBackupData().then(backupData => {
+        let json_string: string = JSON.stringify(backupData);
+        let time = new Date().toJSON().slice(0, 10);
+        let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000) + '.stmb';
+        this.checkDir().then(() => {
+          this.file.writeFile(this.file.externalRootDirectory, filename, json_string).then(() => {
+            this.listDir();
+            this.toastService.showToast('Backup erfolgreich angelegt!');
+            resolve();
+          }).catch(err => {
+            this.toastService.showToast('Fehler beim Anlegen des Backups');
+            reject(err);
+          });
+        }).catch((err) => {
+          if (err.code == 1) {
+            this.createDir().then(() => {
+              this.makeBackup();
+            }).catch(err => reject(err))
+          } else {
+            this.toastService.showToast('Fehler beim Anlegen des Ordners für Backups!');
+            reject(err);
+          }
         });
-      }).catch((err) => {
-        if (err.code == 1) {
-          this.createDir().then(() => {
-            this.makeBackup();
-          }).catch(err => reject(err))
-        } else {
-          this.toastService.showToast('Fehler beim Anlegen des Ordners für Backups!');
-          reject(err);
-        }
       });
-    });
-  })  
+    })
   }
 
   //
@@ -205,8 +206,14 @@ export class SettingsPage {
   // ─── DELETE ──────────────────────────────────────────────────────
   //
 
-  deleteBackupFileOnAndroid(file){
-    
+  deleteBackupFileOnAndroid(file) {
+    return new Promise((resolve, reject) => {
+      this.file.removeFile(this.file.externalRootDirectory + '/StudentMgmt', file.name)
+        .then(() => {
+          this.listDir();
+          resolve()
+        }).catch(err => reject(err));
+    })
   }
 
   deleteDirManually() {
@@ -300,8 +307,9 @@ export class SettingsPage {
       var blob = new Blob([json_string]);
       var a = window.document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
-      let time = new Date().toJSON().slice(0, 23).replace(/-/g, '-');
-      a.download = "student-mgmt-" + time + ".json";
+      let time = new Date().toJSON().slice(0, 10);
+      let filename: string = 'StudentMgmt/';
+      a.download = time + '-' + Math.round(new Date().getTime() / 1000) + '.stmb';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

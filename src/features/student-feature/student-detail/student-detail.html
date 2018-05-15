@@ -5,10 +5,7 @@
             <button ion-button icon-only (click)="presentStudentUpdateModal()">
             <ion-icon name="create"></ion-icon>
           </button>
-            <button ion-button icon-only (click)="refresh()">
-            <ion-icon name="refresh"></ion-icon>
-        </button>
-            <button *ngIf="ENV == 'dev'" ion-button icon-only (click)="printInfo()">
+            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
               <ion-icon name="information-circle"></ion-icon>
           </button>
         </ion-buttons>
@@ -32,9 +29,10 @@
     <div [ngSwitch]="view">
         <ion-list *ngSwitchCase="'grade'">
             <!-- <div class="item-profile" text-center #profilePic style="background-image:url('http://lorempixel.com/400/200/people')"></div> -->
-            <div class="item-profile" text-center #profilePic>
+            <div class="item-profile" style="font-size: 5rem" text-center>
                 <!-- For some values some strange numerical problems ocurres. The -(...)%1 part prevents them -->
-                PUNKTE (rekursiv): {{final_grade*1000-(final_grade*1000)%1}}
+                {{final_grade*1000-(final_grade*1000)%1}}
+                <!-- {{final_grade*100}}% -->
             </div>
             <ion-list>
                 <ion-item *ngIf="courses && courses.length > 0">
@@ -72,18 +70,9 @@
                     </div>
                 </div>
             </ion-list>
-            <!-- <ion-list *ngIf="student.computed_gradings">
-                <div *ngFor="let computedGrading of student.computed_gradings | orderBy: ['category_name']">
-                    <ion-item (click)="addNewRating(computedGrading._id, computedGrading.category_name)" *ngIf="computedGrading.course_id == selected_course.course_id">
-                        {{computedGrading.category_name}}: {{computedGrading.total_points}}
-                    </ion-item>
-                </div>
-            </ion-list> -->
         </ion-list>
         <ion-list *ngSwitchCase="'notes'">
             <div *ngFor="let note of student.notes">
-                <!-- TODO-SECURITY: SECURITY ISSUE. -->
-                <!-- Filter Notes to that only the Notes of the current teacher are displayed -->
                 <ion-card *ngIf="note.course_id == selected_course.course_id">
                     <ion-card-header class="header">
                         <div float-left class="title">
@@ -103,19 +92,14 @@
             </ion-fab>
         </ion-list>
         <ion-list *ngSwitchCase="'ratings'">
-            <!-- TODO-SECURITY: SECURITY ISSUE. -->
-            <!-- Filter Gradings Server Side to that only the Notes of the current teacher && current course are displayed -->
             <div *ngFor="let grading of student.gradings">
-                <!-- <pre *ngIf="grading.course_id == selected_course.course_id"> {{grading | json}}</pre>
-              <div *ngIf="grading.course_id == selected_course.course_id"> {{grading.date_readable}}</div> -->
-                <ion-card *ngIf="grading.course_id == selected_course._id">
+                <ion-card *ngIf="grading && selected_course && grading.course_id == selected_course._id">
                     <ion-card-header class="header">
                         <div float-left class="title">
                             <text-avatar [text]="grading.category_name" item-left></text-avatar>
                         </div>
                         <strong style="padding-left:20px;">{{grading.category_name}}</strong>
                         <div float-right class="right">
-                            <!-- <ion-icon (click)="editGrading(grading)" name="create"></ion-icon>&nbsp;&nbsp;&nbsp; -->
                             <ion-icon (click)="presentGradingDeleteConfirm(grading)" name="close"></ion-icon>
                         </div>
                     </ion-card-header>
@@ -145,7 +129,6 @@
                         </ion-col>
                     </ion-row>
                 </ion-card>
-
             </div>
         </ion-list>
     </div>

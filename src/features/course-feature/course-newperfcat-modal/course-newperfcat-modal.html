@@ -22,7 +22,7 @@
     <form [formGroup]="form" (ngSubmit)="done()">
         <ion-item>
             <ion-label floating>Name</ion-label>
-            <ion-input formControlName="name"></ion-input>
+            <ion-input type="text" formControlName="name"></ion-input>
         </ion-item>
         <ion-item>
             <ion-label floating>Beschreibung</ion-label>
@@ -46,19 +46,19 @@
             </ion-item>
             <ion-item>
                 <ion-label floating>Gewichtung</ion-label>
-                <ion-input formControlName="category_weight"></ion-input>
+                <ion-input type="number" formControlName="category_weight"></ion-input>
             </ion-item>
         </div>
         <div *ngIf="type == 'incremental'">
             <ion-item>
                 <ion-label floating>Wert pro Einheit</ion-label>
-                <ion-input formControlName="percentage_points_per_unit"></ion-input>
+                <ion-input type="number" formControlName="percentage_points_per_unit"></ion-input>
             </ion-item>
         </div>
         <div *ngIf="type == 'group'">
             <ion-item>
                 <ion-label floating>Gewichtung</ion-label>
-                <ion-input formControlName="category_weight"></ion-input>
+                <ion-input type="number" formControlName="category_weight"></ion-input>
             </ion-item>
         </div>
     </form>

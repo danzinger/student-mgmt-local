@@ -15,7 +15,7 @@ export class StudentsListPage {
 
   students: Student[];
   term;
-  ENV = 'dev';
+  ENV = 'prod';
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,

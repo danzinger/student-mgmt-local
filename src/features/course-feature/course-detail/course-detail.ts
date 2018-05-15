@@ -7,6 +7,7 @@ import { ToastService } from '../../../services/toast.service';
 
 import { Course } from '../../../app/models/course';
 import { Student } from '../../../app/models/student';
+import { SettingsService } from '../../../services/settings.service';
 
 @IonicPage()
 @Component({
@@ -21,7 +22,6 @@ export class CourseDetailPage {
 
   course_id
 
-  ENV = 'dev';
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -30,7 +30,8 @@ export class CourseDetailPage {
     public popoverCtrl: PopoverController,
     public toastService: ToastService,
     public courseService: CourseService,
-    public alertCtrl: AlertController) {
+    public alertCtrl: AlertController,
+    public settingsService: SettingsService ) {
 
       this.courses = navParams.get('courses');
       this.course = navParams.get('course');

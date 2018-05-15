@@ -26,7 +26,7 @@ export class TabsPage {
     if($ev.tabTitle == "Studenten" && $ev.getActive().id != 'StudentsListPage'){
       $ev.setRoot('StudentsListPage');
     }
-    if($ev.tabTitle == "Einstellungen" && $ev.getActive().id != 'SettingsPage'){
+    if($ev.tabTitle == "Daten" && $ev.getActive().id != 'SettingsPage'){
       $ev.setRoot('SettingsPage');
     }
   }

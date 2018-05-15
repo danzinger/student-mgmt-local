@@ -22,7 +22,7 @@
     <form>
         <!-- This one updates a top level group -->
         <div *ngIf="!addToGroup && !child">
-            Edit a top level category
+            <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">Edit a top level category</span>
             <ion-item>
                 <ion-label floating>Name</ion-label>
                 <ion-input type="text" [(ngModel)]="performanceCategory.name" name="name"></ion-input>
@@ -67,7 +67,7 @@
         </div>
         <!-- This one is for editing a child -->
         <div *ngIf="child && !addToGroup">
-            Edit a child
+                <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">Edit a child</span>
             <ion-item>
                 <ion-label floating>Name</ion-label>
                 <ion-input type="text" [(ngModel)]="child.name" name="name"></ion-input>
@@ -104,7 +104,7 @@
         </div>
         <!-- This one is for adding a subgroup to a child -->
         <div *ngIf="addToGroup">
-            adding a subgroup to a top level category OR to a child
+                <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">adding a subgroup to a top level category OR to a child</span>
             <ion-item>
                 <ion-label floating>Name</ion-label>
                 <ion-input value="Testerval" type="text" [(ngModel)]="subgroup.name" name="name"></ion-input>

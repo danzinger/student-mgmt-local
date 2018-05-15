@@ -15,7 +15,7 @@
             <button *ngIf="view=='categories'" ion-button icon-only (click)="presentAddNewPerfCatModal()">
             <ion-icon name="add"></ion-icon>
           </button>
-            <button *ngIf="ENV == 'dev'" ion-button icon-only (click)="printInfo()">
+            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
                     <ion-icon name="information-circle"></ion-icon>
                 </button>
         </ion-buttons>

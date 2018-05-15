@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController, AlertController, ItemSliding } from 'ionic-angular';
 import { CourseService } from '../../../services/course.service';
 import { MongoIdService } from '../../../services/mongo-id.service';
+import { SettingsService } from '../../../services/settings.service';
 
 @IonicPage()
 @Component({
@@ -17,7 +18,8 @@ export class CourseListPage {
     public courseService: CourseService,
     public modalCtrl: ModalController,
     public alertCtrl: AlertController,
-    public mongoIdService: MongoIdService
+    public mongoIdService: MongoIdService,
+    public settingsService: SettingsService
   ) {
   }
 
@@ -25,10 +27,11 @@ export class CourseListPage {
     this.courseService.getCourses().subscribe(courses => this.courses = courses);
   }
 
-
   addCourse() {
     let addModal = this.modalCtrl.create('CourseCreatePage');
-    addModal.onDidDismiss(data => this.courses = data)
+    addModal.onDidDismiss((data) => {
+      if (data) this.courses = data;
+    })
     addModal.present();
   }
 

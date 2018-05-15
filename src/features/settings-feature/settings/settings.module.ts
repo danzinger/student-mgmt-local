@@ -18,7 +18,9 @@ import { DirectivesModule } from '../../../directives/directives.module';
   ],
   imports: [
     IonicPageModule.forChild(SettingsPage),
-    Ng2FileInputModule.forRoot(),
+    Ng2FileInputModule.forRoot({
+      showPreviews:false
+    }),
     DirectivesModule
   ],
 })

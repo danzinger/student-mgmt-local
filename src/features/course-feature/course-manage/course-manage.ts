@@ -28,7 +28,13 @@ export class CourseManagePage {
 
     this.course = navParams.get('course');
   }
-
+  
+  done(){
+    this.updateCourse(this.course);
+  }
+  cancel(){
+    this.navCtrl.pop();
+  }
   updateCourse(course){
     this.courseService.updateCourse(course).subscribe((course)=>{
       this.course = course;

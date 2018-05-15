@@ -6,6 +6,8 @@ import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { StudentService } from '../../../services/student-service';
 import { CourseService } from '../../../services/course.service';
 
+import { File } from '@ionic-native/file';
+
 /**
  * Generated class for the StudentAddPage page.
  *
@@ -27,14 +29,15 @@ export class StudentAddPage {
   addMany;
   constructor(
     public navCtrl: NavController,
-    public viewCtrl:ViewController,
+    public viewCtrl: ViewController,
     public alertCtrl: AlertController,
     public navParams: NavParams,
     private papa: PapaParseService,
     private formBuilder: FormBuilder,
     public mongoIdService: MongoIdService,
     public studentService: StudentService,
-    public courseService: CourseService, ) {
+    public courseService: CourseService,
+    public file: File, ) {
 
     this.form = this.formBuilder.group({
       firstname: ['', Validators.required],
@@ -49,27 +52,29 @@ export class StudentAddPage {
   }
 
   onAction(ev) {
-    let me = this;
-    let file = ev.currentFiles[0]
-    this.papa.parse(file, {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true,
-      complete: function (results) {
-        //alert('ok'+results.data.length);
-        results.data.forEach(student => {
-          student._id = me.mongoIdService.newObjectId();
-          student.gradings = [];
-          student.notes = [];
-          student.course_registrations = [];
-          if (me.control_data && me.control_data.registerForCourse) student.course_registrations.push(me.control_data.course._id);
-          student.computed_gradings = [];
-        });
-        me.presentAddStudentsConfirm(results.data, results.data.length + ' Studenten hinzufügen?')
-
-      }
-    })
+    if (ev.action == 1) {
+      let me = this;
+      let file = ev.currentFiles[0]
+      this.papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+          //alert('ok'+results.data.length);
+          results.data.forEach(student => {
+            student._id = me.mongoIdService.newObjectId();
+            student.gradings = [];
+            student.notes = [];
+            student.course_registrations = [];
+            if (me.control_data && me.control_data.registerForCourse) student.course_registrations.push(me.control_data.course._id);
+            student.computed_gradings = [];
+          });
+          me.presentAddStudentsConfirm(results.data, results.data.length + ' Studenten hinzufügen?')
+        }
+      })
+    }
   }
+
 
 
   addStudent(student) {
@@ -84,7 +89,7 @@ export class StudentAddPage {
     this.presentAddStudentsConfirm(student_new, student.firstname + ' ' + student.lastname + ' hinzufügen?');
   }
 
-courses;
+  courses;
   presentAddStudentsConfirm(students, message) {
     this.students = students;
     let alert = this.alertCtrl.create({
@@ -101,20 +106,20 @@ courses;
           text: 'Ok',
           handler: () => {
             //TODO: Check if the csv File is in valid Format
-            
+
             //if the students are added from within the course-detail view of a course they get registered for the course (their _id is added to the participants array of the course) also:
             if (this.control_data && this.control_data.course) {
               students.forEach(student => {
                 this.control_data.course.participants.push(student._id);
               });
-              this.courseService.updateCourse(this.control_data.course).subscribe(courses=>{
+              this.courseService.updateCourse(this.control_data.course).subscribe(courses => {
                 this.courses = courses;
               });
             }
             //in any case the students are created and the view gets dismissed
             this.studentService.addStudents(this.students).subscribe(
               data => this.viewCtrl.dismiss({
-                students:data,
+                students: data,
                 //course:this.control_data.course,
                 //courses:this.courses
               }),
