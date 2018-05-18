@@ -6,7 +6,7 @@ import { CourseService } from '../../../services/course.service';
 
 import { COURSES } from '../../../app/mock-data/courses';
 import { STUDENTS } from '../../../app/mock-data/students_new';
-import { PapaParseService } from 'ngx-papaparse';
+//import { PapaParseService } from 'ngx-papaparse';
 import { ToastService } from '../../../services/toast.service';
 
 import { File, FileEntry } from '@ionic-native/file';
@@ -31,7 +31,7 @@ export class SettingsPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private storage: Storage,
-    private papa: PapaParseService,
+    //private papa: PapaParseService,
     public toastService: ToastService,
     public studentService: StudentService,
     public courseService: CourseService, 
