@@ -6,7 +6,7 @@ import { CourseService } from '../../../services/course.service';
 
 import { COURSES } from '../../../app/mock-data/courses';
 import { STUDENTS } from '../../../app/mock-data/students_new';
-//import { PapaParseService } from 'ngx-papaparse';
+import { PapaParseService } from 'ngx-papaparse';
 import { ToastService } from '../../../services/toast.service';
 
 import { File, FileEntry } from '@ionic-native/file';
@@ -31,7 +31,7 @@ export class SettingsPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private storage: Storage,
-    //private papa: PapaParseService,
+    private papa: PapaParseService,
     public toastService: ToastService,
     public studentService: StudentService,
     public courseService: CourseService, 
@@ -234,7 +234,6 @@ export class SettingsPage {
   listDir() {
     this.file.listDir(this.file.externalRootDirectory, 'StudentMgmt').then((res) => {
       this.filesInDir = res;
-      this.fileInfo = res;
     }).catch((err) => {
       this.toastService.showToast('Backupverzeichnis nicht gefunden!');
     });
@@ -266,21 +265,39 @@ export class SettingsPage {
   fileInfo;
   getMetaDataFromFile(file){
     // https://github.com/ionic-team/ionic-native/issues/1411
-    return this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file:FileEntry)=>{
-      file.file(meta=>{return meta});
+     this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file:FileEntry)=>{
+      file.file(meta=>{this.fileInfo = meta;});
     })
   }
+  // getMetaDataFromFile(file){
+  //   // https://github.com/ionic-team/ionic-native/issues/1411
+  //   return this.file.resolveLocalFilesystemUrl(file.nativeURL).then((fileentry:FileEntry)=>{
+  //     return fileentry.file(file=>{
+  //       var reader = new FileReader();
+  //       let me = this;
+  //       reader.onloadend = function() {
+  //         return me.fileInfo = JSON.parse(this.result).meta;
+  //           //console.log("Successful file read: " + this.result);
+  //       };        
+  //       reader.readAsText(file);
+  //     },
+  //     err=>{
+  //       alert(err);
+  //     });
+  //   })
+  // }
+
 
   //
   // ──────────────────────────────────────────────────────────────────────── III ──────────
   //   :::::: B R O W S E R   F E A T U R E S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
   // 
- 
 
   onAction(ev) {
     return this.restoreBackupFromFileOnBrowser(ev);
   }
+  
   restoreBackupFromFileOnBrowser(ev) {
     // action: (src: https://github.com/bergben/ng2-file-input)
     // Removed=0,

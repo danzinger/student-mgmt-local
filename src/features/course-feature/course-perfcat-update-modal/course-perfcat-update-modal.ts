@@ -22,7 +22,7 @@ export class CoursePerfcatUpdateModalPage {
   child;
   course;
   form;
-  weigth_changed = false;
+  weight_changed = false;
 
   constructor(
     public navCtrl: NavController,
@@ -47,7 +47,7 @@ export class CoursePerfcatUpdateModalPage {
         name: 'Testkategorie',
         description: 'Testbeschreibung der Ersten',
         type: String,
-        category_weight: 0.5,
+        category_weight: 50,
         point_maximum: 100,
         percentage_points_per_unit: 0.025
       };
@@ -59,6 +59,7 @@ export class CoursePerfcatUpdateModalPage {
   }
 
   done() {
+
     if (this.performanceCategory.type == 'max_and_weight') {
       delete this.performanceCategory.percentage_points_per_unit;
     }
@@ -85,20 +86,26 @@ export class CoursePerfcatUpdateModalPage {
     this.performanceCategory.percentage_points_per_unit = '';
   }
 
-  weigthChange(ev){
-    this.weigth_changed = true;
+  weigthChange(ev) {
+    this.weight_changed = true;
   }
 
-  autoWeigth(){
-    if(this.weigth_changed){
-      //console.log(this.course.performanceCategories)
+  autoWeight() {
+    //Autocalculate weight of other categories on same level, if weight of one category is changed manually
+    //currently only works with top-level categories and only when updating a category not when creating one.
+    //HOwever, this feature weems unneccessary. It might be much better to let the user just ender a percentage Value for each category.
+    if (this.weight_changed) {
       let cats = [];
-      for(let category of this.course.performanceCategories){
-        if(category._id != this.performanceCategory._id){
-          cats.push(category.category_weight);
+      for (let category of this.course.performanceCategories) {
+        if (category._id != this.performanceCategory._id) {
+          cats.push(Number(category.category_weight));
         }
       }
-      //console.log(cats)
+      for (let category of this.course.performanceCategories) {
+        if (category._id != this.performanceCategory._id) {
+          category.category_weight = (1 - this.performanceCategory.category_weight) / cats.length
+        }
+      }
     }
   }
 
@@ -116,11 +123,11 @@ export class CoursePerfcatUpdateModalPage {
         {
           text: 'Ok',
           handler: () => {
-            this.autoWeigth();
+            //this.autoWeight();
             this.courseService.updateCourse(this.course).subscribe(
               data => {
                 this.toastService.showToast('Änderung erfolgreich!');
-                this.viewCtrl.dismiss();
+                this.viewCtrl.dismiss(this.weight_changed);
               },
               error => {
                 this.toastService.showToast('Fehler beim Speichern. Server meldet: ' + error._body);

@@ -8,6 +8,9 @@ import { ToastService } from '../../../services/toast.service';
 import { Course } from '../../../app/models/course';
 import { Student } from '../../../app/models/student';
 import { SettingsService } from '../../../services/settings.service';
+import { PapaParseService } from 'ngx-papaparse';
+
+import { File } from '@ionic-native/file';
 
 @IonicPage()
 @Component({
@@ -31,11 +34,13 @@ export class CourseDetailPage {
     public toastService: ToastService,
     public courseService: CourseService,
     public alertCtrl: AlertController,
-    public settingsService: SettingsService ) {
+    public settingsService: SettingsService,
+    private papa: PapaParseService,
+    public file: File) {
 
-      this.courses = navParams.get('courses');
-      this.course = navParams.get('course');
-      this.course_id = this.course._id;
+    this.courses = navParams.get('courses');
+    this.course = navParams.get('course');
+    this.course_id = this.course._id;
 
   }
 
@@ -70,7 +75,7 @@ export class CourseDetailPage {
     this.studentService.getStudents().subscribe(students => this.students = students);
   }
 
-  getParticipants(){
+  getParticipants() {
     this.studentService.getParticipants(this.course._id).subscribe(participants => this.participants = participants);
   }
 
@@ -86,11 +91,6 @@ export class CourseDetailPage {
     let updateModal = this.modalCtrl.create('StudentUpdateModalPage', {
       student: student
     });
-    updateModal.onDidDismiss(weight_changed => {
-      if (weight_changed) {
-        console.log(weight_changed);
-      }
-    })
     updateModal.present();
   }
 
@@ -211,6 +211,11 @@ export class CourseDetailPage {
       child: child,
       course: this.course
     });
+    CoursePerfcatEditModal.onDidDismiss(weight_changed => {
+      if (weight_changed) {
+        console.log(weight_changed);
+      }
+    })    
     CoursePerfcatEditModal.present();
   }
 
@@ -267,7 +272,7 @@ export class CourseDetailPage {
             });
             students_to_update.push(student);
           });
-          this.studentService.updateAllStudents(students_to_update).subscribe(()=>{
+          this.studentService.updateAllStudents(students_to_update).subscribe(() => {
             this.getParticipants();
           })
         }
@@ -299,6 +304,93 @@ export class CourseDetailPage {
       });
   }
 
+
+  //
+  // ────────────────────────────────────────────────────────────────────────────── IV ──────────
+  //   :::::: D A T A   E X P O R T   F E A T U R E : :  :   :    :     :        :          :
+  // ────────────────────────────────────────────────────────────────────────────────────────
+  //
+
+  /*
+  Export Object:
+  
+  lastname, firstname, category1, category2, ...
+  ...,...,TOTAL_POINTS_IN_CAT_1, ...
+  
+  need:
+  array von Objekten der Form:
+  [{
+  lastname: LASTNAME
+  firstname:FIRSTNAME
+  category1: TOTAL_POINTS
+  category2:TOTAL_POINTS
+  },
+  ]
+  
+  */
+  resultcats;
+  exportData;
+  exportCourseData() {
+    //flatten the categories
+    this.resultcats = [];
+    this.exportData = [];
+    this.participants.map((student) => {
+      let exportObject = {
+        Vorname: student.firstname,
+        Nachname: student.lastname,
+      }
+      this.course.performanceCategories.map((cat) => {
+        if (this.isNonEmptyGroup(cat)) {
+          this.digDeeper(cat, student, exportObject);
+        } else {
+          exportObject[cat.name] = this.getStudentsRatingInACat(cat._id, student._id);
+        }
+      });
+      this.exportData.push(exportObject);
+    });
+    let csv_string = this.papa.unparse(this.exportData);
+    var blob = new Blob([csv_string]);
+    var a = window.document.createElement("a");
+    a.href = window.URL.createObjectURL(blob);
+    let time = new Date().toJSON().slice(0, 10);
+    a.download = time + '-' + Math.round(new Date().getTime() / 1000) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a); 
+
+  }
+
+  digDeeper(category, student, exportObject) {
+    //this function searches the tree of subchildren recursively. The recursion stopps when an e
+    return category.children.map((subgroup) => {
+      //if the first,second,third child is also a group, go deeper recursivly
+      if (this.isNonEmptyGroup(subgroup)) {
+        this.digDeeper(subgroup, student, exportObject)
+      } else {
+        //not of type "group" (a potential candiate), or an empty??? group (which cannot have any ratings)
+        return exportObject[subgroup.name] = this.getStudentsRatingInACat(subgroup._id, student._id)
+      }
+    })
+  }
+
+  getStudentsRatingInACat(cat_id, stud_id) {
+    //return number of total_points of student with stud_id in the category with cat_id if found, 0 otherwise.
+    let student = this.participants.find((student) => {
+      return student._id == stud_id
+    });
+    let grading = student.computed_gradings.find((grading) => {
+      return grading.category_id == cat_id
+    });
+    return (grading && grading.total_points) ? grading.total_points : 0;
+  }
+
+  isNonEmptyGroup(toplevel_category) {
+    if (toplevel_category.children.length > 0 && toplevel_category.type == "group") {
+      return true
+    } else {
+      return false;
+    }
+  }
   //
   // ────────────────────────────────────────────────────────────────────── C ──────────
   //   :::::: H E L P E R   F U N C T I O N : :  :   :    :     :        :          :

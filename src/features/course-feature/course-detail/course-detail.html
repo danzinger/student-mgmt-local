@@ -15,9 +15,12 @@
             <button *ngIf="view=='categories'" ion-button icon-only (click)="presentAddNewPerfCatModal()">
             <ion-icon name="add"></ion-icon>
           </button>
-          <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
                   <ion-icon name="information-circle"></ion-icon>
               </button>
+            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="exportCourseData()">
+                    <ion-icon name="download"></ion-icon>
+                  </button>
         </ion-buttons>
     </ion-navbar>
     <ion-toolbar no-border-top class="segment-bar">
@@ -84,7 +87,7 @@
                     <ion-card-header class="header">
                         <div float-left class="title">
                             <strong>{{category.name}}</strong>
-                            <div class="weight-display">
+                            <div  *ngIf="category.type != 'incremental'" class="weight-display">
                                 Gewichtung: {{category.category_weight}}
                             </div>
                         </div>
@@ -109,7 +112,7 @@
                         <ion-card-header class="header">
                             <div float-left class="title">
                                 <strong>{{child.name}}</strong>
-                                <div class="weight-display">
+                                <div  *ngIf="child.type != 'incremental'" class="weight-display">
                                     Gewichtung: {{child.category_weight}}
                                 </div>
                             </div>
@@ -134,7 +137,7 @@
                             <ion-card-header class="header">
                                 <div float-left class="title">
                                     <strong>{{baby.name}}</strong>
-                                    <div class="weight-display">
+                                    <div  *ngIf="baby.type != 'incremental'" class="weight-display">
                                         Gewichtung: {{baby.category_weight}}
                                     </div>
                                 </div>
@@ -159,7 +162,7 @@
                                 <ion-card-header class="header">
                                     <div float-left class="title">
                                         <strong>{{subSubSubGroup.name}}</strong>
-                                        <div class="weight-display">
+                                        <div *ngIf="subSubSubGroup.type != 'incremental'" class="weight-display">
                                             Gewichtung: {{subSubSubGroup.category_weight}}
                                         </div>
                                     </div>
