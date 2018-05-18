@@ -22,6 +22,7 @@ export class CoursePerfcatUpdateModalPage {
   child;
   course;
   form;
+  weigth_changed = false;
 
   constructor(
     public navCtrl: NavController,
@@ -84,6 +85,23 @@ export class CoursePerfcatUpdateModalPage {
     this.performanceCategory.percentage_points_per_unit = '';
   }
 
+  weigthChange(ev){
+    this.weigth_changed = true;
+  }
+
+  autoWeigth(){
+    if(this.weigth_changed){
+      //console.log(this.course.performanceCategories)
+      let cats = [];
+      for(let category of this.course.performanceCategories){
+        if(category._id != this.performanceCategory._id){
+          cats.push(category.category_weight);
+        }
+      }
+      //console.log(cats)
+    }
+  }
+
   presentConfirm() {
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
@@ -98,6 +116,7 @@ export class CoursePerfcatUpdateModalPage {
         {
           text: 'Ok',
           handler: () => {
+            this.autoWeigth();
             this.courseService.updateCourse(this.course).subscribe(
               data => {
                 this.toastService.showToast('Änderung erfolgreich!');

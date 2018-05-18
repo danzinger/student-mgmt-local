@@ -9,7 +9,7 @@ import { STUDENTS } from '../../../app/mock-data/students_new';
 import { PapaParseService } from 'ngx-papaparse';
 import { ToastService } from '../../../services/toast.service';
 
-import { File } from '@ionic-native/file';
+import { File, FileEntry } from '@ionic-native/file';
 import { SettingsService } from '../../../services/settings.service';
 
 @IonicPage()
@@ -22,7 +22,7 @@ export class SettingsPage {
   lastname;
   courses;
   students;
-
+  env;
   show_desktop_features: boolean = false;
   show_android_features: boolean = true;
   autobackup_on_restore: boolean = false;
@@ -34,10 +34,10 @@ export class SettingsPage {
     private papa: PapaParseService,
     public toastService: ToastService,
     public studentService: StudentService,
-    public courseService: CourseService,
+    public courseService: CourseService, 
     public settingsService: SettingsService,
     public file: File, ) {
-  }
+  } 
 
   ionViewDidLoad() {
     this.courseService.getCourses().subscribe(data => this.courses = data)
@@ -234,6 +234,7 @@ export class SettingsPage {
   listDir() {
     this.file.listDir(this.file.externalRootDirectory, 'StudentMgmt').then((res) => {
       this.filesInDir = res;
+      this.fileInfo = res;
     }).catch((err) => {
       this.toastService.showToast('Backupverzeichnis nicht gefunden!');
     });
@@ -262,12 +263,20 @@ export class SettingsPage {
     });
   }
 
+  fileInfo;
+  getMetaDataFromFile(file){
+    // https://github.com/ionic-team/ionic-native/issues/1411
+    return this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file:FileEntry)=>{
+      file.file(meta=>{return meta});
+    })
+  }
+
   //
   // ──────────────────────────────────────────────────────────────────────── III ──────────
   //   :::::: B R O W S E R   F E A T U R E S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
-  //
-
+  // 
+ 
 
   onAction(ev) {
     return this.restoreBackupFromFileOnBrowser(ev);
@@ -308,11 +317,10 @@ export class SettingsPage {
       var a = window.document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       let time = new Date().toJSON().slice(0, 10);
-      let filename: string = 'StudentMgmt/';
       a.download = time + '-' + Math.round(new Date().getTime() / 1000) + '.stmb';
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      document.body.removeChild(a); 
     });
   }
 

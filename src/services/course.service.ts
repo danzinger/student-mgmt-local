@@ -5,7 +5,9 @@ import { Storage } from '@ionic/storage';
 //import { COURSES } from '../app/mock-data/courses';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/from';
+//import 'rxjs/add/observable/fromPromise';
+//import { fromPromise } from 'rxjs/observable/fromPromise';
 import { Course } from '../app/models/course';
 
 @Injectable()
@@ -18,7 +20,7 @@ export class CourseService {
   //
 
   createCourse(course): Observable<Course[]> {
-    return Observable.fromPromise(this.storage.get('courses')
+    return Observable.from(this.storage.get('courses')
       .then(courses => {
         if (!courses) courses = [];
         courses.push(course);
@@ -28,7 +30,7 @@ export class CourseService {
   }
 
   createCourses(courses_to_add): Observable<any> {
-    return Observable.fromPromise(this.storage.get('courses')
+    return Observable.from(this.storage.get('courses')
       .then(courses => {
         if (!courses) courses = [];
         if(courses_to_add && courses_to_add.length > 0){
@@ -46,11 +48,11 @@ export class CourseService {
   //
 
   getCourses(): Observable<Course[]> {
-    return Observable.fromPromise(this.storage.get('courses'));
+    return Observable.from(this.storage.get('courses'));
   }
 
   getCourseById(course_id): Observable<Course[]> {
-    return Observable.fromPromise(this.storage.get('courses')
+    return Observable.from(this.storage.get('courses')
       .then(courses => {
         if (courses) {
           return courses.filter(course => {
@@ -65,7 +67,7 @@ export class CourseService {
   //
 
   updateCourse(updated_course): Observable<Course[]> {
-    return Observable.fromPromise(this.storage.get('courses')
+    return Observable.from(this.storage.get('courses')
       .then(courses => {
         let arr = courses.filter(course => course._id != updated_course._id)
         arr.push(updated_course);
@@ -79,7 +81,7 @@ export class CourseService {
   //
 
   deleteCourse(course_id_to_delete): Observable<Course[]> {
-    return Observable.fromPromise(this.storage.get('courses')
+    return Observable.from(this.storage.get('courses')
       .then(courses => {
         return courses.filter(course => {
           return course._id != course_id_to_delete

@@ -13,12 +13,17 @@
 </ion-header>
 
 <ion-content padding>
+    <ion-item>
+            <ion-label>Entwicklungsmodus</ion-label>
+            <!-- <ion-toggle [(ngModel)]="settingsService.ENVIRONMENT_IS_DEV" (ionChange)="settingsService.setEnvironment(env)" color="secondary"></ion-toggle> -->
+            <ion-toggle [(ngModel)]="settingsService.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
+    </ion-item>    
     <div *ngIf="settingsService.ENVIRONMENT_IS_DEV">
         <ion-item>
             <ion-label>Android Features</ion-label>
             <ion-toggle [(ngModel)]="show_android_features" color="secondary"></ion-toggle>
         </ion-item>
-        <ion-item>
+        <ion-item> 
             <ion-label>Desktop Features</ion-label>
             <ion-toggle [(ngModel)]="show_desktop_features" color="secondary"></ion-toggle>
         </ion-item>
@@ -34,6 +39,7 @@
             <button ion-button color="primary" block (click)="deleteDirManually()">deleteDir</button>
             <button ion-button color="primary" block (click)="checkDirManually()">checkDir</button>
             <button ion-button color="primary" block (click)="listDir()">ListDir</button>
+            <button ion-button color="primary" block (click)="test()">test</button>
         </ion-list>
     </div>
     <ion-list *ngIf="show_desktop_features">
@@ -48,15 +54,16 @@
         </ion-item>
     </ion-list>
     <ion-list>
+        {{fileInfo | json }}
         <div *ngIf="show_android_features">
             <h3 *ngIf="settingsService.ENVIRONMENT_IS_DEV">Data (Android)</h3>
             <button ion-button color="primary" block (click)="makeBackup()">Backup erstellen</button>
             <h4 *ngIf="filesInDir && filesInDir.length > 0">Verfügbare Backups:</h4>
             <ion-list>
-                <ion-item-sliding #slidingItem *ngFor="let file of filesInDir?.reverse()">
+                <ion-item-sliding #slidingItem *ngFor="let file of filesInDir">
                     <ion-item *ngIf="file.isFile" block (click)="toastService.showToast('Links-Swipe für Optionen')">
                         <ion-icon name="document"></ion-icon>&nbsp;{{file.name}}
-                    </ion-item>
+                    </ion-item> 
                     <ion-item-options>
                         <button large style="width:75px;" ion-button color="danger" (click)="deleteBackupFileOnAndroid(file);closeSlidingItem(slidingItem)">
                                       <ion-icon name="trash"></ion-icon>

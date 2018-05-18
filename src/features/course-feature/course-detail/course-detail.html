@@ -15,21 +15,21 @@
             <button *ngIf="view=='categories'" ion-button icon-only (click)="presentAddNewPerfCatModal()">
             <ion-icon name="add"></ion-icon>
           </button>
-            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
-                    <ion-icon name="information-circle"></ion-icon>
-                </button>
+          <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+                  <ion-icon name="information-circle"></ion-icon>
+              </button>
         </ion-buttons>
     </ion-navbar>
     <ion-toolbar no-border-top class="segment-bar">
         <ion-segment [(ngModel)]="view">
             <ion-segment-button value="students">
-                Studenten
+                Teilnehmer
             </ion-segment-button>
             <ion-segment-button value="notes">
-                Notizen
+                Kursnotizen
             </ion-segment-button>
             <ion-segment-button value="categories">
-                kategorien
+                Bewertung
             </ion-segment-button>
         </ion-segment>
     </ion-toolbar>

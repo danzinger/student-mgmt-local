@@ -49,7 +49,7 @@
                 </ion-item>
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
+                    <ion-input [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'incremental'">
@@ -61,7 +61,7 @@
             <div *ngIf="performanceCategory.type == 'group'">
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
+                    <ion-input [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
                 </ion-item>
             </div>
         </div>

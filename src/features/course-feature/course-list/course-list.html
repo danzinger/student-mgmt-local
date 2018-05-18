@@ -17,7 +17,8 @@
         <ion-item-sliding #slidingItem *ngFor="let course of courses | orderBy : ['name']">
             <button ion-item (click)="openCourse(course)">
               <text-avatar [text]="course.name"  item-left></text-avatar>
-            <h2>{{course.name}}@{{course.institution}}</h2>
+              <div>{{course.name}}</div>
+            <div style="font-size:80%;padding-top:5px;" *ngIf="course.institution != ''">{{course.institution}}</div>
           </button>
             <!-- <ion-item-options (ionSwipe)="deleteCourse(course)"> -->
             <ion-item-options>

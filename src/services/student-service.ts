@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/from';
 import { Student } from '../app/models/student';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class StudentService {
   //
 
   addStudents(students): Observable<Student[]> {
-    return Observable.fromPromise(this.storage.get('students')
+    return Observable.from(this.storage.get('students')
       .then(students_in_database => {
         if (!students_in_database) students_in_database = [];
         if(students && students.length > 0){
@@ -33,11 +33,11 @@ export class StudentService {
   //
 
   getStudents(): Observable<Student[]> {
-    return Observable.fromPromise(this.storage.get('students'));
+    return Observable.from(this.storage.get('students'));
   }
 
   getParticipants(course_id): Observable<Student[]> {
-    return Observable.fromPromise(this.storage.get('students').then(students => {
+    return Observable.from(this.storage.get('students').then(students => {
       if (students) {
         return students.filter(student => {
           return student.course_registrations.includes(course_id)
@@ -49,7 +49,7 @@ export class StudentService {
   }
 
   getStudentById(student_id): Observable<Student[]> {
-    return Observable.fromPromise(this.storage.get('students')
+    return Observable.from(this.storage.get('students')
       .then(students => {
         if (!students) students = [];
         return students.filter(student => {
@@ -63,7 +63,7 @@ export class StudentService {
   //
 
   updateStudent(student): Observable<Student[]> {
-    return Observable.fromPromise(this.storage.get('students').then(students => {
+    return Observable.from(this.storage.get('students').then(students => {
       let res = students.find(c => c._id == student._id);
       let index = students.indexOf(res);
       //Delete the old course (if it exists)
@@ -73,14 +73,14 @@ export class StudentService {
     }))
   }
   updateAllStudents(students): Observable<Student[]> {
-    return Observable.fromPromise(this.storage.set('students',students))
+    return Observable.from(this.storage.set('students',students))
   }
 
   //
   // ─── DELETE ─────────────────────────────────────────────────────────────────────
   //
   deleteCourse(course_id_to_delete): Observable<any> {
-    return Observable.fromPromise(this.storage.get('courses')
+    return Observable.from(this.storage.get('courses')
       .then(courses => {
         return courses.filter(course => {
           return course._id != course_id_to_delete
@@ -91,7 +91,7 @@ export class StudentService {
   }
 
   deleteStudent(student_to_delete): Observable<any> {
-    return Observable.fromPromise(this.storage.get('students')
+    return Observable.from(this.storage.get('students')
       .then(students => {
         return students.filter(student => {
           return student._id != student_to_delete._id

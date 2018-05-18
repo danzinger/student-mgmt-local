@@ -86,6 +86,11 @@ export class CourseDetailPage {
     let updateModal = this.modalCtrl.create('StudentUpdateModalPage', {
       student: student
     });
+    updateModal.onDidDismiss(weight_changed => {
+      if (weight_changed) {
+        console.log(weight_changed);
+      }
+    })
     updateModal.present();
   }
 
