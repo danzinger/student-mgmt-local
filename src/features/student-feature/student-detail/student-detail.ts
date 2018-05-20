@@ -43,7 +43,7 @@ export class StudentDetailPage {
   }
 
   ionViewDidEnter() {
-    this.calculateGrade();
+    this.final_grade = this.calculateGrade();
   }
 
   getCourses() {
@@ -64,13 +64,10 @@ export class StudentDetailPage {
 
   addNewRating(category_id, category_name) {
     let rating_details = {
-      //student_id: this.student._id,
       course_id: this.selected_course._id,
       category_name: category_name,
       category_id: category_id,
       date_readable: this.getReadableDate(),
-      //points: Number(0),
-      //remarks: ''
     }
     this.presentRatingModal(rating_details);
   }
@@ -135,23 +132,23 @@ export class StudentDetailPage {
         this.calculateGrade()
       },
       error => {
-        this.toastService.showToast('Fehler beim Löschen!')
+        this.toastService.showToast('Löschen fehlgeschlagen!')
       });
   }
 
-  tmp_index;
   updateComputedGradings(grading) {
+    let tmp_index;
     ///search the corresponding computed grading
     this.student.computed_gradings.forEach(computed_grading => {
       if (computed_grading.category_id == grading.category_id) {
         //ok found a corresponding computed grading
         computed_grading.total_points -= grading.points;
         if (computed_grading.total_points == 0) {
-          this.tmp_index = this.student.computed_gradings.indexOf(computed_grading);
+          tmp_index = this.student.computed_gradings.indexOf(computed_grading);
         }
       }
     });
-    if (this.tmp_index > -1) this.student.computed_gradings.splice(this.tmp_index, 1);
+    if (tmp_index > -1) this.student.computed_gradings.splice(tmp_index, 1);
   }
   //
   // ──────────────────────────────────────────────────────────────── II ──────────
@@ -171,14 +168,6 @@ export class StudentDetailPage {
     let newNoteModal = this.modalCtrl.create('StudentNewnoteModalPage', {
       student: this.student,
       course: this.selected_course
-    });
-    newNoteModal.onDidDismiss(note => {
-      // this.studentService.getStudentById({ _id: this.student._id }).subscribe((data) => {
-      //   this.student = data;
-      //   this.updateStudent(data);
-      // }, (error) => {
-      //   this.toastService.showToast('Error while fetching the student from server');
-      // });
     });
     newNoteModal.present();
   }
@@ -239,18 +228,14 @@ export class StudentDetailPage {
   //
 
   submarks;
-  final_grade = 0;
+  final_grade;
   search_result;
   weight_array;
   grade;
-  recursive_grade;
-
-  computeGrade() {
-    this.calculateGrade()
-  }
 
   calculateGrade() {
     this.submarks = [];
+    let final_grade;
     //start by iterating through the gradings of the student
     if (this.student.computed_gradings.length > 0 && this.selected_course && this.selected_course.performanceCategories) {
       this.student.computed_gradings.map((grading) => {
@@ -259,7 +244,7 @@ export class StudentDetailPage {
         //and also by the points. How they are added depends on the category (max_and_weight) or "incremental"
         //the incremental points are also weightned, when they reside in a group.
 
-        // it would be better to only search the selected_courses categories...
+        // it would be better to only search the selected_course's categories...
         // if(this.selected_course && grading.course_id == this.selected_course._id){
         //   this.findPoints(grading.category_id, grading.total_points)
         // }
@@ -267,39 +252,37 @@ export class StudentDetailPage {
 
         //sum up these points, which is the final grading
         if (this.submarks.length > 0) {
-          this.final_grade = this.submarks.reduce((a, b) => { return a + b; });
-          if (!this.final_grade) this.final_grade = 0;
+          final_grade = this.submarks.reduce((a, b) => { return a + b; });
+          if (!final_grade) final_grade = 0;
         } else {
-          this.final_grade = 0;
+          final_grade = 0
         }
 
       })
-      //write final grading in global variable for displaying
-      this.recursive_grade = this.final_grade;
     } else {
-      this.final_grade = 0;
-      this.recursive_grade = this.final_grade;
+      final_grade = 0
     }
+    return final_grade;
   }
 
   findPoints(query_id, total_points) {
-    //this will hold the search result (which can lie in ANY depth)
+    //this will hold the search result (which can lie in any depth)
     this.search_result = {};
     //iterate through the toplevel performance categories
 
     this.selected_course.performanceCategories.map((category) => {
       //in this array, all weights are written that the searchbot encounters on its way to the final category
       this.weight_array = [];
-      //if the toplevel is a (nonempty)group, first collect the weigth of this group
+      //if the toplevel is a (nonempty)group, first collect the weight of this group
       if (this.isNonEmptyGroup(category)) {
         if (category.category_weight) {
           this.weight_array.push(category.category_weight);
         }
-        // ...go deeper. A group cannot be our search result, since it must be a grading
+        // then go one level deeper. A group cannot be our search result, since it must be a grading
         // where points might be written into, which is not possible in a group
         return this.digDeeper(category, query_id, this.weight_array, total_points);
       } else {
-        //this means the group is empty. There cannot be any rating in an empty category of type == "group".
+        //this means the group is empty or . There cannot be any rating in an empty category of type == "group".
         //If this is the category we searched for (a toplevel-category) add the corresponding submark to the submark_array, if not just continue the search
         if (category._id == query_id) {
           this.weight_array = [];
@@ -313,7 +296,7 @@ export class StudentDetailPage {
   digDeeper(category, query_id, weigth_array, total_points) {
     //this function searches the tree of subchildren recursively. The recursion stopps when an e
     category.children.map((subgroup) => {
-      //if the first,second,third child is also a group, go deeper recursivly
+      //if the first,second,third,... child is also a group, go deeper recursivly
       if (this.isNonEmptyGroup(subgroup)) {
         if (subgroup.category_weight) {
           weigth_array.push(subgroup.category_weight);
@@ -353,12 +336,8 @@ export class StudentDetailPage {
     }
   }
 
-  isNonEmptyGroup(toplevel_category) {
-    if (toplevel_category.children.length > 0 && toplevel_category.type == "group") {
-      return true
-    } else {
-      return false;
-    }
+  isNonEmptyGroup(category) {
+    return category.children.length > 0 && category.type == "group"
   }
 
 

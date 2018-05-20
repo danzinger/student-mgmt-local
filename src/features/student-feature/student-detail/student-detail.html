@@ -92,7 +92,7 @@
             </ion-fab>
         </ion-list>
         <ion-list *ngSwitchCase="'ratings'">
-            <div *ngFor="let grading of student.gradings">
+            <div *ngFor="let grading of student.gradings  | orderBy : date_readable : true">
                 <ion-card *ngIf="grading && selected_course && grading.course_id == selected_course._id">
                     <ion-card-header class="header">
                         <div float-left class="title">

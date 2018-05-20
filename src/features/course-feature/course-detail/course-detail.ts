@@ -569,11 +569,7 @@ export class CourseDetailPage {
   }
 
   isNonEmptyGroup(category) {
-    if (category.children.length > 0 && category.type == "group") {
-      return true
-    } else {
-      return false;
-    }
+    return category.children.length > 0 && category.type == "group"
   }
 
   printInfo() {

@@ -19,9 +19,9 @@ import { ToastService } from '../../../services/toast.service';
 })
 export class CourseCreatePage {
 
-  private form: FormGroup;
-  isReadyToSave: boolean;
-  course;
+  private form: FormGroup
+  isReadyToSave: boolean
+  course
 
   constructor(
     public navCtrl: NavController,
@@ -33,39 +33,40 @@ export class CourseCreatePage {
     public toastService: ToastService, ) {
 
     this.form = this.formBuilder.group({
-      name: ['Testkurs 1', Validators.required],
+      name: ['', Validators.required],
       time: [''],
       location: [''],
-      institution: ['BOKU', Validators.required]
+      institution: ['', Validators.required]
     })
     // Watch the form for changes
     this.form.valueChanges.subscribe((v) => {
-      this.isReadyToSave = this.form.valid;
+      this.isReadyToSave = this.form.valid
     });
   }
 
   cancel() {
-    this.viewCtrl.dismiss();
+    this.viewCtrl.dismiss()
   }
 
   done() {
-    if (!this.form.valid) { return; }
-    let course = this.form.value;
-    course._id = this.mongoIdService.newObjectId();
-    course.participants = [];
-    course.notes = [];
+    if (!this.form.valid) { return }
+    let course = this.form.value
+    course._id = this.mongoIdService.newObjectId()
+    course.participants = []
+    course.notes = []
     this.createCourse(course)
   }
 
   createCourse(course) {
     this.courseService.createCourse(course).subscribe(
       data => {
-        this.viewCtrl.dismiss(data);
+        this.toastService.showToast('Kurs erfolgreich erstellt')
+        this.viewCtrl.dismiss(data)
       },
       error => {
         this.toastService.showToast('Fehler beim Erstellen')
-        this.viewCtrl.dismiss();
-      });
+        this.viewCtrl.dismiss()
+      })
   }
 
 }
