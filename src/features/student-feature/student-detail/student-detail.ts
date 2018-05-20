@@ -78,7 +78,7 @@ export class StudentDetailPage {
       student: this.student
     });
     ratingModal.onDidDismiss(data => {
-      this.calculateGrade();
+      //this.final_grade = this.calculateGrade();
 
     });
     ratingModal.present();
@@ -129,7 +129,7 @@ export class StudentDetailPage {
     this.studentService.updateStudent(this.student).subscribe(
       student => {
         this.toastService.showToast('Löschen erfolgreich!');
-        this.calculateGrade()
+        this.final_grade = this.calculateGrade();
       },
       error => {
         this.toastService.showToast('Löschen fehlgeschlagen!')
@@ -227,29 +227,25 @@ export class StudentDetailPage {
   // ────────────────────────────────────────────────────────────────────────────────────────────────────
   //
 
+  //
+  // ─── TOTAL GRADE COMPUTATION FEATURE ────────────────────────────────────────────
+  //
+
   submarks;
   final_grade;
-  search_result;
-  weight_array;
-  grade;
+  partialGradings = [];
 
-  calculateGrade() {
+  calculateGrade(partialGradingForGroup?) {
     this.submarks = [];
     let final_grade;
     //start by iterating through the gradings of the student
     if (this.student.computed_gradings.length > 0 && this.selected_course && this.selected_course.performanceCategories) {
       this.student.computed_gradings.map((grading) => {
-        //find and calculate the  points in each category and write then into an array
-        //this is done by calculating the weigth a certain grading has
+        // find and calculate the weighted percentage-points for each grading in the computed_gradings array, write then into an array and add them to obtain the final grade
+        // each rating in the 
         //and also by the points. How they are added depends on the category (max_and_weight) or "incremental"
         //the incremental points are also weightned, when they reside in a group.
-
-        // it would be better to only search the selected_course's categories...
-        // if(this.selected_course && grading.course_id == this.selected_course._id){
-        //   this.findPoints(grading.category_id, grading.total_points)
-        // }
-        this.findPoints(grading.category_id, grading.total_points)
-
+        this.findWeightedPercentagePoints(grading.category_id, grading.total_points)
         //sum up these points, which is the final grading
         if (this.submarks.length > 0) {
           final_grade = this.submarks.reduce((a, b) => { return a + b; });
@@ -257,36 +253,37 @@ export class StudentDetailPage {
         } else {
           final_grade = 0
         }
-
       })
     } else {
       final_grade = 0
     }
-    return final_grade;
+    return this.precisionRound(final_grade * 100, 2)
   }
 
-  findPoints(query_id, total_points) {
-    //this will hold the search result (which can lie in any depth)
-    this.search_result = {};
-    //iterate through the toplevel performance categories
+  precisionRound(number, precision) {
+    var factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
+  }
 
+  findWeightedPercentagePoints(query_id, total_points) {
+    //iterate through the toplevel performance categories
     this.selected_course.performanceCategories.map((category) => {
       //in this array, all weights are written that the searchbot encounters on its way to the final category
-      this.weight_array = [];
+      let weight_array = [];
       //if the toplevel is a (nonempty)group, first collect the weight of this group
-      if (this.isNonEmptyGroup(category)) {
+      if (this.categoryHasChildren(category)) {
         if (category.category_weight) {
-          this.weight_array.push(category.category_weight);
+          weight_array.push(category.category_weight);
         }
         // then go one level deeper. A group cannot be our search result, since it must be a grading
         // where points might be written into, which is not possible in a group
-        return this.digDeeper(category, query_id, this.weight_array, total_points);
+        return this.digDeeper(category, query_id, weight_array, total_points);
       } else {
         //this means the group is empty or . There cannot be any rating in an empty category of type == "group".
         //If this is the category we searched for (a toplevel-category) add the corresponding submark to the submark_array, if not just continue the search
         if (category._id == query_id) {
-          this.weight_array = [];
-          return this.addSubmarksToSubmarksArray(category, this.weight_array, total_points)
+          weight_array = [];
+          return this.addSubmarksToSubmarksArray(category, weight_array, total_points)
         }
       }
     })
@@ -297,7 +294,7 @@ export class StudentDetailPage {
     //this function searches the tree of subchildren recursively. The recursion stopps when an e
     category.children.map((subgroup) => {
       //if the first,second,third,... child is also a group, go deeper recursivly
-      if (this.isNonEmptyGroup(subgroup)) {
+      if (this.categoryHasChildren(subgroup)) {
         if (subgroup.category_weight) {
           weigth_array.push(subgroup.category_weight);
         }
@@ -305,8 +302,7 @@ export class StudentDetailPage {
       } else {
         //not of type "group" (a potential candiate), or an empty group (which cannot have any ratings)
         if (subgroup._id == query_id) {
-          this.search_result = subgroup;
-          this.weight_array = weigth_array;
+          //this.search_result = subgroup;
           return this.addSubmarksToSubmarksArray(subgroup, weigth_array, total_points)
         }
       }
@@ -317,28 +313,26 @@ export class StudentDetailPage {
     if (subgroup.type == "max_and_weight") {
       weight_array.push(subgroup.category_weight);
       //multiply all vales in the weigth array
-      let weight;
-      let i;
-      weight = weight_array.length > 0 ? weight_array.reduce(function (a, b) { return a * b; }) : 1;
-      i = weight * (total_points / Number(subgroup.point_maximum))
-      this.submarks.push(i);
-      i = 0;
-      weight = 0
+      let calculated_weight_for_submark = weight_array.length > 0 ? weight_array.reduce(function (a, b) { return a * b; }) : 1;
+      //calculate the weightened percentage of the total points in a category in relation to the maximum points that can be reached
+      let weighted_percentage = calculated_weight_for_submark * (total_points / Number(subgroup.point_maximum))
+      this.submarks.push(weighted_percentage);
     }
     if (subgroup.type == "incremental") {
-      let weight;
-      let l;
-      weight = weight_array.length > 0 ? weight_array.reduce(function (a, b) { return a * b; }) : 1;
-      l = weight * Number(subgroup.percentage_points_per_unit) * total_points;
-      this.submarks.push(l);
-      l = 0;
-      weight = 0;
+      let calculated_weight_for_submark = weight_array.length > 0 ? weight_array.reduce(function (a, b) { return a * b; }) : 1;
+      let weighted_percentage = calculated_weight_for_submark * Number(subgroup.percentage_points_per_unit) * total_points;
+      this.submarks.push(weighted_percentage);
     }
   }
 
-  isNonEmptyGroup(category) {
+  categoryHasChildren(category) {
     return category.children.length > 0 && category.type == "group"
   }
+
+  //
+  // ─── PARTIAL GRADE COMPUTATION FEATURE ──────────────────────────────────────────
+  //
+
 
 
   //
@@ -398,7 +392,7 @@ export class StudentDetailPage {
 
   onCourseSelect(selected_course) {
     this.final_grade = 0;
-    this.calculateGrade();
+    this.final_grade = this.calculateGrade();
   }
 
   extround(x, n) {

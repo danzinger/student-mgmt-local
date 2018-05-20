@@ -29,11 +29,10 @@
     <div [ngSwitch]="view">
         <ion-list *ngSwitchCase="'grade'">
             <!-- <div class="item-profile" text-center #profilePic style="background-image:url('http://lorempixel.com/400/200/people')"></div> -->
-            <div class="item-profile" style="font-size: 5rem" text-center>
-                <!-- For some values some strange numerical problems ocurres. The -(...)%1 part prevents them -->
-                {{final_grade*1000-(final_grade*1000)%1}}
-                <!-- {{final_grade*100}}% -->
-            </div>
+            <!-- <div class="item-profile" style="font-size: 5rem" text-center> -->
+            <!-- For some values some strange numerical problems ocurres. The -(...)%1 part prevents them -->
+            <!-- {{calculateGrade()}} -->
+            <!-- </div> -->
             <ion-list>
                 <ion-item *ngIf="courses && courses.length > 0">
                     <ion-label>Kurs</ion-label>
@@ -48,6 +47,10 @@
                 </ion-item>
             </ion-list>
             <ion-list *ngIf="selected_course && selected_course.performanceCategories">
+
+                <ion-item>
+                    <ion-label>Total für Kurs: {{calculateGrade()}} %</ion-label>
+                </ion-item>
                 <div *ngFor="let category of selected_course.performanceCategories">
                     <button class="toplevel-button" *ngIf="category.type != 'group'" (click)="addNewRating(category._id, category.name)" ion-button full>{{category.name}}</button>
                     <ion-item class="toplevel-grouplabel" *ngIf="category.type == 'group'">
