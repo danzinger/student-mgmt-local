@@ -27,13 +27,13 @@
             </ion-list>
         </ion-list>
     </form>
-    <h3>Aus Datei hinzufügen</h3>
+    <h3>Aus CSV-Datei hinzufügen</h3>
     <!-- TODO: Check if the csv File is in valid Format -->
-    <p>Die .csv Datei sollte das Folgende Format haben:</p>
+    <p>Die <a href="https://www.google.com/search?q=csv">.csv Datei</a> muss das Folgende Format haben:</p>
     <pre>
-      firstname,lastname
+      firstname, lastname
       Max, Mustermann 
-      Alex, Mcmillian
+      Michael, Jackson
   </pre>
     <ng2-file-input [drop-text]="' '" [show-previews]="false" [extensions]="['csv']" [invalid-file-text]="'Keine .csv Datei ausgewählt'" [browse-text]="'Ziehe .csv Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
 

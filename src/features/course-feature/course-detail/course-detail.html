@@ -3,24 +3,33 @@
     <ion-navbar color="stdt-mgmt-theme">
         <ion-title small>{{course.name}} <span *ngIf="currentSortingCategoryName">|</span> {{currentSortingCategoryName}}</ion-title>
         <ion-buttons end>
-            <button ion-button icon-only (click)="manageCourse(course)">
-              <ion-icon name="create"></ion-icon>
-          </button>
+            <!-- <button *ngIf="view=='students'" ion-button icon-only (click)="manageCourse(course)">
+                <ion-icon name="create"></ion-icon>
+            </button> -->
             <button *ngIf="view=='students'" ion-button icon-only (click)="createAndregisterStudents()">
-            <ion-icon name="add"></ion-icon>
-          </button>
-            <button *ngIf="view=='notes'" ion-button icon-only (click)="addNewNote()">
-            <ion-icon name="add"></ion-icon>
-          </button>
-            <button *ngIf="view=='categories'" ion-button icon-only (click)="presentAddNewPerfCatModal()">
-            <ion-icon name="add"></ion-icon>
-          </button>
-            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
-                  <ion-icon name="information-circle"></ion-icon>
+                <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="view=='students'" ion-button icon-only (click)="showOrderByDialogue()">
+                <ion-icon name="list"></ion-icon>
+            </button>
+            <button *ngIf="view == 'students' && reverse == false" ion-button icon-only (click)="reverseList()">
+              <ion-icon name="arrow-dropup-circle"></ion-icon>
               </button>
-            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="exportCourseData()">
-                    <ion-icon name="download"></ion-icon>
-                  </button>
+            <button *ngIf="view == 'students' && reverse == true" ion-button icon-only (click)="reverseList()">
+                <ion-icon name="arrow-dropdown-circle"></ion-icon>
+            </button>
+            <button *ngIf="view=='students'" ion-button icon-only (click)="presentExportCourseDataConfirm()">
+                <ion-icon name="download"></ion-icon>
+            </button>
+            <button *ngIf="view=='notes'" ion-button icon-only (click)="addNewNote()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="view=='categories'" ion-button icon-only (click)="presentAddNewPerfCatModal()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+                <ion-icon name="information-circle"></ion-icon>
+            </button>
         </ion-buttons>
     </ion-navbar>
     <ion-toolbar no-border-top class="segment-bar">
@@ -38,18 +47,17 @@
     </ion-toolbar>
 </ion-header>
 <ion-content>
+
     <div [ngSwitch]="view">
         <ion-list *ngSwitchCase="'students'">
             <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche"></ion-searchbar>
-            <!-- <ion-item-sliding *ngFor="let participant of participants | filter:term | orderBy : orderBy(listOrderBy)"> -->
-            <ion-item-sliding #slidingItem *ngFor="let participant of participants | filter:term | orderBy : 'firstname'">
+            <ion-item-sliding #slidingItem *ngFor="let participant of dataTable | orderBy : listOrderBy : reverse | filter:term">
                 <button ion-item (click)="goToStudentDetail(participant)">
                   <text-avatar [text]="participant.firstname"  item-left></text-avatar>
                   <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
-                  <!-- TODO-SECURITY: This feature currently has NO MULTIUSER SUPPORT. TODO: Filter Notes from other users server side instead of here using the getNumberOfStudentNotes() function -->
-                  <!-- <ion-badge *ngIf="getNumberOfStudentNotes(participant) == 1" item-end>1 Notiz</ion-badge> -->
-                  <!-- <ion-badge *ngIf="getNumberOfStudentNotes(participant) > 1" item-end>{{getNumberOfStudentNotes(participant)}} Notizen</ion-badge>
-                  <ion-badge *ngIf="orderByCategory" item-end>{{participant[listOrderBy]}}</ion-badge> -->
+                  <!-- <ion-badge *ngIf="participant.notes && participant.notes.length == 1" item-end>1 Notiz</ion-badge>
+                  <ion-badge *ngIf="participant.notes && participant.notes.length > 1" item-end>{{participant.notes.length}}&nbsp;Notizen</ion-badge> -->
+                  <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>{{participant[listOrderBy]}}</ion-badge>
               </button>
                 <ion-item-options>
                     <button large style="width:75px;" ion-button color="danger" (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
@@ -87,7 +95,7 @@
                     <ion-card-header class="header">
                         <div float-left class="title">
                             <strong>{{category.name}}</strong>
-                            <div  *ngIf="category.type != 'incremental'" class="weight-display">
+                            <div *ngIf="category.type != 'incremental'" class="weight-display">
                                 Gewichtung: {{category.category_weight}}
                             </div>
                         </div>
@@ -112,7 +120,7 @@
                         <ion-card-header class="header">
                             <div float-left class="title">
                                 <strong>{{child.name}}</strong>
-                                <div  *ngIf="child.type != 'incremental'" class="weight-display">
+                                <div *ngIf="child.type != 'incremental'" class="weight-display">
                                     Gewichtung: {{child.category_weight}}
                                 </div>
                             </div>
@@ -137,7 +145,7 @@
                             <ion-card-header class="header">
                                 <div float-left class="title">
                                     <strong>{{baby.name}}</strong>
-                                    <div  *ngIf="baby.type != 'incremental'" class="weight-display">
+                                    <div *ngIf="baby.type != 'incremental'" class="weight-display">
                                         Gewichtung: {{baby.category_weight}}
                                     </div>
                                 </div>

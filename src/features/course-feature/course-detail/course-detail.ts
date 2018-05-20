@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController, PopoverController, AlertController, ItemSliding } from 'ionic-angular';
 
 import { StudentService } from '../../../services/student-service';
@@ -12,6 +12,8 @@ import { PapaParseService } from 'ngx-papaparse';
 
 import { File } from '@ionic-native/file';
 
+//import { OrderPipe } from 'ngx-order-pipe';
+
 @IonicPage()
 @Component({
   selector: 'page-course-detail',
@@ -24,6 +26,10 @@ export class CourseDetailPage {
   view = 'students';
 
   course_id
+  listOrderBy = 'lastname'
+
+  dataTable;
+  reverse = false;
 
   constructor(
     public navCtrl: NavController,
@@ -36,20 +42,32 @@ export class CourseDetailPage {
     public alertCtrl: AlertController,
     public settingsService: SettingsService,
     private papa: PapaParseService,
-    public file: File) {
+    public file: File,
+    public ref: ChangeDetectorRef) {
 
     this.courses = navParams.get('courses');
     this.course = navParams.get('course');
     this.course_id = this.course._id;
 
-  }
 
+  }
   ionViewDidEnter() {
-    this.getParticipants();
+    this.getParticipants().then((participants) => {
+      this.participants = participants;
+      //for easy sorting, we generate a 2-Dimensional dataTable here. We use this table - not the original array of participants - to display the students in the view.
+      // However, we need the original participants in this view to pass a selected participant to the next view and of course to generate the dataTable
+      // If this table would be needed elsewhere, it might be useful to outsource this work to the student-service.
+      this.dataTable = this.generateGradingTable(participants);
+    });
   }
 
-  manageCourse(course) {
-    this.navCtrl.push('CourseManagePage', { course: course })
+  // If it should be possible to edit the CourseDetails from this view as well (its already possible from the list-view) and we have so many icons already in the participants-tab
+  // manageCourse(course) {
+  //   this.navCtrl.push('CourseManagePage', { course: course })
+  // }
+
+  reverseList() {
+    return this.reverse = this.reverse ? false : true;
   }
 
   //
@@ -75,12 +93,73 @@ export class CourseDetailPage {
     this.studentService.getStudents().subscribe(students => this.students = students);
   }
 
-  getParticipants() {
-    this.studentService.getParticipants(this.course._id).subscribe(participants => this.participants = participants);
+  getParticipants(): Promise<Student[]> {
+    return new Promise((resolve, reject) => {
+      this.studentService.getParticipants(this.course._id).subscribe(participants => resolve(participants), err => reject(err));
+    })
   }
 
-  goToStudentDetail(participant) {
-    this.navCtrl.push('StudentDetailPage', { student: participant, course: this.course, courses: this.courses });
+  goToStudentDetail(selected_participant) {
+    let full_participant = this.participants.find(participant => { return participant._id == selected_participant._id })
+    this.navCtrl.push('StudentDetailPage', { student: full_participant, course: this.course, courses: this.courses });
+  }
+
+  generateGradingTable(participants) {
+    //flatten the categories
+    let dataTable = [];
+    participants.map((student) => {
+      let dataTableRow = {
+        _id: student._id,
+        firstname: student.firstname,
+        lastname: student.lastname,
+      }
+      let flattenedCategories = this.flattenCategories();
+      flattenedCategories.map((cat) => {
+        dataTableRow[cat._id] = this.getStudentsRatingInACat(cat._id, student._id);
+      });
+      dataTable.push(dataTableRow);
+    });
+    return dataTable;
+  }
+
+  //
+  // ─── SORT BY CATEGORY FEATURE ───────────────────────────────────────────────────
+  //
+
+  showOrderByDialogue() {
+    let alert = this.alertCtrl.create();
+    alert.setTitle('Ordnen und anzeigen');
+
+    alert.addInput({
+      type: 'radio',
+      label: 'Vorname',
+      value: 'firstname'
+    });
+
+    alert.addInput({
+      type: 'radio',
+      label: 'Nachname',
+      value: 'lastname'
+    });
+
+    let flattenedCategories = this.flattenCategories();
+    for (let category of flattenedCategories) {
+      alert.addInput({
+        type: 'radio',
+        label: category.name,
+        value: category._id
+      });
+    }
+
+    alert.addButton('Cancel');
+    alert.addButton({
+      text: 'OK',
+      handler: data => {
+        this.listOrderBy = data;
+        this.ref.detectChanges();
+      }
+    });
+    alert.present();
   }
 
   //
@@ -107,6 +186,7 @@ export class CourseDetailPage {
       error => { throw new Error(error) }
     )
   }
+
 
   //
   // ────────────────────────────────────────────────────────────────── II ──────────
@@ -215,7 +295,7 @@ export class CourseDetailPage {
       if (weight_changed) {
         console.log(weight_changed);
       }
-    })    
+    })
     CoursePerfcatEditModal.present();
   }
 
@@ -273,7 +353,9 @@ export class CourseDetailPage {
             students_to_update.push(student);
           });
           this.studentService.updateAllStudents(students_to_update).subscribe(() => {
-            this.getParticipants();
+            this.getParticipants().then((participants) => {
+              this.participants = participants;
+            });
           })
         }
       },
@@ -324,54 +406,122 @@ export class CourseDetailPage {
   firstname:FIRSTNAME
   category1: TOTAL_POINTS
   category2:TOTAL_POINTS
+  ...
+  ...
   },
   ]
   
   */
-  resultcats;
-  exportData;
+
+  //resultcats;
   exportCourseData() {
+    let resultcats = this.flattenCategories();
+    let exportData = this.generateExportData(resultcats);
+    //this.parseAndDownloadGradingsOnDesktop(exportData);
+    this.parseAndDownloadGradingsOnAndroid(exportData).then(() => {
+      this.toastService.showToast('Datenexport erfolgreich!');
+    }).catch(err => alert(JSON.stringify(err)))
+  }
+
+  presentExportCourseDataConfirm() {
+    let alert = this.alertCtrl.create({
+      title: 'Datenexport',
+      message: 'Kurs "'+ this.course.name +'" inkl. aller Bewertungen jetzt als .csv Datei exportieren? Der Kurs wird im Ordner StudentMgmt/csv gespeichert.',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Ok',
+          handler: () => {
+            this.exportCourseData()
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  generateExportData(resultcats) {
     //flatten the categories
-    this.resultcats = [];
-    this.exportData = [];
+    let exportData = [];
     this.participants.map((student) => {
       let exportObject = {
         Vorname: student.firstname,
         Nachname: student.lastname,
       }
-      this.course.performanceCategories.map((cat) => {
-        if (this.isNonEmptyGroup(cat)) {
-          this.digDeeper(cat, student, exportObject);
-        } else {
-          exportObject[cat.name] = this.getStudentsRatingInACat(cat._id, student._id);
-        }
+      resultcats.map((cat) => {
+        exportObject[cat.name] = this.getStudentsRatingInACat(cat._id, student._id);
       });
-      this.exportData.push(exportObject);
+      exportData.push(exportObject);
     });
-    let csv_string = this.papa.unparse(this.exportData);
+    return exportData;
+  }
+
+  parseAndDownloadGradingsOnDesktop(exportData) {
+    let csv_string = this.papa.unparse(exportData);
     var blob = new Blob([csv_string]);
     var a = window.document.createElement("a");
     a.href = window.URL.createObjectURL(blob);
     let time = new Date().toJSON().slice(0, 10);
-    a.download = time + '-' + Math.round(new Date().getTime() / 1000) + '.csv';
+    a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a); 
-
+    document.body.removeChild(a);
   }
 
-  digDeeper(category, student, exportObject) {
-    //this function searches the tree of subchildren recursively. The recursion stopps when an e
-    return category.children.map((subgroup) => {
-      //if the first,second,third child is also a group, go deeper recursivly
-      if (this.isNonEmptyGroup(subgroup)) {
-        this.digDeeper(subgroup, student, exportObject)
-      } else {
-        //not of type "group" (a potential candiate), or an empty??? group (which cannot have any ratings)
-        return exportObject[subgroup.name] = this.getStudentsRatingInACat(subgroup._id, student._id)
-      }
+  parseAndDownloadGradingsOnAndroid(exportData) {
+    return new Promise((resolve, reject) => {
+      this.checkDir().then(() => {
+        let csv_string = this.papa.unparse(exportData);
+        let time = new Date().toJSON().slice(0, 10);
+        let filename: string = 'StudentMgmt/csv-export/' + this.course.name + '-' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
+        this.file.writeFile(this.file.externalRootDirectory, filename, csv_string).then(() => {
+          //this.listDir();
+          resolve();
+        }).catch(err => {
+          this.toastService.showToast('Fehler beim Anlegen des Backups! Dateisystem meldet: ' + JSON.stringify(err));
+          reject(err);
+        });
+      }).catch((err) => {
+        if (err.code == 1) {
+          this.createDir().then(() => {
+            this.parseAndDownloadGradingsOnAndroid(exportData).then(() => {
+              resolve();
+            }).catch(err => reject(err))
+          }).catch(err => this.toastService.showToast('Fehler beim Anlegen des Ordners für Backups! Dateisystem meldet: ' + JSON.stringify(err)))
+        } else {
+          this.toastService.showToast('Fehler beim Anlegen des Ordners für Backups! Dateisystem meldet: ' + JSON.stringify(err));
+          reject(err);
+        }
+      });
     })
   }
+
+  checkDir() {
+    return this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt/csv-export')
+  }
+  createDir() {
+    return this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt', true).then(() => {
+      return this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt/csv-export', true)
+    })
+  }
+  //
+  // ────────────────────────────────────────────────────────────────────── C ──────────
+  //   :::::: H E L P E R   F U N C T I O N : :  :   :    :     :        :          :
+  // ────────────────────────────────────────────────────────────────────────────────
+  //
+
+  closeSlidingItem(slidingItem: ItemSliding) {
+    slidingItem.close();
+  }
+
+  //
+  // ─── GET STUDENTS RATING IN A CATEGORY FROM COMPUTED GRADINGS ARRAY IN THE STUDENT OBJECT ──────────
+  //
 
   getStudentsRatingInACat(cat_id, stud_id) {
     //return number of total_points of student with stud_id in the category with cat_id if found, 0 otherwise.
@@ -384,42 +534,52 @@ export class CourseDetailPage {
     return (grading && grading.total_points) ? grading.total_points : 0;
   }
 
-  isNonEmptyGroup(toplevel_category) {
-    if (toplevel_category.children.length > 0 && toplevel_category.type == "group") {
+  //
+  // ─── Flatten Categories ───────────────────────────────────────────────────────────────────────────
+  //
+
+  resultcats: any[];
+  flattenCategories() {
+    //flatten the nested categories
+    let resultcats: any[] = [];
+    if (this.course.performanceCategories) {
+      this.course.performanceCategories.map((cat) => {
+        if (this.isNonEmptyGroup(cat)) {
+          this.digDeeper(cat, resultcats);
+        } else {
+          resultcats.push(cat);
+        }
+      });
+    }
+    return resultcats;
+  }
+
+  digDeeper(category, resultcats: any[]) {
+    //this function searches the tree of subchildren recursively.
+    return category.children.map((subgroup) => {
+      //if the child is also a nonempty group, go one level deeper
+      if (this.isNonEmptyGroup(subgroup)) {
+        this.digDeeper(subgroup, resultcats)
+      } else {
+        //not of type "group" (a potential candiate), or an empty(=no children) group (which cannot have any ratings)
+        // return exportObject[subgroup.name] = this.getStudentsRatingInACat(subgroup._id, student._id)
+        return resultcats.push(subgroup);
+      }
+    })
+  }
+
+  isNonEmptyGroup(category) {
+    if (category.children.length > 0 && category.type == "group") {
       return true
     } else {
       return false;
     }
   }
-  //
-  // ────────────────────────────────────────────────────────────────────── C ──────────
-  //   :::::: H E L P E R   F U N C T I O N : :  :   :    :     :        :          :
-  // ────────────────────────────────────────────────────────────────────────────────
-  //
 
-  closeSlidingItem(slidingItem: ItemSliding) {
-    slidingItem.close();
-  }
-
-  presentPopover(myEvent) {
-    let popover = this.popoverCtrl.create('CourseDetailPopoverPage', {
-      course: this.course,
-      view: this.view,
-    });
-    popover.present({
-      ev: myEvent
-    });
-    popover.onDidDismiss(data => {
-      if (data) {
-        //Here we could call functions. Even with parameters if needed (set data.parameters or so...)
-        //However, this created very slow user experience and should therefore be avoided
-        // if (data.function == 'someFunction') {
-        //   this.someFunction();
-        // }
-      }
-    })
-  }
   printInfo() {
     console.log('this.course: ', this.course, '\nthis.courses: ', this.courses, '\nthis.participants: ', this.participants)
   }
+
+
+
 }

@@ -62,7 +62,7 @@
             <button ion-button color="primary" block (click)="makeBackup()">Backup erstellen</button>
             <h4 *ngIf="filesInDir && filesInDir.length > 0">Verfügbare Backups:</h4>
             <ion-list>
-                <ion-item-sliding #slidingItem *ngFor="let file of filesInDir">
+                <ion-item-sliding #slidingItem *ngFor="let file of filesInDir | orderBy : 'name' : true">
                     <ion-item *ngIf="file.isFile" block (click)="toastService.showToast('Links-Swipe für Optionen')">
                         <ion-icon name="document"></ion-icon>&nbsp;{{file.name}}
                     </ion-item>

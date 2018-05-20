@@ -159,7 +159,7 @@ export class SettingsPage {
       this.gatherBackupData().then(backupData => {
         let json_string: string = JSON.stringify(backupData);
         let time = new Date().toJSON().slice(0, 10);
-        let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000) + '.stmb';
+        let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.stmb';
         this.checkDir().then(() => {
           this.file.writeFile(this.file.externalRootDirectory, filename, json_string).then(() => {
             this.listDir();
@@ -172,7 +172,9 @@ export class SettingsPage {
         }).catch((err) => {
           if (err.code == 1) {
             this.createDir().then(() => {
-              this.makeBackup();
+              this.makeBackup().then(() => {
+                resolve();
+              }).catch(err => reject(err))
             }).catch(err => reject(err))
           } else {
             this.toastService.showToast('Fehler beim Anlegen des Ordners für Backups!');
@@ -334,7 +336,7 @@ export class SettingsPage {
       var a = window.document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       let time = new Date().toJSON().slice(0, 10);
-      a.download = time + '-' + Math.round(new Date().getTime() / 1000) + '.stmb';
+      a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.stmb';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a); 

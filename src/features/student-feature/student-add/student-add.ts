@@ -7,6 +7,7 @@ import { StudentService } from '../../../services/student-service';
 import { CourseService } from '../../../services/course.service';
 
 import { File } from '@ionic-native/file';
+import { ToastService } from '../../../services/toast.service';
 
 /**
  * Generated class for the StudentAddPage page.
@@ -37,7 +38,8 @@ export class StudentAddPage {
     public mongoIdService: MongoIdService,
     public studentService: StudentService,
     public courseService: CourseService,
-    public file: File, ) {
+    public file: File,
+    public toastService: ToastService) {
 
     this.form = this.formBuilder.group({
       firstname: ['', Validators.required],
@@ -61,21 +63,27 @@ export class StudentAddPage {
         skipEmptyLines: true,
         complete: function (results) {
           //alert('ok'+results.data.length);
-          results.data.forEach(student => {
-            student._id = me.mongoIdService.newObjectId();
-            student.gradings = [];
-            student.notes = [];
-            student.course_registrations = [];
-            if (me.control_data && me.control_data.registerForCourse) student.course_registrations.push(me.control_data.course._id);
-            student.computed_gradings = [];
-          });
-          me.presentAddStudentsConfirm(results.data, results.data.length + ' Studenten hinzufügen?')
+          if (me.checkData(results)) {
+            results.data.forEach(student => {
+              student._id = me.mongoIdService.newObjectId();
+              student.gradings = [];
+              student.notes = [];
+              student.course_registrations = [];
+              if (me.control_data && me.control_data.registerForCourse) student.course_registrations.push(me.control_data.course._id);
+              student.computed_gradings = [];
+            });
+            me.presentAddStudentsConfirm(results.data, results.data.length + ' Studenten hinzufügen?')
+          } else {
+            me.toastService.showToast('Fehler: Daten nicht im richtigen Format')
+          }
         }
       })
     }
   }
 
-
+  checkData(parsed_data) {
+    return parsed_data.meta.fields.length == 2 && parsed_data.meta.fields[0] == 'firstname' && parsed_data.meta.fields[1] == 'lastname'
+  }
 
   addStudent(student) {
     student._id = this.mongoIdService.newObjectId();
@@ -104,10 +112,7 @@ export class StudentAddPage {
         },
         {
           text: 'Ok',
-          handler: () => {
-            //TODO: Check if the csv File is in valid Format
-
-            //if the students are added from within the course-detail view of a course they get registered for the course (their _id is added to the participants array of the course) also:
+          handler: () => { 
             if (this.control_data && this.control_data.course) {
               students.forEach(student => {
                 this.control_data.course.participants.push(student._id);
@@ -120,8 +125,6 @@ export class StudentAddPage {
             this.studentService.addStudents(this.students).subscribe(
               data => this.viewCtrl.dismiss({
                 students: data,
-                //course:this.control_data.course,
-                //courses:this.courses
               }),
               error => { throw new Error(error) }
             );
