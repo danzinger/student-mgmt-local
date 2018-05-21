@@ -245,7 +245,7 @@ export class StudentDetailPage {
         // each rating in the 
         //and also by the points. How they are added depends on the category (max_and_weight) or "incremental"
         //the incremental points are also weightned, when they reside in a group.
-        this.findWeightedPercentagePoints(grading.category_id, grading.total_points)
+        this.findWeightedPercentagePoints(grading.category_id, grading.total_points, partialGradingForGroup)
         //sum up these points, which is the final grading
         if (this.submarks.length > 0) {
           final_grade = this.submarks.reduce((a, b) => { return a + b; });
@@ -265,9 +265,16 @@ export class StudentDetailPage {
     return Math.round(number * factor) / factor;
   }
 
-  findWeightedPercentagePoints(query_id, total_points) {
+  findWeightedPercentagePoints(query_id, total_points, partialGradingForGroup?) {
     //iterate through the toplevel performance categories
-    this.selected_course.performanceCategories.map((category) => {
+    let group;
+    //let group = partialGradingForGroup ? partialGradingForGroup : this.selected_course.performanceCategories;
+    if(partialGradingForGroup){
+     group = partialGradingForGroup
+    }else{
+     group = this.selected_course.performanceCategories;
+    }
+    group.map((category) => {
       //in this array, all weights are written that the searchbot encounters on its way to the final category
       let weight_array = [];
       //if the toplevel is a (nonempty)group, first collect the weight of this group
