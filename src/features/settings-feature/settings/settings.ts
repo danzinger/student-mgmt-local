@@ -159,7 +159,7 @@ export class SettingsPage {
       this.gatherBackupData().then(backupData => {
         let json_string: string = JSON.stringify(backupData);
         let time = new Date().toJSON().slice(0, 10);
-        let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.stmb';
+        let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6) + '.stmb';
         this.checkDir().then(() => {
           this.file.writeFile(this.file.externalRootDirectory, filename, json_string).then(() => {
             this.listDir();
@@ -336,7 +336,7 @@ export class SettingsPage {
       var a = window.document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       let time = new Date().toJSON().slice(0, 10);
-      a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.stmb';
+      a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6) + '.stmb';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a); 

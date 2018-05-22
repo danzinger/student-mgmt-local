@@ -6,6 +6,7 @@ import { StudentService } from '../../../services/student-service';
 import { Student } from '../../../app/models/student';
 import { Course } from '../../../app/models/course';
 import { SettingsService } from '../../../services/settings.service';
+import { PerfCat } from '../../../app/models/performance-category';
 
 @IonicPage()
 @Component({
@@ -379,6 +380,31 @@ export class StudentDetailPage {
   //   :::::: H E L P E R   F U N C T I O N S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
   //
+
+  //
+  // ─── GET STUDENTS RATING IN A CATEGORY FROM COMPUTED GRADINGS ARRAY IN THE STUDENT OBJECT ──────────
+  //
+
+  getStudentsRatingInACat(cat_id, stud_id) {
+    //return number of total_points of student with stud_id in the category with cat_id if found, 0 otherwise.
+    let student = this.student;
+    let grading = student.computed_gradings.find((grading) => {
+      return grading.category_id == cat_id
+    });
+    return (grading && grading.total_points) ? grading.total_points : 0;
+  }
+
+  getCategoryInfo(category:PerfCat):string{
+    if(category.type == 'max_and_weight' && category.point_maximum){
+      return ' / '+category.point_maximum;
+    }
+    if(category.type == 'incremental' && category.percentage_points_per_unit){
+      return ' ('+category.percentage_points_per_unit+')'
+    }
+    if(!category.type || category.type == 'group'){
+      return ''
+    }
+  }
 
   //helper function, so that the correct value is autoselected, 
   //if user navigates to the view from the course-detail-page.

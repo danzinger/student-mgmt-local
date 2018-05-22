@@ -64,6 +64,11 @@
                     <ion-input [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
                 </ion-item>
             </div>
+            <ion-item>
+                <ion-label>Gruppen automatisch Gewichten</ion-label>
+                <!-- <ion-toggle [(ngModel)]="settingsService.ENVIRONMENT_IS_DEV" (ionChange)="settingsService.setEnvironment(env)" color="secondary"></ion-toggle> -->
+                <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
+            </ion-item>
         </div>
         <!-- This one is for editing a child -->
         <div *ngIf="child && !addToGroup">
@@ -145,5 +150,4 @@
             </div>
         </div>
     </form>
-
 </ion-content>

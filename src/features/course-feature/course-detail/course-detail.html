@@ -47,7 +47,6 @@
     </ion-toolbar>
 </ion-header>
 <ion-content>
-
     <div [ngSwitch]="view">
         <ion-list *ngSwitchCase="'students'">
             <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche"></ion-searchbar>
@@ -96,7 +95,7 @@
                         <div float-left class="title">
                             <strong>{{category.name}}</strong>
                             <div *ngIf="category.type != 'incremental'" class="weight-display">
-                                Gewichtung: {{category.category_weight}}
+                                Gewichtung: {{category.category_weight*100}}%
                             </div>
                         </div>
                         <div float-right class="right">
@@ -121,7 +120,10 @@
                             <div float-left class="title">
                                 <strong>{{child.name}}</strong>
                                 <div *ngIf="child.type != 'incremental'" class="weight-display">
-                                    Gewichtung: {{child.category_weight}}
+                                    Gewichtung: {{child.category_weight*100}}%
+                                </div>
+                                <div *ngIf="child.type == 'incremental'" class="weight-display">
+                                    Prozentpunkte: &plusmn;{{child.percentage_points_per_unit*100}}
                                 </div>
                             </div>
                             <div float-right class="right">
@@ -146,7 +148,7 @@
                                 <div float-left class="title">
                                     <strong>{{baby.name}}</strong>
                                     <div *ngIf="baby.type != 'incremental'" class="weight-display">
-                                        Gewichtung: {{baby.category_weight}}
+                                        Gewichtung: {{baby.category_weight*100}}%
                                     </div>
                                 </div>
                                 <div float-right class="right">
@@ -171,7 +173,7 @@
                                     <div float-left class="title">
                                         <strong>{{subSubSubGroup.name}}</strong>
                                         <div *ngIf="subSubSubGroup.type != 'incremental'" class="weight-display">
-                                            Gewichtung: {{subSubSubGroup.category_weight}}
+                                            Gewichtung: {{subSubSubGroup.category_weight*100}}%
                                         </div>
                                     </div>
                                     <div float-right class="right">

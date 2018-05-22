@@ -23,6 +23,7 @@ export class CoursePerfcatUpdateModalPage {
   course;
   form;
   weight_changed = false;
+  distribute_others_equally = true;
 
   constructor(
     public navCtrl: NavController,
@@ -47,7 +48,7 @@ export class CoursePerfcatUpdateModalPage {
         name: 'Testkategorie',
         description: 'Testbeschreibung der Ersten',
         type: String,
-        category_weight: 50,
+        category_weight: 0.5,
         point_maximum: 100,
         percentage_points_per_unit: 0.025
       };
@@ -123,7 +124,7 @@ export class CoursePerfcatUpdateModalPage {
         {
           text: 'Ok',
           handler: () => {
-            //this.autoWeight();
+            if(this.distribute_others_equally) this.autoWeight();
             this.courseService.updateCourse(this.course).subscribe(
               data => {
                 this.toastService.showToast('Änderung erfolgreich!');
