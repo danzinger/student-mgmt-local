@@ -44,7 +44,7 @@ export class StudentDetailPage {
   }
 
   ionViewDidEnter() {
-    this.final_grade = this.calculateGrade();
+    //this.final_grade = this.calculateGrade(this.selected_course.performanceCategories[0].children);
   }
 
   getCourses() {
@@ -107,7 +107,7 @@ export class StudentDetailPage {
       message: 'Bewertung löschen?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
           }
@@ -198,7 +198,7 @@ export class StudentDetailPage {
       message: 'Notiz löschen?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
           }
@@ -234,20 +234,13 @@ export class StudentDetailPage {
 
   submarks;
   final_grade;
-  partialGradings = [];
 
   calculateGrade(partialGradingForGroup?) {
     this.submarks = [];
     let final_grade;
-    //start by iterating through the gradings of the student
     if (this.student.computed_gradings.length > 0 && this.selected_course && this.selected_course.performanceCategories) {
       this.student.computed_gradings.map((grading) => {
-        // find and calculate the weighted percentage-points for each grading in the computed_gradings array, write then into an array and add them to obtain the final grade
-        // each rating in the 
-        //and also by the points. How they are added depends on the category (max_and_weight) or "incremental"
-        //the incremental points are also weightned, when they reside in a group.
-        this.findWeightedPercentagePoints(grading.category_id, grading.total_points, partialGradingForGroup)
-        //sum up these points, which is the final grading
+        this.findWeight(grading.category_id, grading.total_points, partialGradingForGroup)
         if (this.submarks.length > 0) {
           final_grade = this.submarks.reduce((a, b) => { return a + b; });
           if (!final_grade) final_grade = 0;
@@ -261,65 +254,61 @@ export class StudentDetailPage {
     return this.precisionRound(final_grade * 100, 2)
   }
 
-  precisionRound(number, precision) {
-    var factor = Math.pow(10, precision);
-    return Math.round(number * factor) / factor;
-  }
 
-  findWeightedPercentagePoints(query_id, total_points, partialGradingForGroup?) {
-    //iterate through the toplevel performance categories
+  findWeight(query_id, total_points, partialGradingForGroup?){
     let group;
     //let group = partialGradingForGroup ? partialGradingForGroup : this.selected_course.performanceCategories;
-    if(partialGradingForGroup){
-     group = partialGradingForGroup
-    }else{
-     group = this.selected_course.performanceCategories;
-    }
-    group.map((category) => {
-      //in this array, all weights are written that the searchbot encounters on its way to the final category
+    if (partialGradingForGroup) {
+      group = partialGradingForGroup 
+    } else {
+      group = this.selected_course.performanceCategories;
+    }    
+    if(group.length > 0) group.map((category)=>{
       let weight_array = [];
-      //if the toplevel is a (nonempty)group, first collect the weight of this group
       if (this.categoryHasChildren(category)) {
-        if (category.category_weight) {
-          weight_array.push(category.category_weight);
-        }
-        // then go one level deeper. A group cannot be our search result, since it must be a grading
-        // where points might be written into, which is not possible in a group
-        return this.digDeeper(category, query_id, weight_array, total_points);
+        weight_array.push(category.category_weight);
+        this.digDeeper(category, query_id, weight_array, total_points);
       } else {
-        //this means the group is empty or . There cannot be any rating in an empty category of type == "group".
-        //If this is the category we searched for (a toplevel-category) add the corresponding submark to the submark_array, if not just continue the search
         if (category._id == query_id) {
-          weight_array = [];
-          return this.addSubmarksToSubmarksArray(category, weight_array, total_points)
+          if(category.category_weight) weight_array.push(category.category_weight)
+          //console.log("Toplevel-Category "+category.name+" with id: "+query_id+" has weight_array: "+weight_array);
+          this.addSubmarksToSubmarksArray(category, weight_array, total_points)
         }
       }
     })
-
   }
 
-  digDeeper(category, query_id, weigth_array, total_points) {
-    //this function searches the tree of subchildren recursively. The recursion stopps when an e
+  tmp_weight_array = []
+  digDeeper(category, query_id, weight_array, total_points) {
     category.children.map((subgroup) => {
       //if the first,second,third,... child is also a group, go deeper recursivly
       if (this.categoryHasChildren(subgroup)) {
         if (subgroup.category_weight) {
-          weigth_array.push(subgroup.category_weight);
+          //DAS will ich NUR wenn sie auch innerhalb gefunden wird!
+          this.tmp_weight_array.push(subgroup.category_weight);
         }
-        this.digDeeper(subgroup, query_id, weigth_array, total_points)
+        this.digDeeper(subgroup, query_id, weight_array, total_points)
       } else {
         //not of type "group" (a potential candiate), or an empty group (which cannot have any ratings)
         if (subgroup._id == query_id) {
-          //this.search_result = subgroup;
-          return this.addSubmarksToSubmarksArray(subgroup, weigth_array, total_points)
+          this.tmp_weight_array.map((e)=>{
+            weight_array.push(e);
+          });
+          this.tmp_weight_array = [];
+          if(subgroup.category_weight) weight_array.push(subgroup.category_weight);
+          //console.log("Sublevel-Category "+subgroup.name+", where Student has "+total_points+" of "+subgroup.point_maximum+" Points, with id: "+subgroup._id+" has weight_array: "+weight_array);
+          //let calculated_weight_for_submark = weight_array.length > 0 ? weight_array.reduce(function (a, b) { return a * b; }) : 1;
+          //let weighted_percentage = calculated_weight_for_submark * (total_points / Number(subgroup.point_maximum))
+          //console.log("This results in: "+weighted_percentage);
+          this.addSubmarksToSubmarksArray(subgroup, weight_array, total_points)
         }
       }
     })
+    this.tmp_weight_array = []
   }
 
   addSubmarksToSubmarksArray(subgroup, weight_array, total_points) {
     if (subgroup.type == "max_and_weight") {
-      weight_array.push(subgroup.category_weight);
       //multiply all vales in the weigth array
       let calculated_weight_for_submark = weight_array.length > 0 ? weight_array.reduce(function (a, b) { return a * b; }) : 1;
       //calculate the weightened percentage of the total points in a category in relation to the maximum points that can be reached
@@ -331,6 +320,11 @@ export class StudentDetailPage {
       let weighted_percentage = calculated_weight_for_submark * Number(subgroup.percentage_points_per_unit) * total_points;
       this.submarks.push(weighted_percentage);
     }
+  }
+
+  precisionRound(number, precision) {
+    var factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
   }
 
   categoryHasChildren(category) {
@@ -394,14 +388,14 @@ export class StudentDetailPage {
     return (grading && grading.total_points) ? grading.total_points : 0;
   }
 
-  getCategoryInfo(category:PerfCat):string{
-    if(category.type == 'max_and_weight' && category.point_maximum){
-      return ' / '+category.point_maximum;
+  getCategoryInfo(category: PerfCat): string {
+    if (category.type == 'max_and_weight' && category.point_maximum) {
+      return ' / ' + category.point_maximum;
     }
-    if(category.type == 'incremental' && category.percentage_points_per_unit){
-      return ' ('+category.percentage_points_per_unit+')'
+    if (category.type == 'incremental' && category.percentage_points_per_unit) {
+      return ' (' + category.percentage_points_per_unit + ')'
     }
-    if(!category.type || category.type == 'group'){
+    if (!category.type || category.type == 'group') {
       return ''
     }
   }
@@ -417,9 +411,10 @@ export class StudentDetailPage {
   printInfo() {
     console.log(
       'this.student: ', this.student,
-      '\n\n this.final_grade: ', this.final_grade,
+      //'\n\n this.final_grade: ', this.calculateGrade(this.selected_course.performanceCategories[0]),
       '\n\n this.courses: ', this.courses,
       '\n\n this.selected_course: ', this.selected_course,
+      //'\n\n Table: ', this.generateTable()
     )
   }
 
@@ -446,5 +441,98 @@ export class StudentDetailPage {
     return utc;
   }
 
+  //
+  // ─── OLD FUNCTIONS ──────────────────────────────────────────────────────────────
+  //
+
+
+  calculateGradeOLD(partialGradingForGroup?) {
+    this.submarks = [];
+    let final_grade;
+    //start by iterating through the gradings of the student
+    if (this.student.computed_gradings.length > 0 && this.selected_course && this.selected_course.performanceCategories) {
+      this.student.computed_gradings.map((grading) => {
+        // find and calculate the weighted percentage-points for each grading in the computed_gradings array, write then into an array and add them to obtain the final grade
+        // each rating in the 
+        //and also by the points. How they are added depends on the category (max_and_weight) or "incremental"
+        //the incremental points are also weightned, when they reside in a group.
+        this.findWeightedPercentagePointsOLD(grading.category_id, grading.total_points, partialGradingForGroup)
+        //sum up these points, which is the final grading
+        if (this.submarks.length > 0) {
+          final_grade = this.submarks.reduce((a, b) => { return a + b; });
+          if (!final_grade) final_grade = 0;
+        } else {
+          final_grade = 0
+        }
+      })
+    } else {
+      final_grade = 0
+    }
+    return this.precisionRound(final_grade * 100, 2)
+  }
+
+
+  findWeightedPercentagePointsOLD(query_id, total_points, partialGradingForGroup?) {
+    //iterate through the toplevel performance categories
+    let group;
+    //let group = partialGradingForGroup ? partialGradingForGroup : this.selected_course.performanceCategories;
+    if (partialGradingForGroup) {
+      group = partialGradingForGroup 
+    } else {
+      group = this.selected_course.performanceCategories;
+    }
+    group.map((category) => {
+      //in this array, all weights are written that the searchbot encounters on its way to the final category
+      let weight_array = [];
+      //if the toplevel is a (nonempty)group, first collect the weight of this group
+      if (this.categoryHasChildren(category)) {
+        if (category.category_weight) {
+          weight_array.push(category.category_weight);
+          this.tmp_weight_array.push(category.category_weight);
+        }
+        this.digDeeperOLD(category, query_id, weight_array, total_points);
+      } else {
+        //this means the category is empty group or not of type "group". There cannot be any rating in an empty category of type == "group".
+        //If this is the category we searched for (a toplevel-category) add the corresponding submark to the submark_array, if not just continue the search
+        if (category._id == query_id) {
+          this.tmp_weight_array.map((e)=>{
+            weight_array.push(e);
+          });
+          this.tmp_weight_array = []; 
+          weight_array.push(category.category_weight)
+          //console.log("Toplevel-Category "+category.name+" with id: "+query_id+" has weight_array: "+weight_array);
+          this.addSubmarksToSubmarksArray(category, weight_array, total_points)
+          //weight_array = [];
+        }
+      }
+    })
+    this.tmp_weight_array = [];
+  }
+
+  digDeeperOLD(category, query_id, weight_array, total_points) {
+    //this function searches the tree of subchildren recursively.
+    category.children.map((subgroup) => {
+      //if the first,second,third,... child is also a group, go deeper recursivly
+      if (this.categoryHasChildren(subgroup)) {
+        if (subgroup.category_weight) {
+          this.tmp_weight_array.push(subgroup.category_weight);
+        }
+        this.digDeeperOLD(subgroup, query_id, weight_array, total_points)
+      } else {
+        //not of type "group" (a potential candiate), or an empty group (which cannot have any ratings)
+        if (subgroup._id == query_id) {
+          this.tmp_weight_array.map((e)=>{
+            weight_array.push(e);
+          });
+          this.tmp_weight_array = [];          
+          weight_array.push(category.category_weight)
+          //console.log("Sublevel-Category "+subgroup.name+" with id: "+subgroup._id+" has weight_array: "+weight_array);
+          this.addSubmarksToSubmarksArray(subgroup, weight_array, total_points)
+        }
+      }
+    })
+    this.tmp_weight_array = [];
+  }
+    
 
 }

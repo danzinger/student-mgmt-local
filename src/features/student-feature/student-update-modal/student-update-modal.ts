@@ -26,7 +26,7 @@ export class StudentUpdateModalPage {
     public toastService:ToastService) {
 
     this.student = navParams.get('student');
-
+    console.log(this.student)
   }
 
 
@@ -36,26 +36,26 @@ export class StudentUpdateModalPage {
 
 
   done() {
-    this.presentConfirm();
+    this.presentConfirm(this.student);
   }
 
-  presentConfirm() {
+  presentConfirm(student) {
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
       message: 'Änderung speichern?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
-          }
+          } 
         },
         {
           text: 'Ok',
           handler: () => {
-             this.studentService.updateStudent(this.student).subscribe(
-              data => {
-                this.toastService.showToast('Änderung erfolgreich!');
+             this.studentService.updateStudent(student).subscribe(
+              student => {
+                this.toastService.showToast('Änderung erfolgreich gespeichert.');
                 this.viewCtrl.dismiss();
               },
               error => {

@@ -57,14 +57,14 @@
         <div *ngIf="show_android_features">
             <div *ngIf="settingsService.ENVIRONMENT_IS_DEV">
                 <h3>Data (Android)</h3>
-                {{fileInfo}}
+                {{fileInfo | json}}
             </div>
             <button ion-button color="primary" block (click)="makeBackup()">Backup erstellen</button>
             <h4 *ngIf="filesInDir && filesInDir.length > 0">Verfügbare Backups:</h4>
             <ion-list>
                 <ion-item-sliding #slidingItem *ngFor="let file of filesInDir | orderBy : 'name' : true">
                     <ion-item *ngIf="file.isFile" block (click)="toastService.showToast('Links-Swipe für Optionen')">
-                        <ion-icon name="document"></ion-icon>&nbsp;{{file.name}}
+                        <ion-icon name="document"></ion-icon>&nbsp;{{file.name}}{{file.lastModified}}
                     </ion-item>
                     <ion-item-options>
                         <button large style="width:75px;" ion-button color="danger" (click)="deleteBackupFileOnAndroid(file);closeSlidingItem(slidingItem)">

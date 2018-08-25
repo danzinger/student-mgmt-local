@@ -5,9 +5,12 @@
             <button ion-button icon-only (click)="presentStudentUpdateModal()">
             <ion-icon name="create"></ion-icon>
           </button>
-            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
-              <ion-icon name="information-circle"></ion-icon>
-          </button>
+          <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+            <ion-icon name="information-circle"></ion-icon>
+        </button>
+        <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="generateTable()">
+          <ion-icon name="information-circle"></ion-icon>
+      </button>
         </ion-buttons>
     </ion-navbar>
     <ion-toolbar no-border-top class="segment-bar">

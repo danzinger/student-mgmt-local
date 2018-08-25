@@ -105,7 +105,7 @@
                             <button ion-button icon-only (click)="editPerformanceCategory(category)">
                                       <ion-icon name="create"></ion-icon>
                               </button>
-                            <button ion-button icon-only (click)="deletePerformanceCategory(category, category, category, true)">
+                            <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, category, category, true)">
                                       <ion-icon name="close-circle"></ion-icon>
                               </button>
                         </div>
@@ -133,7 +133,7 @@
                                 <button ion-button icon-only (click)="editPerformanceCategory(category, child)">
                                                       <ion-icon name="create"></ion-icon>
                                               </button>
-                                <button ion-button icon-only (click)="deletePerformanceCategory(category, category, child, false)">
+                                <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, category, child, false)">
                                               <ion-icon name="close-circle"></ion-icon>
                                       </button>
                             </div>
@@ -158,7 +158,7 @@
                                     <button ion-button icon-only (click)="editPerformanceCategory(category, baby)">
                                                       <ion-icon name="create"></ion-icon>
                                               </button>
-                                    <button ion-button icon-only (click)="deletePerformanceCategory(category, child, baby, false)">
+                                    <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, child, baby, false)">
                                                       <ion-icon name="close-circle"></ion-icon>
                                               </button>
                                 </div>
@@ -183,7 +183,7 @@
                                         <button ion-button icon-only (click)="editPerformanceCategory(category, subSubSubGroup)">
                                                               <ion-icon name="create"></ion-icon>
                                                       </button>
-                                        <button ion-button icon-only (click)="deletePerformanceCategory(category, baby, subSubSubGroup, false)">
+                                        <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, baby, subSubSubGroup, false)">
                                                               <ion-icon name="close-circle"></ion-icon>
                                                       </button>
                                     </div>

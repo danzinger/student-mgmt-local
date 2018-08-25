@@ -166,10 +166,20 @@ export class CourseDetailPage {
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
 
-  presentStudentUpdateModal(student) {
+  presentStudentUpdateModal(student_from_table) {
+    console.log(student_from_table);
+    let student = this.participants.filter(participant => {
+      return participant._id == student_from_table._id
+    })
     let updateModal = this.modalCtrl.create('StudentUpdateModalPage', {
-      student: student
+      student: student[0]
     });
+    updateModal.onDidDismiss(() => {
+      this.getParticipants().then((participants) => {
+        this.participants = participants;
+        this.dataTable = this.generateGradingTable(participants);
+      });
+    })
     updateModal.present();
   }
 
@@ -178,15 +188,39 @@ export class CourseDetailPage {
   //
 
   deleteParticipant(participant) {
-    this.studentService.deleteStudent(participant).subscribe(
-      data => {
-        let index = this.participants.indexOf(participant);
-        if (index > -1) this.participants.splice(index, 1);
-      },
-      error => { throw new Error(error) }
-    )
+    this.presentStudentDeleteConfirm(participant);
   }
 
+  presentStudentDeleteConfirm(participant) {
+    let alert = this.alertCtrl.create({
+      title: 'Achtung',
+      message: participant.firstname + " " + participant.lastname + ' wird gelöscht. Bist du sicher?',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Löschen',
+          handler: () => {
+            this.studentService.deleteStudent(participant).subscribe(
+              data => {
+                let index = this.dataTable.indexOf(participant);
+                if (index > -1) this.dataTable.splice(index, 1);
+                this.toastService.showToast('Löschen erfolgreich');
+              },
+              error => {
+                this.toastService.showToast('Löschen fehlgeschlagen');
+              }
+            )
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
 
   //
   // ────────────────────────────────────────────────────────────────── II ──────────
@@ -230,7 +264,7 @@ export class CourseDetailPage {
       message: 'Notiz löschen?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
           }
@@ -364,6 +398,28 @@ export class CourseDetailPage {
       })
   }
 
+  presentPerfCatDeleteConfirm(category, parent, child, isTopLevel) {
+    let alert = this.alertCtrl.create({
+      title: 'Achtung',
+      message: 'Die Kategorie ' + category.name + ' wird gelöscht. Zudem werden alle Bewertungen von allen Studenten in dieser Kategorie gelöscht. Bist du sicher?',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Löschen',
+          handler: () => {
+            this.deletePerformanceCategory(category, parent, child, isTopLevel);
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
   deletePerformanceCategory(category, parent, child, isTopLevel) {
     let deletion_array = this.initializeDeletionArray(child);
     // if it is a top-level-category, the whole course gets updated
@@ -426,7 +482,7 @@ export class CourseDetailPage {
   presentExportCourseDataConfirm() {
     let alert = this.alertCtrl.create({
       title: 'Datenexport',
-      message: 'Kurs "'+ this.course.name +'" inkl. aller Bewertungen jetzt als .csv Datei exportieren? Der Kurs wird im Ordner StudentMgmt/csv gespeichert.',
+      message: 'Kurs "' + this.course.name + '" inkl. aller Bewertungen jetzt als .csv Datei exportieren? Der Kurs wird im Ordner StudentMgmt/csv gespeichert.',
       buttons: [
         {
           text: 'Abbrechen',

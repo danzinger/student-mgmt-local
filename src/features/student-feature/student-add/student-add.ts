@@ -105,7 +105,7 @@ export class StudentAddPage {
       message: message,
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
           }

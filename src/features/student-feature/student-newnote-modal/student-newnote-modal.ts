@@ -51,7 +51,7 @@ export class StudentNewnoteModalPage {
       message: 'Notiz speichern?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
             this.viewCtrl.dismiss();

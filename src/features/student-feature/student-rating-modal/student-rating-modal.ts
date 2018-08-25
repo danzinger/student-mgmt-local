@@ -113,7 +113,7 @@ export class StudentRatingModalPage {
       message: 'Bewertung speichern?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
           }

@@ -241,6 +241,13 @@ export class SettingsPage {
     });
   }
 
+  fileInfo;
+  getMetaDataFromFile(file){
+    // https://github.com/ionic-team/ionic-native/issues/1411
+     this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file:FileEntry)=>{
+      file.file(meta=>{return meta})
+    })
+  }
   checkDir() {
     return this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt')
   }
@@ -264,13 +271,6 @@ export class SettingsPage {
     });
   }
 
-  fileInfo;
-  getMetaDataFromFile(file){
-    // https://github.com/ionic-team/ionic-native/issues/1411
-     this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file:FileEntry)=>{
-      file.file(meta=>{this.fileInfo = meta;});
-    })
-  }
   // getMetaDataFromFile(file){
   //   // https://github.com/ionic-team/ionic-native/issues/1411
   //   return this.file.resolveLocalFilesystemUrl(file.nativeURL).then((fileentry:FileEntry)=>{
@@ -278,8 +278,8 @@ export class SettingsPage {
   //       var reader = new FileReader();
   //       let me = this;
   //       reader.onloadend = function() {
+  //         console.log("Successful file read: " + this.result);
   //         return me.fileInfo = JSON.parse(this.result).meta;
-  //           //console.log("Successful file read: " + this.result);
   //       };        
   //       reader.readAsText(file);
   //     },

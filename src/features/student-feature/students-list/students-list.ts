@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ItemSliding, ModalController} from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ItemSliding, ModalController, AlertController} from 'ionic-angular';
 
 import { StudentService } from '../../../services/student-service';
 import { CourseService } from '../../../services/course.service';
@@ -22,6 +22,7 @@ export class StudentsListPage {
     public studentService: StudentService,
     public courseService: CourseService,
     public toastService: ToastService,
+    public alertCtrl: AlertController,
     public modalCtrl: ModalController) {
     if (this.selected_course) this.selected_course = this.selected_course;
   }
@@ -88,13 +89,33 @@ export class StudentsListPage {
   //
 
   deleteStudent(student) {
-    this.studentService.deleteStudent(student).subscribe(
-      data => {
-        let index = this.students.indexOf(student);
-        if (index > -1) this.students.splice(index, 1);
-      })
+    let alert = this.alertCtrl.create({
+      title: 'Achtung',
+      message: student.firstname + " " + student.lastname + ' wird gelöscht. Bist du sicher?',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Löschen',
+          handler: () => {
+            this.studentService.deleteStudent(student).subscribe(
+              data => {
+                let index = this.students.indexOf(student);
+                if (index > -1) this.students.splice(index, 1);
+                this.toastService.showToast('Löschen erfolgreich'); }
+              ,error => {
+                this.toastService.showToast('Löschen fehlgeschlagen');
+              });
+          }
+        }
+      ]
+    });
+    alert.present();
   }
-
 
   //
   // ────────────────────────────────────────────────────────────────────────────────────────────── II ──────────

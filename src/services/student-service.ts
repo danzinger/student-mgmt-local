@@ -40,7 +40,7 @@ export class StudentService {
     return Observable.from(this.storage.get('students').then(students => {
       if (students) {
         return students.filter(student => {
-          return student.course_registrations.includes(course_id)
+          return student.course_registrations ? student.course_registrations.includes(course_id) : false;
         })
       } else {
         return [];
@@ -62,16 +62,27 @@ export class StudentService {
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
 
-  updateStudent(student): Observable<Student[]> {
+  updateStudentOLD(student): Observable<Student[]> {
     return Observable.from(this.storage.get('students').then(students => {
       let res = students.find(c => c._id == student._id);
       let index = students.indexOf(res);
-      //Delete the old course (if it exists)
+      //Delete the old student (if it exists)
       delete student.registered;
       if (index > -1) students[index] = student;
       return this.storage.set('students', students);
     }))
   }
+
+  updateStudent(updated_student): Observable<Student[]> {
+    return Observable.from(this.storage.get('students')
+      .then(students => {
+        let arr = students.filter(student => student._id != updated_student._id)
+        arr.push(updated_student);
+        console.log(arr);
+        return this.storage.set('students', arr);
+      }));
+  }
+
   updateAllStudents(students): Observable<Student[]> {
     return Observable.from(this.storage.set('students',students))
   }

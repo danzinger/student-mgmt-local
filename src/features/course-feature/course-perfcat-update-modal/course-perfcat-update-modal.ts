@@ -23,7 +23,7 @@ export class CoursePerfcatUpdateModalPage {
   course;
   form;
   weight_changed = false;
-  distribute_others_equally = true;
+  distribute_others_equally = false;
 
   constructor(
     public navCtrl: NavController,
@@ -116,7 +116,7 @@ export class CoursePerfcatUpdateModalPage {
       message: 'Änderung speichern?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
           }

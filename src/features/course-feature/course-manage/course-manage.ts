@@ -24,22 +24,47 @@ export class CourseManagePage {
     public alertCtrl: AlertController,
     public toastService: ToastService,
     public navParams: NavParams,
-    public mongoIdService:MongoIdService,) {
+    public mongoIdService: MongoIdService, ) {
 
     this.course = navParams.get('course');
   }
-  
-  done(){
+
+  done() {
     this.updateCourse(this.course);
   }
-  cancel(){
+  cancel() {
     this.navCtrl.pop();
   }
-  updateCourse(course){
-    this.courseService.updateCourse(course).subscribe((course)=>{
-      this.course = course;
-      this.navCtrl.pop();
-    })
+
+  updateCourse(course) {
+    let alert = this.alertCtrl.create({
+      title: 'Bestätigen',
+      message: 'Änderung speichern?',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Ok',
+          handler: () => {
+            this.courseService.updateCourse(course).subscribe(
+            course => {
+              this.course = course;
+              this.toastService.showToast('Änderung erfolgreich gespeichert.');
+              this.navCtrl.pop();
+            },
+            error => {
+                this.toastService.showToast('Fehler beim Speichern.');
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
   }
+
 
 }

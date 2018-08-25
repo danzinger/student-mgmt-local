@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ModalController, AlertController, 
 import { CourseService } from '../../../services/course.service';
 import { MongoIdService } from '../../../services/mongo-id.service';
 import { SettingsService } from '../../../services/settings.service';
+import { ToastService } from '../../../services/toast.service';
 
 @IonicPage()
 @Component({
@@ -19,7 +20,8 @@ export class CourseListPage {
     public modalCtrl: ModalController,
     public alertCtrl: AlertController,
     public mongoIdService: MongoIdService,
-    public settingsService: SettingsService
+    public settingsService: SettingsService,
+    public toastService:ToastService
   ) {
   }
 
@@ -49,20 +51,21 @@ export class CourseListPage {
       message: course.name + ' wird gelöscht. Bist du sicher?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           handler: () => {
           }
         },
         {
-          text: 'Ok',
+          text: 'Löschen',
           handler: () => {
-            this.courseService.deleteCourse(course._id).subscribe(data => this.courses = data);
-            //this.toastCtrl.showToast('Löschen erfolgreich'); 
-
-            // }, (error) => {
-            //   this.toastCtrl.showToast('Löschen fehlgeschlagen');
-            // });
+            this.courseService.deleteCourse(course._id).subscribe(
+              data => {
+                this.courses = data;
+                this.toastService.showToast('Löschen erfolgreich'); }
+              ,error => {
+                this.toastService.showToast('Löschen fehlgeschlagen');
+              });
           }
         }
       ]
