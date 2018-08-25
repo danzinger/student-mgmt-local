@@ -79,6 +79,7 @@ export class CourseNewperfcatModalPage {
       if(!this.course.performanceCategories) this.course.performanceCategories = [];
       this.form.value.type = this.type;
       this.form.value.children = [];
+      if(this.form.value.type == 'incremental') this.form.value.category_weight = 1;
       this.course.performanceCategories.push(this.form.value);
       this.courseService.updateCourse(this.course).subscribe(
         data => {

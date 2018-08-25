@@ -64,9 +64,9 @@ export class CoursePerfcatUpdateModalPage {
     if (this.performanceCategory.type == 'max_and_weight') {
       delete this.performanceCategory.percentage_points_per_unit;
     }
-    if (this.performanceCategory.type == 'incremental') {
+    if (this.subgroup.type == 'incremental') {
       delete this.performanceCategory.point_maximum;
-      delete this.performanceCategory.category_weight;
+      this.subgroup.category_weight = 1;
     }
     this.subgroup._id = this.mongoIdService.newObjectId();
     this.subgroup.children = [];

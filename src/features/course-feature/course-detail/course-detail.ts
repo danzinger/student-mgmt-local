@@ -401,7 +401,7 @@ export class CourseDetailPage {
   presentPerfCatDeleteConfirm(category, parent, child, isTopLevel) {
     let alert = this.alertCtrl.create({
       title: 'Achtung',
-      message: 'Die Kategorie ' + category.name + ' wird gelöscht. Zudem werden alle Bewertungen von allen Studenten in dieser Kategorie gelöscht. Bist du sicher?',
+      message: 'Die Kategorie wird gelöscht. Zudem werden alle Bewertungen von allen Studenten in dieser Kategorie gelöscht. Bist du sicher?',
       buttons: [
         {
           text: 'Abbrechen',
