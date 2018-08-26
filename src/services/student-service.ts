@@ -78,7 +78,6 @@ export class StudentService {
       .then(students => {
         let arr = students.filter(student => student._id != updated_student._id)
         arr.push(updated_student);
-        console.log(arr);
         return this.storage.set('students', arr);
       }));
   }

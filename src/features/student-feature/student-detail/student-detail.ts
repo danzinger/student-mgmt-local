@@ -228,19 +228,32 @@ export class StudentDetailPage {
   //
 
   //
-  // ─── TOTAL GRADE COMPUTATION FEATURE ────────────────────────────────────────────
+  // ─── GRADE COMPUTATION FEATURE ────────────────────────────────────────────
   //
 
   calculateGrade(partialGradingForGroup?) {
+
+/*
+This Function computes the overall grade and the partial gradings for a student.
+If a subgroup is passed, a partial grading will be returned and if not, the overall grade is computed.
+The functions iterates over the performance_categories of the course, or a subgroup of these (to compute a partial grading).
+For each category, the corresponding weight is computed and some information is stored (slightly different "max_and_weight" or "incremental" grading types)
+We obtain a datastructure like this:
+{
+PERFORMANCE-CATEGORY-1-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
+PERFORMANCE-CATEGORY-2-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
+PERFORMANCE-CATEGORY-3-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
+...
+}
+Then it is easily possible to compute the final/partial grade.
+*/ 
+
     let table = {};
     let submarks = [];
-    let group;
-    let grade;
-    if (partialGradingForGroup) {
-      group = partialGradingForGroup
-    } else {
-      group = this.selected_course.performanceCategories;
-    }
+    let grade = 0;
+    let group = partialGradingForGroup ? partialGradingForGroup : this.selected_course.performanceCategories;
+
+    //first the table is generated:
     if (group.length > 0) group.map((toplevel_category) => {
       table[toplevel_category._id] = [Number(toplevel_category.category_weight), toplevel_category.type, toplevel_category.point_maximum, toplevel_category.percentage_points_per_unit]
       if (this.categoryHasChildren(toplevel_category)) {
@@ -259,24 +272,24 @@ export class StudentDetailPage {
         })
       }
     })
+    //console.log(table);
+
+    //then the grade is computed
     this.student.computed_gradings.map((grading) => {
       if (table[grading.category_id] && table[grading.category_id][1] == "max_and_weight") {
         submarks.push(table[grading.category_id][0] * (grading.total_points / table[grading.category_id][2]))
       }
       if (table[grading.category_id] && table[grading.category_id][1] == "incremental") {
-        table[grading.category_id][1]
         submarks.push(table[grading.category_id][0] * grading.total_points * table[grading.category_id][3])
       }
     })
-    if (submarks.length > 0) {
-      grade = submarks.reduce((a, b) => { return a + b; });
-      if (!grade) grade = 0;
-    } else {
-      grade = 0
-    }
+    grade = (submarks.length > 0) ? submarks.reduce((a, b) => { return a + b; }) : 0;
     return this.precisionRound(grade * 100, 2);
   }
 
+  //
+  // ─── HELPER FUNCTIONS ────────────────────────────────────────────
+  //
 
   precisionRound(number, precision) {
     var factor = Math.pow(10, precision);

@@ -94,7 +94,7 @@ export class CoursePerfcatUpdateModalPage {
   autoWeight() {
     //Autocalculate weight of other categories on same level, if weight of one category is changed manually
     //currently only works with top-level categories and only when updating a category not when creating one.
-    //HOwever, this feature weems unneccessary. It might be much better to let the user just ender a percentage Value for each category.
+    //HOwever, this feature weems unneccessary. It might be much better to let the user enter a percentage Value for each category.
     if (this.weight_changed) {
       let cats = [];
       for (let category of this.course.performanceCategories) {
