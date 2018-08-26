@@ -49,7 +49,7 @@
                 </ion-item>
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
+                    <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'incremental'">
@@ -60,15 +60,16 @@
             </div>
             <div *ngIf="performanceCategory.type == 'group'">
                 <ion-item>
-                    <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
+                    <ion-label floating>Gewichtungy</ion-label>
+                    <ion-input type="number" min="0" max="1" [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
                 </ion-item>
             </div>
-            <ion-item>
-                <ion-label>Gruppen automatisch Gewichten</ion-label>
-                <!-- <ion-toggle [(ngModel)]="settingsService.ENVIRONMENT_IS_DEV" (ionChange)="settingsService.setEnvironment(env)" color="secondary"></ion-toggle> -->
-                <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
-            </ion-item>
+            <div *ngIf="performanceCategory.type == 'group' || performanceCategory.type == 'max_and_weight'">
+                <ion-item>
+                    <ion-label>Diese Ebene automatisch gewichten</ion-label>
+                    <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
+                </ion-item>
+            </div>
         </div>
         <!-- This one is for editing a child -->
         <div *ngIf="child && !addToGroup">
@@ -91,7 +92,7 @@
                 </ion-item>
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="child.category_weight" name="weight"></ion-input>
+                    <ion-input [(ngModel)]="child.category_weight" name="weight" (ionChange)='weigthChange($event)'></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="child.type == 'incremental'">
@@ -103,7 +104,13 @@
             <div *ngIf="child.type == 'group'">
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="child.category_weight" name="category_weight"></ion-input>
+                    <ion-input [(ngModel)]="child.category_weight" name="category_weight" (ionChange)='weigthChange($event)'></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="child.type == 'group' || child.type == 'max_and_weight'">
+                <ion-item>
+                    <ion-label>Diese Ebene automatisch gewichten</ion-label>
+                    <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>
             </div>
         </div>
@@ -123,7 +130,7 @@
                 <ion-select name="type" [(ngModel)]="subgroup.type" (ngModelChange)="clearInitialSelection()" multiple="false" cancelText="Abbrechen" okText="Ok">
                     <ion-option value="incremental">Incremental</ion-option>
                     <ion-option value="max_and_weight">Maximum und Gewicht</ion-option>
-                    <ion-option value="group">Gruppe</ion-option>
+                    <ion-option *ngIf="number_of_parents < 3" value="group">Gruppe</ion-option>
                 </ion-select>
             </ion-item>
             <div *ngIf="subgroup.type == 'max_and_weight'">
@@ -146,6 +153,12 @@
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
                     <ion-input [(ngModel)]="subgroup.category_weight" name="category_weight"></ion-input>
+                </ion-item>
+            </div>
+            <div *ngIf="subgroup.type == 'group' || subgroup.type == 'max_and_weight'">
+                <ion-item>
+                    <ion-label>Diese Ebene automatisch gewichten</ion-label>
+                    <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>
             </div>
         </div>

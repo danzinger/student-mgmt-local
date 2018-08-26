@@ -317,27 +317,25 @@ export class CourseDetailPage {
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
 
-  editPerformanceCategory(category, child) {
+  editPerformanceCategory(category, child?, parent?) {
     //if user wants to edit a child, the child is passed to next view
     child = null ? !child : child;
+    parent = null ? !parent : parent;
     let CoursePerfcatEditModal = this.modalCtrl.create('CoursePerfcatUpdateModalPage', {
       category: category,
       child: child,
-      course: this.course
+      course: this.course,
+      parent: parent
     });
-    CoursePerfcatEditModal.onDidDismiss(weight_changed => {
-      if (weight_changed) {
-        console.log(weight_changed);
-      }
-    })
     CoursePerfcatEditModal.present();
   }
 
-  addPerformanceCategoryGroupMember(category, parent_id, number_of_parents, child) {
+  addPerformanceCategoryGroupMember(category, parent, number_of_parents, child) {
     let CoursePerfcatUpdateModal = this.modalCtrl.create('CoursePerfcatUpdateModalPage', {
       category: category,
       addToGroup: true,
-      parent_id: parent_id,
+      parent: parent,
+      number_of_parents: number_of_parents,
       child: child,
       course: this.course
     })

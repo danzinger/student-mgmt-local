@@ -19,6 +19,7 @@ export class CoursePerfcatUpdateModalPage {
   number_of_parents;
   subgroup;
   parent_id;
+  parent;
   child;
   course;
   form;
@@ -38,10 +39,11 @@ export class CoursePerfcatUpdateModalPage {
     this.course = this.navParams.get('course');
     this.performanceCategory = navParams.get('category');
     this.addToGroup = navParams.get('addToGroup');
-    this.parent_id = navParams.get('parent_id');
     this.child = navParams.get('child');
+    this.number_of_parents = navParams.get('number_of_parents');
+    this.parent = navParams.get('parent');
+    this.parent_id = this.parent ? this.parent._id : null;
 
-    //let category_type = 'incremental' ? this.performanceCategory.percentage_points_per_unit != false : 'max_and_weight';
     this.subgroup = {}
     if (this.settingsService.ENVIRONMENT_IS_DEV) {
       this.subgroup = {
@@ -55,6 +57,10 @@ export class CoursePerfcatUpdateModalPage {
     }
   }
 
+  ionViewDidEnter(){
+    console.log(this.number_of_parents);
+  }
+
   cancel() {
     this.viewCtrl.dismiss();
   }
@@ -66,6 +72,7 @@ export class CoursePerfcatUpdateModalPage {
     }
     if (this.subgroup.type == 'incremental') {
       delete this.performanceCategory.point_maximum;
+      //this was needed for the grade-calculation to work. 
       this.subgroup.category_weight = 1;
     }
     this.subgroup._id = this.mongoIdService.newObjectId();
@@ -92,23 +99,40 @@ export class CoursePerfcatUpdateModalPage {
   }
 
   autoWeight() {
-    //Autocalculate weight of other categories on same level, if weight of one category is changed manually
-    //currently only works with top-level categories and only when updating a category not when creating one.
-    //HOwever, this feature weems unneccessary. It might be much better to let the user enter a percentage Value for each category.
-    if (this.weight_changed) {
+    //Equally distribute weight of other categories on same level if weight of one category is changed manually
+
+    //the following definitions are valid if we EDIT a toplevel-category or a child
+    let group_to_autoweight = this.parent ? this.parent.children : this.course.performanceCategories;
+    let edited_category = this.child ? this.child : this.performanceCategory;
+
+    //if we ADD a subgroup to a parent things are slightly different
+    if(this.addToGroup) {
+      console.log("add to group")
+      //group_to_autoweight = this.parent;
+      edited_category = this.subgroup;
+    }
+
+    let precisionRound = function (number, precision) {
+      var factor = Math.pow(10, precision);
+      return Math.round(number * factor) / factor;
+    }
+
+    if (this.weight_changed || this.addToGroup) {
       let cats = [];
-      for (let category of this.course.performanceCategories) {
-        if (category._id != this.performanceCategory._id) {
+      for (let category of group_to_autoweight) {
+        if (category._id != edited_category._id) {
           cats.push(Number(category.category_weight));
         }
       }
-      for (let category of this.course.performanceCategories) {
-        if (category._id != this.performanceCategory._id) {
-          category.category_weight = (1 - this.performanceCategory.category_weight) / cats.length
+      for (let category of group_to_autoweight) {
+        if (category._id != edited_category._id) {
+          category.category_weight = precisionRound((1 - edited_category.category_weight) / cats.length, 2)
+          if (category.category_weight < 0) category.category_weight = 0;
         }
       }
     }
   }
+
 
   presentConfirm() {
     let alert = this.alertCtrl.create({
@@ -124,7 +148,7 @@ export class CoursePerfcatUpdateModalPage {
         {
           text: 'Ok',
           handler: () => {
-            if(this.distribute_others_equally) this.autoWeight();
+            if (this.distribute_others_equally) this.autoWeight();
             this.courseService.updateCourse(this.course).subscribe(
               data => {
                 this.toastService.showToast('Änderung erfolgreich!');

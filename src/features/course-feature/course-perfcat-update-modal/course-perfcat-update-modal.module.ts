@@ -7,7 +7,7 @@ import { CoursePerfcatUpdateModalPage } from './course-perfcat-update-modal';
     CoursePerfcatUpdateModalPage,
   ],
   imports: [
-    IonicPageModule.forChild(CoursePerfcatUpdateModalPage),
+    IonicPageModule.forChild(CoursePerfcatUpdateModalPage)
   ],
 })
 export class CoursePerfcatUpdateModalPageModule {}

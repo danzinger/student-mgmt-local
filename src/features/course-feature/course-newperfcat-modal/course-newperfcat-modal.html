@@ -31,7 +31,6 @@
     </form>
     <ion-item>
         <ion-label floating>Kategorietyp</ion-label>
-        <!-- <ion-select name="type" [(ngModel)]="type" (ngModelChange)="selectCategoryType(type)" multiple="false" cancelText="Abbrechen" okText="Ok"> -->
         <ion-select name="type" [(ngModel)]="type" multiple="false" cancelText="Abbrechen" okText="Ok">
             <ion-option value="incremental">Incremental</ion-option>
             <ion-option value="max_and_weight">Maximum und Gewicht</ion-option>
@@ -46,7 +45,7 @@
             </ion-item>
             <ion-item>
                 <ion-label floating>Gewichtung</ion-label>
-                <ion-input type="number" formControlName="category_weight"></ion-input>
+                <ion-input type="number" formControlName="category_weight" ></ion-input>
             </ion-item>
         </div>
         <div *ngIf="type == 'incremental'">
@@ -58,8 +57,14 @@
         <div *ngIf="type == 'group'">
             <ion-item>
                 <ion-label floating>Gewichtung</ion-label>
-                <ion-input type="number" formControlName="category_weight"></ion-input>
+                <ion-input type="number" formControlName="category_weight" ></ion-input>
             </ion-item>
         </div>
     </form>
+    <div *ngIf="type == 'group' || type == 'max_and_weight'">
+        <ion-item>
+            <ion-label>Diese Ebene automatisch gewichten</ion-label>
+            <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
+        </ion-item>
+    </div>
 </ion-content>

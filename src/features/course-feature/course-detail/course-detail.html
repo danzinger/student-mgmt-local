@@ -99,7 +99,7 @@
                             </div>
                         </div>
                         <div float-right class="right">
-                            <button *ngIf="category.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,category._id,1,child)">
+                            <button *ngIf="category.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,category,1,child)">
                                       <ion-icon name="add"></ion-icon>
                               </button>
                             <button ion-button icon-only (click)="editPerformanceCategory(category)">
@@ -127,10 +127,11 @@
                                 </div>
                             </div>
                             <div float-right class="right">
-                                <button *ngIf="child.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,child._id,2,child)">
+                                <button *ngIf="child.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,child,2,child)">
                                               <ion-icon name="add"></ion-icon>
                                       </button>
-                                <button ion-button icon-only (click)="editPerformanceCategory(category, child)">
+                                      <!-- The "category" is passed two times for the sake of clearer code. First time as the Toplevel-category which is edited, second time as the parent of the child that is edited (used for autoweight feature) -->
+                                <button ion-button icon-only (click)="editPerformanceCategory(category, child, category)">
                                                       <ion-icon name="create"></ion-icon>
                                               </button>
                                 <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, category, child, false)">
@@ -152,10 +153,10 @@
                                     </div>
                                 </div>
                                 <div float-right class="right">
-                                    <button *ngIf="baby.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,baby._id,3,baby)">
+                                    <button *ngIf="baby.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,baby,3,baby)">
                                                       <ion-icon name="add"></ion-icon>
                                               </button>
-                                    <button ion-button icon-only (click)="editPerformanceCategory(category, baby)">
+                                    <button ion-button icon-only (click)="editPerformanceCategory(category, baby, child)">
                                                       <ion-icon name="create"></ion-icon>
                                               </button>
                                     <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, child, baby, false)">
@@ -177,10 +178,10 @@
                                         </div>
                                     </div>
                                     <div float-right class="right">
-                                        <!-- <button *ngIf="subSubSubGroup.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,baby._id,3,baby)">
+                                        <!-- <button *ngIf="subSubSubGroup.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,baby,3,baby)">
                                                               <ion-icon name="add"></ion-icon>
                                                       </button> -->
-                                        <button ion-button icon-only (click)="editPerformanceCategory(category, subSubSubGroup)">
+                                        <button ion-button icon-only (click)="editPerformanceCategory(category, subSubSubGroup, baby)">
                                                               <ion-icon name="create"></ion-icon>
                                                       </button>
                                         <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, baby, subSubSubGroup, false)">
