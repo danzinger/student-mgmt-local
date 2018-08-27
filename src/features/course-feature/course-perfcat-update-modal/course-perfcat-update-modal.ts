@@ -43,6 +43,8 @@ export class CoursePerfcatUpdateModalPage {
     this.number_of_parents = navParams.get('number_of_parents');
     this.parent = navParams.get('parent');
     this.parent_id = this.parent ? this.parent._id : null;
+    if(this.child) this.performanceCategory = this.child;
+    //this.performanceCategory = this.child ? this.child : this.performanceCategory;
 
     this.subgroup = {}
     if (this.settingsService.ENVIRONMENT_IS_DEV) {
@@ -104,29 +106,31 @@ export class CoursePerfcatUpdateModalPage {
     //the following definitions are valid if we EDIT a toplevel-category or a child
     let group_to_autoweight = this.parent ? this.parent.children : this.course.performanceCategories;
     let edited_category = this.child ? this.child : this.performanceCategory;
+    //or - because it is now unneccesary to distinguish between a child or a category - we can just put:
+    // let edited_category = this.performanceCategory;
+    //or now just use this.performanceCategory directly in the function
+
 
     //if we ADD a subgroup to a parent things are slightly different
     if(this.addToGroup) {
-      console.log("add to group")
-      //group_to_autoweight = this.parent;
       edited_category = this.subgroup;
     }
 
-    let precisionRound = function (number, precision) {
-      var factor = Math.pow(10, precision);
-      return Math.round(number * factor) / factor;
-    }
+    // let precisionRound = function (number, precision) {
+    //   var factor = Math.pow(10, precision);
+    //   return Math.round(number * factor) / factor;
+    // }
 
     if (this.weight_changed || this.addToGroup) {
       let cats = [];
       for (let category of group_to_autoweight) {
-        if (category._id != edited_category._id) {
+        if (category._id != edited_category._id && category.type != 'incremental') {
           cats.push(Number(category.category_weight));
         }
       }
       for (let category of group_to_autoweight) {
         if (category._id != edited_category._id) {
-          category.category_weight = precisionRound((1 - edited_category.category_weight) / cats.length, 2)
+          category.category_weight = (1 - edited_category.category_weight) / cats.length;
           if (category.category_weight < 0) category.category_weight = 0;
         }
       }

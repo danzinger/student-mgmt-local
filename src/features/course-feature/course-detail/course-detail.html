@@ -95,7 +95,10 @@
                         <div float-left class="title">
                             <strong>{{category.name}}</strong>
                             <div *ngIf="category.type != 'incremental'" class="weight-display">
-                                Gewichtung: {{category.category_weight*100}}%
+                                Gewichtung: {{precisionRound(category.category_weight*100,2)}}%
+                            </div>
+                            <div *ngIf="category.type == 'incremental'" class="weight-display">
+                                Prozentpunkte: &plusmn;{{category.percentage_points_per_unit*100}}
                             </div>
                         </div>
                         <div float-right class="right">
@@ -120,7 +123,7 @@
                             <div float-left class="title">
                                 <strong>{{child.name}}</strong>
                                 <div *ngIf="child.type != 'incremental'" class="weight-display">
-                                    Gewichtung: {{child.category_weight*100}}%
+                                    Gewichtung: {{precisionRound(child.category_weight*100,2)}}%
                                 </div>
                                 <div *ngIf="child.type == 'incremental'" class="weight-display">
                                     Prozentpunkte: &plusmn;{{child.percentage_points_per_unit*100}}
@@ -130,7 +133,8 @@
                                 <button *ngIf="child.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,child,2,child)">
                                               <ion-icon name="add"></ion-icon>
                                       </button>
-                                      <!-- The "category" is passed two times for the sake of clearer code. First time as the Toplevel-category which is edited, second time as the parent of the child that is edited (used for autoweight feature) -->
+                                <!-- The "category" is passed two times for the sake of clearer code. First time as the Toplevel-category which is edited, second time as the parent of the child that is edited (used for autoweight feature) -->
+                                                                 <!-- editPerformanceCategory(TOPLEVEL, CATEGORY TO CHANGE, PARENT CATEGORY) -->
                                 <button ion-button icon-only (click)="editPerformanceCategory(category, child, category)">
                                                       <ion-icon name="create"></ion-icon>
                                               </button>
@@ -149,7 +153,7 @@
                                 <div float-left class="title">
                                     <strong>{{baby.name}}</strong>
                                     <div *ngIf="baby.type != 'incremental'" class="weight-display">
-                                        Gewichtung: {{baby.category_weight*100}}%
+                                        Gewichtung: {{precisionRound(baby.category_weight*100,2)}}%
                                     </div>
                                 </div>
                                 <div float-right class="right">
@@ -165,7 +169,7 @@
                                 </div>
                             </ion-card-header>
                             <ion-card-content>
-                                Gewichtung: {{baby.description}}
+                                {{baby.description}}
                             </ion-card-content>
                         </ion-card>
                         <div *ngFor="let subSubSubGroup of baby.children" class="sub-sub-level-children-border">
@@ -174,7 +178,7 @@
                                     <div float-left class="title">
                                         <strong>{{subSubSubGroup.name}}</strong>
                                         <div *ngIf="subSubSubGroup.type != 'incremental'" class="weight-display">
-                                            Gewichtung: {{subSubSubGroup.category_weight*100}}%
+                                            Gewichtung: {{precisionRound(subSubSubGroup.category_weight*100,2)}}%
                                         </div>
                                     </div>
                                     <div float-right class="right">

@@ -61,7 +61,7 @@ export class SettingsPage {
       this.storage.set('students', STUDENTS).then(() => {
         this.students = STUDENTS;
       });
-    }).then(() => this.toastService.showToast('SUCCESS')
+    }).then(() => this.toastService.showToast('SUCCESS') 
     ).catch(() => this.toastService.showToast('ERROR'))
   }
 

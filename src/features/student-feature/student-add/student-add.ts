@@ -85,6 +85,10 @@ export class StudentAddPage {
     return parsed_data.meta.fields.length == 2 && parsed_data.meta.fields[0] == 'firstname' && parsed_data.meta.fields[1] == 'lastname'
   }
 
+  addStudentFromForm(){
+    this.addStudent(this.form.value);
+  }
+  
   addStudent(student) {
     student._id = this.mongoIdService.newObjectId();
     student.gradings = [];

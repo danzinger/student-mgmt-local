@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { CourseService } from '../../../services/course.service';
 import { ToastService } from '../../../services/toast.service';
@@ -15,8 +15,10 @@ import { SettingsService } from '../../../services/settings.service';
 })
 export class CourseNewperfcatModalPage {
   course;
-  form: FormGroup;
-  isReadyToSave: boolean = true;
+  form_max_and_weight: FormGroup;
+  form_incremental: FormGroup;
+  form_group: FormGroup;
+  isReadyToSave: boolean = false;
   type = "incremental";
   weight_changed = false;
   distribute_others_equally = false;
@@ -32,41 +34,45 @@ export class CourseNewperfcatModalPage {
     public settingsService: SettingsService
   ) {
 
-    if (this.settingsService.ENVIRONMENT_IS_DEV) {
-      this.form = formBuilder.group({
-        _id: [''],
-        name: ['test'],
-        description: ['testdescription'],
-        point_maximum: ['100'],
-        category_weight: ['0.5'],
-        type: [''],
-        percentage_points_per_unit: ['0.025']
-      });
-    } else {
-      this.form = formBuilder.group({
-        _id: [''],
-        name: [''],
-        description: [''],
-        point_maximum: [''],
-        category_weight: [''],
-        type: [''],
-        percentage_points_per_unit: ['']
-      });
-    }
+    //if (this.settingsService.ENVIRONMENT_IS_DEV) {
+    // Könnte man so automatisch ausfüllen:
+    // this.form_max_and_weight = formBuilder.group({
+    //   _id: [''],
+    //   name: ['Testkategorie', Validators.required],
+    //   description: ['Testbeschreibung'],
+    //   point_maximum: ['100', [Validators.required, Validators.min(0)]],
+    //   category_weight: ['0.5', [Validators.required, Validators.min(0), Validators.max(1)]],
+    //   type: [''],
+    // });
+    //}
+
+    this.form_max_and_weight = formBuilder.group({
+      _id: [''],
+      name: ['', Validators.required],
+      description: [''],
+      point_maximum: ['', [Validators.required, Validators.min(0)]],
+      category_weight: ['', [Validators.required, Validators.min(0), Validators.max(1)]],
+      type: [''],
+    });
+
+    this.form_incremental = formBuilder.group({
+      _id: [''],
+      name: ['', Validators.required],
+      description: [''],
+      type: [''],
+      percentage_points_per_unit: ['', [Validators.required, Validators.min(0), Validators.max(1)]]
+    });
+
+    this.form_group = formBuilder.group({
+      _id: [''],
+      name: ['', Validators.required],
+      description: [''],
+      category_weight: ['', [Validators.required, Validators.min(0), Validators.max(1)]],
+      type: [''],
+    });
 
     this.course = navParams.get('course');
 
-    // Watch the form for changes, and
-    this.form.valueChanges.subscribe((v) => {
-      //to grey-out the save button when the form is not valid (however, no validators here)
-      this.isReadyToSave = this.form.valid;
-      //to display the correct input fields based on the selected type
-      this.form.value.type = this.type;
-      //Convert the input-values to the correct type
-      this.form.value.point_maximum = Number(this.form.value.point_maximum);
-      this.form.value.category_weight = Number(this.form.value.category_weight);
-      this.form.value.percentage_points_per_unit = Number(this.form.value.percentage_points_per_unit);
-    });
   }
 
   cancel() {
@@ -76,26 +82,31 @@ export class CourseNewperfcatModalPage {
   autoWeight(created_category) {
     //Equally distribute weight of other categories on same level if weight of one category is changed manually
     let group_to_autoweight = this.course.performanceCategories;
-    let precisionRound = function (number, precision) {
-      var factor = Math.pow(10, precision);
-      return Math.round(number * factor) / factor;
-    }
 
     let cats = [];
     for (let category of group_to_autoweight) {
-      if (category._id != created_category._id) {
+      if (category._id != created_category._id && category.type != 'incremental') {
         cats.push(Number(category.category_weight));
       }
     }
     for (let category of group_to_autoweight) {
       if (category._id != created_category._id) {
-        category.category_weight = precisionRound((1 - created_category.category_weight) / cats.length, 2)
+        category.category_weight = (1 - created_category.category_weight) / cats.length;
       }
     }
-
   }
 
+  form;
   done() {
+    if (this.type == "max_and_weight") this.form = this.form_max_and_weight
+    if (this.type == "incremental") this.form = this.form_incremental
+    if (this.type == "group") this.form = this.form_group
+
+    //Convert the input-values to the correct type
+    this.form.value.point_maximum = this.form.value.point_maximum ? Number(this.form.value.point_maximum) : null;
+    this.form.value.category_weight = this.form.value.category_weight ? Number(this.form.value.category_weight) : null;
+    this.form.value.percentage_points_per_unit = this.form.value.percentage_points_per_unit ? Number(this.form.value.percentage_points_per_unit) : null;
+
     this.form.value._id = this.mongoIdService.newObjectId();
     if (!this.course.performanceCategories) this.course.performanceCategories = [];
     this.form.value.type = this.type;

@@ -21,7 +21,7 @@
 <ion-content padding>
     <form>
         <!-- This one updates a top level group -->
-        <div *ngIf="!addToGroup && !child">
+        <div *ngIf="!addToGroup">
             <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">Edit a top level category</span>
             <ion-item>
                 <ion-label floating>Name</ion-label>
@@ -60,8 +60,8 @@
             </div>
             <div *ngIf="performanceCategory.type == 'group'">
                 <ion-item>
-                    <ion-label floating>Gewichtungy</ion-label>
-                    <ion-input type="number" min="0" max="1" [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
+                    <ion-label floating>Gewichtung</ion-label>
+                    <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'group' || performanceCategory.type == 'max_and_weight'">
@@ -72,7 +72,7 @@
             </div>
         </div>
         <!-- This one is for editing a child -->
-        <div *ngIf="child && !addToGroup">
+        <!-- <div *ngIf="child && !addToGroup">
                 <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">Edit a child</span>
             <ion-item>
                 <ion-label floating>Name</ion-label>
@@ -113,7 +113,7 @@
                     <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>
             </div>
-        </div>
+        </div> -->
         <!-- This one is for adding a subgroup to a child -->
         <div *ngIf="addToGroup">
                 <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">adding a subgroup to a top level category OR to a child</span>

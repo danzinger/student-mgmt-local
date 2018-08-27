@@ -12,7 +12,7 @@
 
 <ion-content padding>
     <h3>Einzeln hinzufügen</h3>
-    <form [formGroup]="form">
+    <form [formGroup]="form" (ngSubmit)="addStudentFromForm()">
         <ion-list>
             <ion-item>
                 <ion-label color="primary" floating>Vorname</ion-label>
@@ -23,10 +23,11 @@
                 <ion-input type="text" formControlName="lastname"></ion-input>
             </ion-item>
             <ion-list>
-                <button ion-button color="primary" block (click)="addStudent(form.value)">Student Hinzufügen</button>
+                <button ion-button block color="primary" type="submit" [disabled]="!form.valid">Student Hinzufügen</button>
             </ion-list>
         </ion-list>
     </form>
+    
     <h3>Aus CSV-Datei hinzufügen</h3>
     <!-- TODO: Check if the csv File is in valid Format -->
     <p>Die <a href="https://www.google.com/search?q=csv">.csv Datei</a> muss das Folgende Format haben:</p>
