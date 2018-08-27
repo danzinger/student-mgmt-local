@@ -90,8 +90,9 @@ export class CourseNewperfcatModalPage {
       }
     }
     for (let category of group_to_autoweight) {
-      if (category._id != created_category._id) {
+      if (category._id != created_category._id && category.type != 'incremental') {
         category.category_weight = (1 - created_category.category_weight) / cats.length;
+        if (category.category_weight < 0) category.category_weight = 0;
       }
     }
   }
@@ -114,7 +115,7 @@ export class CourseNewperfcatModalPage {
     if (this.form.value.type == 'incremental') this.form.value.category_weight = 1;
     this.course.performanceCategories.push(this.form.value);
 
-    this.autoWeight(this.form.value);
+    if(this.form.value.type != 'incremental') this.autoWeight(this.form.value);
 
     this.courseService.updateCourse(this.course).subscribe(
       data => {

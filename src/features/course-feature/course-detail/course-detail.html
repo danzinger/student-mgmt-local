@@ -155,6 +155,9 @@
                                     <div *ngIf="baby.type != 'incremental'" class="weight-display">
                                         Gewichtung: {{precisionRound(baby.category_weight*100,2)}}%
                                     </div>
+                                    <div *ngIf="baby.type == 'incremental'" class="weight-display">
+                                        Prozentpunkte: &plusmn;{{baby.percentage_points_per_unit*100}}
+                                    </div>
                                 </div>
                                 <div float-right class="right">
                                     <button *ngIf="baby.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,baby,3,baby)">
@@ -179,6 +182,9 @@
                                         <strong>{{subSubSubGroup.name}}</strong>
                                         <div *ngIf="subSubSubGroup.type != 'incremental'" class="weight-display">
                                             Gewichtung: {{precisionRound(subSubSubGroup.category_weight*100,2)}}%
+                                        </div>
+                                        <div *ngIf="subSubSubGroup.type == 'incremental'" class="weight-display">
+                                            Prozentpunkte: &plusmn;{{subSubSubGroup.percentage_points_per_unit*100}}
                                         </div>
                                     </div>
                                     <div float-right class="right">

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ItemSliding } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ItemSliding, AlertController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { StudentService } from '../../../services/student-service';
 import { CourseService } from '../../../services/course.service';
@@ -24,7 +24,7 @@ export class SettingsPage {
   env;
   show_desktop_features: boolean = false;
   show_android_features: boolean = true;
-  autobackup_on_restore: boolean = false;
+  autobackup_on_restore: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -34,7 +34,8 @@ export class SettingsPage {
     public studentService: StudentService,
     public courseService: CourseService, 
     public settingsService: SettingsService,
-    public file: File, ) {
+    public file: File,
+    public alertCtrl: AlertController, ) {
   } 
 
   ionViewDidLoad() {
@@ -110,7 +111,7 @@ export class SettingsPage {
   }
 
   handleError(err) {
-    console.log(err);
+    //console.log(err);
     this.toastService.showToast(JSON.stringify(err));
   }
 
@@ -119,6 +120,28 @@ export class SettingsPage {
   //   :::::: A N D R O I D   F E A T U R E S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
   //
+
+  presentRestoreFromBackupOnAndroidConfirm(file) {
+    let alert = this.alertCtrl.create({
+      title: 'Bestätigen',
+      message: 'Backup wiederherstellen? Dadurch werden alle derzeitigen Daten gelöscht! Es wird jedoch ein automatisches Backup der derzeitigen Daten erstellt.',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Ok',
+          handler: () => {
+            this.restoreBackupFromFileOnAndroid(file);
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
 
   restoreBackupFromFileOnAndroid(file) {
     // Repetitive code. How to avoid this here?

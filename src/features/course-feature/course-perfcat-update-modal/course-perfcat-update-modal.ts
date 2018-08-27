@@ -129,7 +129,7 @@ export class CoursePerfcatUpdateModalPage {
         }
       }
       for (let category of group_to_autoweight) {
-        if (category._id != edited_category._id) {
+        if (category._id != edited_category._id && category.type != 'incremental') {
           category.category_weight = (1 - edited_category.category_weight) / cats.length;
           if (category.category_weight < 0) category.category_weight = 0;
         }

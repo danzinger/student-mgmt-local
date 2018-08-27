@@ -15,7 +15,6 @@
 <ion-content padding>
     <ion-item>
         <ion-label>Entwicklungsmodus</ion-label>
-        <!-- <ion-toggle [(ngModel)]="settingsService.ENVIRONMENT_IS_DEV" (ionChange)="settingsService.setEnvironment(env)" color="secondary"></ion-toggle> -->
         <ion-toggle [(ngModel)]="settingsService.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
     </ion-item>
     <div *ngIf="settingsService.ENVIRONMENT_IS_DEV">
@@ -70,10 +69,10 @@
                         <button large style="width:75px;" ion-button color="danger" (click)="deleteBackupFileOnAndroid(file);closeSlidingItem(slidingItem)">
                             <ion-icon name="trash"></ion-icon>
                         </button>
-                        <button large style="width:75px;" ion-button color="primary" (click)="getMetaDataFromFile(file);closeSlidingItem(slidingItem)">
+                        <!-- <button large style="width:75px;" ion-button color="primary" (click)="getMetaDataFromFile(file);closeSlidingItem(slidingItem)">
                             <ion-icon name="information-circle"></ion-icon>
-                        </button>
-                        <button large style="width:75px;" ion-button color="secondary" (click)="restoreBackupFromFileOnAndroid(file);closeSlidingItem(slidingItem)">
+                        </button> -->
+                        <button large style="width:75px;" ion-button color="secondary" (click)="presentRestoreFromBackupOnAndroidConfirm(file);closeSlidingItem(slidingItem)">
                             <ion-icon name="checkmark"></ion-icon>
                         </button>
                     </ion-item-options>
