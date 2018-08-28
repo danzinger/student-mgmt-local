@@ -99,31 +99,55 @@ export class CourseNewperfcatModalPage {
 
   form;
   done() {
-    if (this.type == "max_and_weight") this.form = this.form_max_and_weight
-    if (this.type == "incremental") this.form = this.form_incremental
-    if (this.type == "group") this.form = this.form_group
 
-    //Convert the input-values to the correct type
+    if (this.type == "max_and_weight") {
+      this.form = this.form_max_and_weight
+
+    }
+    if (this.type == "incremental") {
+      this.form = this.form_incremental
+      delete this.form.point_maximum
+
+    }
+    if (this.type == "group") {
+      this.form = this.form_group
+      delete this.form.percentage_points_per_unit
+      delete this.form.point_maximum
+    }
+
+    //Convert the input-values to the correct type and prepare data for saving
     this.form.value.point_maximum = this.form.value.point_maximum ? Number(this.form.value.point_maximum) : null;
     this.form.value.category_weight = this.form.value.category_weight ? Number(this.form.value.category_weight) : null;
     this.form.value.percentage_points_per_unit = this.form.value.percentage_points_per_unit ? Number(this.form.value.percentage_points_per_unit) : null;
 
     this.form.value._id = this.mongoIdService.newObjectId();
-    if (!this.course.performanceCategories) this.course.performanceCategories = [];
     this.form.value.type = this.type;
-    this.form.value.children = [];
-    if (this.form.value.type == 'incremental') this.form.value.category_weight = 1;
+    if (this.form.value.type != 'incremental') this.autoWeight(this.form.value);
+
+    if (this.form.value.type == "max_and_weight") {
+      delete this.form.value.percentage_points_per_unit
+    }
+    if (this.form.value.type == "incremental") {
+      delete this.form.value.point_maximum
+      //this was needed for the grade-calculation to work. 
+      this.form.value.category_weight = 1;
+    }
+    if (this.form.value.type == "group") {
+      delete this.form.value.percentage_points_per_unit
+      delete this.form.value.point_maximum
+      this.form.value.children = [];
+    }
+
+    if (!this.course.performanceCategories) this.course.performanceCategories = [];
     this.course.performanceCategories.push(this.form.value);
-
-    if(this.form.value.type != 'incremental') this.autoWeight(this.form.value);
-
+    
     this.courseService.updateCourse(this.course).subscribe(
       data => {
         this.toastService.showToast('Kategorie hinzugefügt');
         this.viewCtrl.dismiss(this.course);
       },
       error => {
-        this.toastService.showToast('Fehler beim Anlegen. Server meldet: ' + error._body);
+        this.toastService.showToast('Fehler beim Anlegen');
       });
   }
 

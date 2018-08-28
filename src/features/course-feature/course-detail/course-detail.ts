@@ -623,7 +623,7 @@ export class CourseDetailPage {
   }
 
   isNonEmptyGroup(category) {
-    return category.children.length > 0 && category.type == "group"
+    return category.children && category.children.length > 0 && category.type == "group"
   }
 
   printInfo() {

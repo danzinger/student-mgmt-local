@@ -59,26 +59,27 @@ export class CoursePerfcatUpdateModalPage {
     }
   }
 
-  ionViewDidEnter(){
-    console.log(this.number_of_parents);
-  }
-
   cancel() {
     this.viewCtrl.dismiss();
   }
 
   done() {
 
-    if (this.performanceCategory.type == 'max_and_weight') {
-      delete this.performanceCategory.percentage_points_per_unit;
+    if (this.subgroup.type == 'max_and_weight') {
+      delete this.subgroup.percentage_points_per_unit;
     }
     if (this.subgroup.type == 'incremental') {
-      delete this.performanceCategory.point_maximum;
+      delete this.subgroup.point_maximum;
       //this was needed for the grade-calculation to work. 
       this.subgroup.category_weight = 1;
+    }if(this.subgroup.type == 'group'){
+      this.subgroup.children = [];
+      delete this.subgroup.percentage_points_per_unit;
+      delete this.subgroup.point_maximum;
     }
+
     this.subgroup._id = this.mongoIdService.newObjectId();
-    this.subgroup.children = [];
+
     if (this.addToGroup) {
       if (this.child) {
         this.subgroup.parent_id = this.child._id;
