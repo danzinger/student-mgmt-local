@@ -73,7 +73,7 @@
                         <ion-icon name="document"></ion-icon>&nbsp;{{file.name}}{{file.lastModified}}
                     </ion-item>
                     <ion-item-options>
-                        <button large style="width:75px;" ion-button color="danger" (click)="deleteBackupFileOnAndroid(file);closeSlidingItem(slidingItem)">
+                        <button large style="width:75px;" ion-button color="danger" (click)="presentDeleteBackupOnAndroidConfirm(file);closeSlidingItem(slidingItem)">
                             <ion-icon name="trash"></ion-icon>
                         </button>
                         <!-- <button large style="width:75px;" ion-button color="primary" (click)="getMetaDataFromFile(file);closeSlidingItem(slidingItem)">

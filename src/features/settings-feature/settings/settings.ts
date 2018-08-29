@@ -123,7 +123,7 @@ export class SettingsPage {
   presentRestoreFromBackupOnAndroidConfirm(file) {
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
-      message: 'Backup wiederherstellen? Dadurch werden alle derzeitigen Daten gelöscht! Es kann jedoch ein automatisches Backup der derzeitigen Daten erstellt werden.',
+      message: 'Backup "'+file.name+'" wiederherstellen? Dadurch werden alle derzeitigen Daten gelöscht! Es kann jedoch ein automatisches Backup der derzeitigen Daten erstellt werden.',
       buttons: [
         {
           text: 'Abbrechen',
@@ -227,6 +227,30 @@ export class SettingsPage {
   //
   // ─── DELETE ──────────────────────────────────────────────────────
   //
+
+  presentDeleteBackupOnAndroidConfirm(file) {
+    let alert = this.alertCtrl.create({
+      title: 'Löschen?',
+      message: 'Soll das Backup "'+file.name+'" gelöscht werden?',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Ok',
+          handler: () => {
+            this.deleteBackupFileOnAndroid(file).then(()=>{
+              this.toastService.showToast('Löschen erfolgreich!');
+            })
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
 
   deleteBackupFileOnAndroid(file) {
     return new Promise((resolve, reject) => {
