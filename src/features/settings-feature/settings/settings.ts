@@ -24,7 +24,6 @@ export class SettingsPage {
   env;
   show_desktop_features: boolean = false;
   show_android_features: boolean = true;
-  autobackup_on_restore: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -32,11 +31,11 @@ export class SettingsPage {
     private storage: Storage,
     public toastService: ToastService,
     public studentService: StudentService,
-    public courseService: CourseService, 
+    public courseService: CourseService,
     public settingsService: SettingsService,
     public file: File,
     public alertCtrl: AlertController, ) {
-  } 
+  }
 
   ionViewDidLoad() {
     this.courseService.getCourses().subscribe(data => this.courses = data)
@@ -56,13 +55,13 @@ export class SettingsPage {
   //
 
   addMockData() {
-    this.storage.set('courses', COURSES).then(() => { 
+    this.storage.set('courses', COURSES).then(() => {
       this.courses = COURSES;
     }).then(() => {
       this.storage.set('students', STUDENTS).then(() => {
         this.students = STUDENTS;
       });
-    }).then(() => this.toastService.showToast('SUCCESS') 
+    }).then(() => this.toastService.showToast('SUCCESS')
     ).catch(() => this.toastService.showToast('ERROR'))
   }
 
@@ -124,7 +123,7 @@ export class SettingsPage {
   presentRestoreFromBackupOnAndroidConfirm(file) {
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
-      message: 'Backup wiederherstellen? Dadurch werden alle derzeitigen Daten gelöscht! Es wird jedoch ein automatisches Backup der derzeitigen Daten erstellt.',
+      message: 'Backup wiederherstellen? Dadurch werden alle derzeitigen Daten gelöscht! Es kann jedoch ein automatisches Backup der derzeitigen Daten erstellt werden.',
       buttons: [
         {
           text: 'Abbrechen',
@@ -145,7 +144,7 @@ export class SettingsPage {
 
   restoreBackupFromFileOnAndroid(file) {
     // Repetitive code. How to avoid this here?
-    if (this.autobackup_on_restore == true) {
+    if (this.settingsService.AUTOBACKUP_ON_RESTORE == true) {
       this.makeBackup().then(() => {
         this.getBackupDataFromFileOnAndroid(file).then((parsed_data) => {
           this.restoreFromBackup(parsed_data).then(() => {
@@ -263,10 +262,10 @@ export class SettingsPage {
   }
 
   fileInfo;
-  getMetaDataFromFile(file){
+  getMetaDataFromFile(file) {
     // https://github.com/ionic-team/ionic-native/issues/1411
-     this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file:FileEntry)=>{
-      file.file(meta=>{return meta})
+    this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file: FileEntry) => {
+      file.file(meta => { return meta })
     })
   }
   checkDir() {
@@ -320,7 +319,7 @@ export class SettingsPage {
   onAction(ev) {
     return this.restoreBackupFromFileOnBrowser(ev);
   }
-  
+
   restoreBackupFromFileOnBrowser(ev) {
     // action: (src: https://github.com/bergben/ng2-file-input)
     // Removed=0,
@@ -360,7 +359,7 @@ export class SettingsPage {
       a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6) + '.stmb';
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a); 
+      document.body.removeChild(a);
     });
   }
 
