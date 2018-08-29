@@ -66,11 +66,11 @@ export class SettingsPage {
   }
 
   removeCourses() {
-    this.courseService.removeCourses().then(res => this.toastService.showToast('Löschen erfolgreich!'))
+    this.courseService.removeCourses().then(res => this.toastService.showToast('Löschen erfolgreich'))
   }
 
   removeStudents() {
-    this.studentService.removeStudents().then(res => this.toastService.showToast('Löschen erfolgreich!'))
+    this.studentService.removeStudents().then(res => this.toastService.showToast('Löschen erfolgreich'))
   }
 
   gatherBackupData(): Promise<any> {
@@ -119,11 +119,11 @@ export class SettingsPage {
   //   :::::: A N D R O I D   F E A T U R E S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
   //
-
   presentRestoreFromBackupOnAndroidConfirm(file) {
+    let message = !this.settingsService.AUTOBACKUP_ON_RESTORE ? 'Backup "'+file.name+'" wiederherstellen?<br><br><strong>ACHTUNG</strong>: Dadurch werden alle derzeitigen Daten gelöscht!' : 'Backup "'+file.name+'" wiederherstellen? Es wird ein automatisches Backup der derzeitigen Daten angelegt.'
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
-      message: 'Backup "'+file.name+'" wiederherstellen? Dadurch werden alle derzeitigen Daten gelöscht! Es kann jedoch ein automatisches Backup der derzeitigen Daten erstellt werden.',
+      message: message,
       buttons: [
         {
           text: 'Abbrechen',
@@ -148,7 +148,7 @@ export class SettingsPage {
       this.makeBackup().then(() => {
         this.getBackupDataFromFileOnAndroid(file).then((parsed_data) => {
           this.restoreFromBackup(parsed_data).then(() => {
-            this.toastService.showToast('Backup erfolgreich wiederhergestellt!');
+            this.toastService.showToast('Backup erfolgreich wiederhergestellt');
           }).catch((err) => {
             this.toastService.showToast(JSON.stringify(err));
           });
@@ -159,7 +159,7 @@ export class SettingsPage {
     } else {
       this.getBackupDataFromFileOnAndroid(file).then((parsed_data) => {
         this.restoreFromBackup(parsed_data).then(() => {
-          this.toastService.showToast('Backup erfolgreich wiederhergestellt!');
+          this.toastService.showToast('Backup erfolgreich wiederhergestellt');
         }).catch((err) => {
           this.toastService.showToast(JSON.stringify(err));
         });
@@ -183,7 +183,7 @@ export class SettingsPage {
         this.checkDir().then(() => {
           this.file.writeFile(this.file.externalRootDirectory, filename, json_string).then(() => {
             this.listDir();
-            this.toastService.showToast('Backup erfolgreich angelegt!');
+            this.toastService.showToast('Backup erfolgreich angelegt');
             resolve();
           }).catch(err => {
             this.toastService.showToast('Fehler beim Anlegen des Backups');
@@ -197,7 +197,7 @@ export class SettingsPage {
               }).catch(err => reject(err))
             }).catch(err => reject(err))
           } else {
-            this.toastService.showToast('Fehler beim Anlegen des Ordners für Backups!');
+            this.toastService.showToast('Fehler beim Anlegen des Ordners für Backups');
             reject(err);
           }
         });
@@ -243,7 +243,7 @@ export class SettingsPage {
           text: 'Ok',
           handler: () => {
             this.deleteBackupFileOnAndroid(file).then(()=>{
-              this.toastService.showToast('Löschen erfolgreich!');
+              this.toastService.showToast('Löschen erfolgreich');
             })
           }
         }
@@ -264,7 +264,7 @@ export class SettingsPage {
 
   deleteDirManually() {
     this.file.removeRecursively(this.file.externalRootDirectory, 'StudentMgmt').then(() => {
-      this.toastService.showToast('Löschen erfolgreich!');
+      this.toastService.showToast('Löschen erfolgreich');
     }).catch((err) => {
       this.toastService.showToast(err.message);
     });
@@ -281,7 +281,7 @@ export class SettingsPage {
     this.file.listDir(this.file.externalRootDirectory, 'StudentMgmt').then((res) => {
       this.filesInDir = res;
     }).catch((err) => {
-      this.toastService.showToast('Backupverzeichnis nicht gefunden!');
+      this.toastService.showToast('Backupverzeichnis nicht gefunden');
     });
   }
 
@@ -301,7 +301,7 @@ export class SettingsPage {
 
   checkDirManually() {
     this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt').then((res) => {
-      this.toastService.showToast('Directory exists!')
+      this.toastService.showToast('Directory exists')
     }).catch((err) => {
       this.toastService.showToast(err.message);
     });
@@ -309,7 +309,7 @@ export class SettingsPage {
 
   createDirManually() {
     this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt', true).then((res) => {
-      this.toastService.showToast('Directory successfully created!')
+      this.toastService.showToast('Directory successfully created')
     }).catch((err) => {
       this.toastService.showToast(err.message);
     });
@@ -360,7 +360,7 @@ export class SettingsPage {
             try {
               let imported_data = JSON.parse(reader.result);
               me.restoreFromBackup(imported_data).then(() => {
-                me.toastService.showToast('Backup erfolgreich wiederhergestellt!');
+                me.toastService.showToast('Backup erfolgreich wiederhergestellt');
               })
             } catch (err) {
               me.toastService.showToast('Fehler beim Lesen der Datei');
