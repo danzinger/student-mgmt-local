@@ -54,6 +54,7 @@ export class CourseCreatePage {
     course._id = this.mongoIdService.newObjectId()
     course.participants = []
     course.notes = []
+    course.performanceCategories = [];
     this.createCourse(course)
   }
 

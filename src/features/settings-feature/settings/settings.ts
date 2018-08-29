@@ -56,7 +56,7 @@ export class SettingsPage {
   //
 
   addMockData() {
-    this.storage.set('courses', COURSES).then(() => {
+    this.storage.set('courses', COURSES).then(() => { 
       this.courses = COURSES;
     }).then(() => {
       this.storage.set('students', STUDENTS).then(() => {

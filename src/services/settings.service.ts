@@ -8,6 +8,7 @@ export class SettingsService {
   }
 
   ENVIRONMENT_IS_DEV = false;
+  AUTOBACKUP_ON_RESTORE = true;
   // setEnvironment(env){
   //   this.storage.set('ENVIRONMENT_IS_DEV',env).then(()=>{
   //     this.ENVIRONMENT_IS_DEV = env;

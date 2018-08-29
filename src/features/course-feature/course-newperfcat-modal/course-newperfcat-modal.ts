@@ -19,7 +19,7 @@ export class CourseNewperfcatModalPage {
   form_incremental: FormGroup;
   form_group: FormGroup;
   isReadyToSave: boolean = false;
-  type = "incremental";
+  type;
   weight_changed = false;
   distribute_others_equally = false;
 
