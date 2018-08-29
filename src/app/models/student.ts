@@ -9,5 +9,5 @@ export class Student {
     gradings:any[]; //This Object contains: grading_id, course_id (grading for which course), teilleistungs_id (grading for which teilleistung, Teilleistungen können dann gewichtet werden),  date, actual grading(points), notes
     computed_gradings:any; 
     notes:object[];
-    //registered?:any;
+    registered?:any;
   }
