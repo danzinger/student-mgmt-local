@@ -8,9 +8,10 @@ import { COURSES } from '../../../app/mock-data/courses';
 import { STUDENTS } from '../../../app/mock-data/students_new';
 import { ToastService } from '../../../services/toast.service';
 
-import { File, FileEntry } from '@ionic-native/file';
+import { File } from '@ionic-native/file';
 import { SettingsService } from '../../../services/settings.service';
-
+import { FileChooser } from '@ionic-native/file-chooser';
+import { FilePath } from '@ionic-native/file-path';
 @IonicPage()
 @Component({
   selector: 'page-settings',
@@ -34,6 +35,9 @@ export class SettingsPage {
     public courseService: CourseService,
     public settingsService: SettingsService,
     public file: File,
+    private fileChooser: FileChooser,
+    //public fileEntry: FileEntry,
+    public filePath: FilePath,
     public alertCtrl: AlertController, ) {
   }
 
@@ -61,8 +65,8 @@ export class SettingsPage {
       this.storage.set('students', STUDENTS).then(() => {
         this.students = STUDENTS;
       });
-    }).then(() => this.toastService.showToast('SUCCESS')
-    ).catch(() => this.toastService.showToast('ERROR'))
+    }).then(() => this.toastService.showToast('Testdaten erfolgreich hinzugefügt')
+    ).catch(() => this.toastService.showToast('Fehler beim Hinzufügen der Testdaten'))
   }
 
   removeCourses() {
@@ -109,6 +113,7 @@ export class SettingsPage {
     })
   }
 
+
   handleError(err) {
     //console.log(err);
     this.toastService.showToast(JSON.stringify(err));
@@ -119,8 +124,61 @@ export class SettingsPage {
   //   :::::: A N D R O I D   F E A T U R E S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
   //
+
+  editFileName(file) {
+    let backup_data;
+    this.getBackupDataFromFileOnAndroid(file).then((data => {
+      backup_data = data;
+      let backup_data_courses_length = backup_data.courses ? backup_data.courses.length : 0;
+      let backup_data_students_length = backup_data.students ? backup_data.students.length : 0; 
+      let prompt = this.alertCtrl.create({
+        title: 'Details',
+        message: "Datum: " + backup_data.meta.date+"<br>Uhrzeit: "+backup_data.meta.time+"<br>Kurse: "+backup_data_courses_length+"<br>Studenten: "+backup_data_students_length,
+        inputs: [
+          {
+            name: 'new_filename',
+            placeholder: file.name
+          },
+        ],
+        buttons: [
+          {
+            text: 'Abbrechen',
+            handler: data => {
+              console.log('Cancel clicked');
+            }
+          },
+          {
+            text: 'Speichern',
+            handler: data => {
+              if(data.new_filename && data.new_filename != '' ) this.file.copyFile(this.file.externalRootDirectory, 'StudentMgmt/' + file.name, this.file.externalRootDirectory, 'StudentMgmt/' + data.new_filename).then(() => {
+                this.deleteBackupFileOnAndroid(file);
+                this.listDir()
+              });
+            }
+          }
+        ]
+      });
+      prompt.present();
+    }));
+  }
+
+  openFileChooser() {
+    this.fileChooser.open()
+      //.then(uri => console.log(uri))
+      .then(uri => {
+        //console.log(file)
+        this.filePath.resolveNativePath(uri).then((x) => {
+          this.file.resolveLocalFilesystemUrl(x).then((file) => {
+            this.presentRestoreFromBackupOnAndroidConfirm(file);
+          });
+        })
+        //this.presentRestoreFromBackupOnAndroidConfirm(file);
+      })
+      .catch(e => console.log(e));
+  }
+
   presentRestoreFromBackupOnAndroidConfirm(file) {
-    let message = !this.settingsService.AUTOBACKUP_ON_RESTORE ? 'Backup "'+file.name+'" wiederherstellen?<br><br><strong>ACHTUNG</strong>: Dadurch werden alle derzeitigen Daten gelöscht!' : 'Backup "'+file.name+'" wiederherstellen? Es wird ein automatisches Backup der derzeitigen Daten angelegt.'
+    let message = !this.settingsService.AUTOBACKUP_ON_RESTORE ? 'Backup "' + file.name + '" wiederherstellen?<br><br><strong>ACHTUNG</strong>: Dadurch werden alle derzeitigen Daten gelöscht!' : 'Backup "' + file.name + '" wiederherstellen? Es wird ein automatisches Backup der derzeitigen Daten angelegt.'
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
       message: message,
@@ -150,10 +208,10 @@ export class SettingsPage {
           this.restoreFromBackup(parsed_data).then(() => {
             this.toastService.showToast('Backup erfolgreich wiederhergestellt');
           }).catch((err) => {
-            this.toastService.showToast(JSON.stringify(err));
+            this.toastService.showToast("Fehler beim Wiederherstellen");
           });
         }).catch((err) => {
-          this.toastService.showToast(JSON.stringify(err));
+          this.toastService.showToast("Fehler beim Wiederherstellen");
         });
       }).catch((err) => this.handleError(err));
     } else {
@@ -161,10 +219,10 @@ export class SettingsPage {
         this.restoreFromBackup(parsed_data).then(() => {
           this.toastService.showToast('Backup erfolgreich wiederhergestellt');
         }).catch((err) => {
-          this.toastService.showToast(JSON.stringify(err));
+          this.toastService.showToast("Fehler beim Wiederherstellen");
         });
       }).catch((err) => {
-        this.toastService.showToast(JSON.stringify(err));
+        this.toastService.showToast("Fehler beim Wiederherstellen");
       });
     }
   }
@@ -179,7 +237,7 @@ export class SettingsPage {
       this.gatherBackupData().then(backupData => {
         let json_string: string = JSON.stringify(backupData);
         let time = new Date().toJSON().slice(0, 10);
-        let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6) + '.stmb';
+        let filename: string = 'StudentMgmt/' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6);// + '.stmb' removed
         this.checkDir().then(() => {
           this.file.writeFile(this.file.externalRootDirectory, filename, json_string).then(() => {
             this.listDir();
@@ -210,18 +268,24 @@ export class SettingsPage {
   //
 
   getBackupDataFromFileOnAndroid(file) {
-    return new Promise(resolve => {
-      this.file.readAsText(this.file.externalRootDirectory, 'StudentMgmt/' + file.name).then((res) => {
-        let parsed_data = JSON.parse(res);
-        resolve(parsed_data);
+    //console.log(JSON.stringify(file))
+    return new Promise(
+      (resolve, reject) => {
+        this.file.readAsText(this.file.externalRootDirectory, 'StudentMgmt/' + file.name).then((res) => {
+          let parsed_data = JSON.parse(res);
+          //just a ridicolous check, but I'd like to use older data for testing. So I dont introduce a more complex check.
+          if (!parsed_data || !parsed_data.meta) reject("wrong file");
+          //console.log(JSON.stringify(parsed_data.meta))
+          resolve(parsed_data);
+        }).catch((err) => {
+          reject(err);
+        });
       });
-    });
   }
 
   //
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
-
 
 
   //
@@ -231,7 +295,7 @@ export class SettingsPage {
   presentDeleteBackupOnAndroidConfirm(file) {
     let alert = this.alertCtrl.create({
       title: 'Löschen?',
-      message: 'Soll das Backup "'+file.name+'" gelöscht werden?',
+      message: 'Soll das Backup "' + file.name + '" gelöscht werden?',
       buttons: [
         {
           text: 'Abbrechen',
@@ -242,7 +306,7 @@ export class SettingsPage {
         {
           text: 'Ok',
           handler: () => {
-            this.deleteBackupFileOnAndroid(file).then(()=>{
+            this.deleteBackupFileOnAndroid(file).then(() => {
               this.toastService.showToast('Löschen erfolgreich');
             })
           }
@@ -285,13 +349,14 @@ export class SettingsPage {
     });
   }
 
-  fileInfo;
-  getMetaDataFromFile(file) {
-    // https://github.com/ionic-team/ionic-native/issues/1411
-    this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file: FileEntry) => {
-      file.file(meta => { return meta })
-    })
-  }
+  // fileInfo;
+  // getMetaDataFromFile(file) {
+  //   // https://github.com/ionic-team/ionic-native/issues/1411
+  //   this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file: FileEntry) => {
+  //     file.file(meta => { return meta })
+  //   })
+  // }
+
   checkDir() {
     return this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt')
   }
@@ -380,7 +445,7 @@ export class SettingsPage {
       var a = window.document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       let time = new Date().toJSON().slice(0, 10);
-      a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6) + '.stmb';
+      a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6);// + '.stmb' removed
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -5,16 +5,20 @@ import { Ng2FileInputModule } from 'ng2-file-input';
 
 //PLUGINS:
 import { File } from '@ionic-native/file';
+import { FileChooser } from '@ionic-native/file-chooser';
+import { FilePath } from '@ionic-native/file-path';
 
 //DIRECTIVES
 import { DirectivesModule } from '../../../directives/directives.module';
 
 @NgModule({
   declarations: [
-    SettingsPage,
+    SettingsPage
   ],
   providers:[
-    File
+    File,
+    FileChooser,
+    FilePath
   ],
   imports: [
     IonicPageModule.forChild(SettingsPage),
