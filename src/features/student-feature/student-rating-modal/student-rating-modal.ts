@@ -102,6 +102,7 @@ export class StudentRatingModalPage {
   addNewComputedGrading() {
     this.student.computed_gradings.push({
       category_id: this.rating.category_id,
+      course_id: this.rating.course_id,
       category_name: this.category_name,
       total_points: this.rating.points
     })

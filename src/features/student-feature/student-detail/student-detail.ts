@@ -76,7 +76,8 @@ export class StudentDetailPage {
   presentRatingModal(rating_details) {
     let ratingModal = this.modalCtrl.create('StudentRatingModalPage', {
       rating_details: rating_details,
-      student: this.student
+      student: this.student,
+      course_id: this.selected_course._id
     });
     ratingModal.onDidDismiss(data => {
       //this.final_grade = this.calculateGrade();

@@ -5,6 +5,7 @@ import { MongoIdService } from '../../../services/mongo-id.service';
 import { SettingsService } from '../../../services/settings.service';
 import { ToastService } from '../../../services/toast.service';
 import { Course } from '../../../app/models/course';
+import { StudentService } from '../../../services/student-service';
 
 @IonicPage()
 @Component({
@@ -22,7 +23,9 @@ export class CourseListPage {
     public alertCtrl: AlertController,
     public mongoIdService: MongoIdService,
     public settingsService: SettingsService,
-    public toastService:ToastService
+    public toastService:ToastService,
+    private studentService: StudentService
+    
   ) {
   }
 
@@ -147,6 +150,7 @@ export class CourseListPage {
             this.courseService.deleteCourse(course._id).subscribe(
               data => {
                 this.courses = data;
+                this.deleteAllGradingsInPerfcatsFromAllStudents(course._id);
                 this.toastService.showToast('Löschen erfolgreich'); }
               ,error => {
                 this.toastService.showToast('Löschen fehlgeschlagen');
@@ -156,6 +160,51 @@ export class CourseListPage {
       ]
     });
     alert.present();
+  }
+  
+  initializeDeletionArray(child): String[] {
+    //returns an array of a grading_category and all of its subgroups
+    let deletion_array = []
+    deletion_array.push(child._id);
+    if (child.children && child.children.length > 0) {
+      child.children.map((subgroup) => {
+        deletion_array.push(subgroup._id);
+        if (subgroup.children && subgroup.children.length > 0) {
+          subgroup.children.map((subsubgroup) => {
+            deletion_array.push(subsubgroup._id);
+            if (subsubgroup.children && subsubgroup.children.length > 0) {
+              subsubgroup.children.map((subsubsubgroup) => {
+                deletion_array.push(subsubsubgroup._id);
+              })
+            }
+          });
+        }
+      });
+    }
+    return deletion_array;
+  }
+
+  deleteAllGradingsInPerfcatsFromAllStudents(course_id) {
+    //delete all gradings from all students in all categories enlisted in the deletion_array
+    //we not only fetch the registered students because: 1) students is registered for course 2) grading is entered 3) student is unregistered from course 4) grading category is deleted => if only the registered students would be updated, then this grading would remain in the students gradings & computed_gradings array(s)    
+    let students_to_update = [];
+    this.studentService.getStudents().subscribe(
+      students => {
+        if (students) {
+          students.forEach((student) => {
+            //filter the student.gradings and the student.computed_gradings array, to delete the gradings of the course being deleted
+              if (student.gradings) { student.gradings = student.gradings.filter(grading => grading.course_id != course_id) };
+              if (student.computed_gradings) { student.computed_gradings = student.computed_gradings.filter(computed_grading => computed_grading.course_id != course_id) };
+            //});
+            students_to_update.push(student);
+          });
+          this.studentService.updateAllStudents(students_to_update).subscribe(() => {
+          })
+        }
+      },
+      error => {
+        this.toastService.showToast('Fehler beim Löschen der Bewertungen!');
+      })
   }
 
 //

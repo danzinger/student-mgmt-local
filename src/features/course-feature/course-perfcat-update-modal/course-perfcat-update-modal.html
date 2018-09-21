@@ -22,7 +22,7 @@
     <form>
         <!-- This one updates a top level group -->
         <div *ngIf="!addToGroup">
-            <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">Edit a top level category</span>
+            <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">Edit a category</span>
             <ion-item>
                 <ion-label floating>Name</ion-label>
                 <ion-input type="text" [(ngModel)]="performanceCategory.name" name="name"></ion-input>
@@ -37,8 +37,11 @@
 
               -> only feasable solution would be to delete all gradings within this category and start over. But this is more logical if the user is forced to delete the group (which deletes all gradings of all students within this category) and start over.
                  anyway, the way a course is graded should be exactly defined, before students are graded. Otherwise this will cause many problems. 
-              -> It will only be possible to change the name, description and the Parameters of the GROUP TYPE (like defined when the category was created). Like the maximum_points / weigth in type "max_and_weight" or the percenage_points-per_unit in type "incremental". For subgroups it should always be possible to change the weigths -->
+              -> It will only be possible to change the name, description and the Parameters of the GROUP TYPE (like defined when the category was created). Like the maximum_points / weigth in type "max_and_weight" or the percenage_points-per_unit in type "incremental". For subgroups it should always be possible to change the weigths 
 
+              ///2018-09-02
+                An option is to let the user change between type "incremental" and "maximum and weight" 
+                A Group pf course cant be changed to something else -->
             <ion-item>
                 <ion-label>Typspezifische Parameter:</ion-label>
             </ion-item>
@@ -49,7 +52,7 @@
                 </ion-item>
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
-                    <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
+                    <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'incremental'">
@@ -61,7 +64,7 @@
             <div *ngIf="performanceCategory.type == 'group'">
                 <ion-item>
                     <ion-label floating>Gewichtung</ion-label>
-                    <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" (ionChange)='weigthChange($event)' name="category_weight"></ion-input>
+                    <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'group' || performanceCategory.type == 'max_and_weight'">
@@ -70,6 +73,12 @@
                     <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>
             </div>
+            <ion-item>
+                <ion-label floating>In andere Gruppe verschieben</ion-label>
+                <ion-select name="group" [(ngModel)]="newParent" multiple="false" cancelText="Abbrechen" okText="Ok">
+                    <ion-option *ngFor="let group of groups" [value]="group">{{group.name}}</ion-option>
+                </ion-select>
+            </ion-item>
         </div>
         <!-- This one is for editing a child -->
         <!-- <div *ngIf="child && !addToGroup">

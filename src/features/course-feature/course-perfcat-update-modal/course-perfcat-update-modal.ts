@@ -25,6 +25,7 @@ export class CoursePerfcatUpdateModalPage {
   form;
   weight_changed = false;
   distribute_others_equally = false;
+  topLevelCategory;
 
   constructor(
     public navCtrl: NavController,
@@ -43,8 +44,10 @@ export class CoursePerfcatUpdateModalPage {
     this.number_of_parents = navParams.get('number_of_parents');
     this.parent = navParams.get('parent');
     this.parent_id = this.parent ? this.parent._id : null;
-    if(this.child) this.performanceCategory = this.child;
-    //this.performanceCategory = this.child ? this.child : this.performanceCategory;
+    // next two lines seem very weired. This was done because in older Version, there was a distinction between "edit a toplevel-category" and "edit a child". To avoid repetitive code in the model, this was changed. However, I was too lazy to change the variabled in the model accordingly. So I introduced this weired "hack"
+    // unfourtunately, to delete a category which has moved, we need to know which is the corresponding toplevel-category to easily find and delete the category that has been moved.
+    this.topLevelCategory = this.performanceCategory;
+    if (this.child) this.performanceCategory = this.child;
 
     this.subgroup = {}
     if (this.settingsService.ENVIRONMENT_IS_DEV) {
@@ -59,12 +62,24 @@ export class CoursePerfcatUpdateModalPage {
     }
   }
 
+  //
+  // ─── CORE FEATURES ──────────────────────────────────────────────────────────────
+  //
+
+  ionViewDidEnter() {
+    this.gatherAllGroups();
+    console.log(this.parent)
+  }
+
   cancel() {
     this.viewCtrl.dismiss();
   }
 
   done() {
+    this.presentConfirm();
+  }
 
+  makeDataReady() {
     if (this.subgroup.type == 'max_and_weight') {
       delete this.subgroup.percentage_points_per_unit;
     }
@@ -72,7 +87,7 @@ export class CoursePerfcatUpdateModalPage {
       delete this.subgroup.point_maximum;
       //this was needed for the grade-calculation to work. 
       this.subgroup.category_weight = 1;
-    }if(this.subgroup.type == 'group'){
+    } if (this.subgroup.type == 'group') {
       this.subgroup.children = [];
       delete this.subgroup.percentage_points_per_unit;
       delete this.subgroup.point_maximum;
@@ -89,53 +104,11 @@ export class CoursePerfcatUpdateModalPage {
         this.performanceCategory.children.push(this.subgroup);
       }
     }
-    this.presentConfirm();
   }
 
   clearInitialSelection() {
     this.performanceCategory.point_maximum = '';
     this.performanceCategory.percentage_points_per_unit = '';
-  }
-
-  weigthChange(ev) {
-    this.weight_changed = true;
-  }
-
-  autoWeight() {
-    //Equally distribute weight of other categories on same level if weight of one category is changed manually
-
-    //the following definitions are valid if we EDIT a toplevel-category or a child
-    let group_to_autoweight = this.parent ? this.parent.children : this.course.performanceCategories;
-    let edited_category = this.child ? this.child : this.performanceCategory;
-    //or - because it is now unneccesary to distinguish between a child or a category - we can just put:
-    // let edited_category = this.performanceCategory;
-    //or now just use this.performanceCategory directly in the function
-
-
-    //if we ADD a subgroup to a parent things are slightly different
-    if(this.addToGroup) {
-      edited_category = this.subgroup;
-    }
-
-    // let precisionRound = function (number, precision) {
-    //   var factor = Math.pow(10, precision);
-    //   return Math.round(number * factor) / factor;
-    // }
-
-    if (this.weight_changed || this.addToGroup) {
-      let cats = [];
-      for (let category of group_to_autoweight) {
-        if (category._id != edited_category._id && category.type != 'incremental') {
-          cats.push(Number(category.category_weight));
-        }
-      }
-      for (let category of group_to_autoweight) {
-        if (category._id != edited_category._id && category.type != 'incremental') {
-          category.category_weight = (1 - edited_category.category_weight) / cats.length;
-          if (category.category_weight < 0) category.category_weight = 0;
-        }
-      }
-    }
   }
 
 
@@ -153,6 +126,8 @@ export class CoursePerfcatUpdateModalPage {
         {
           text: 'Ok',
           handler: () => {
+            this.makeDataReady();
+            if (this.newParent) this.changeParent(this.performanceCategory, this.newParent);
             if (this.distribute_others_equally) this.autoWeight();
             this.courseService.updateCourse(this.course).subscribe(
               data => {
@@ -168,5 +143,142 @@ export class CoursePerfcatUpdateModalPage {
     });
     alert.present();
   }
+
+
+  //
+  // ─── MOVE CATEGORY FEATURE ──────────────────────────────────────────────────────
+  //
+
+  newParent;
+  groups;
+  differentParentSelected = false;
+  // TODO: if user moves the category, but want to autoweight, he wants to autoweight two things:
+  // first the OLD parent group
+  // second the NEW parent group
+  gatherAllGroups() {
+    this.groups = []
+    if (this.parent) this.groups.push({ _id: 0, name: 'Oberste Ebene' });
+    // TODO (URGENT): Do not show subcategories of the category!!! One cannot move a parent into one of his children
+    if (this.course.performanceCategories.length > 0) this.course.performanceCategories.map((toplevel_category) => {
+      if (this.isGroup(toplevel_category) && toplevel_category._id != this.performanceCategory._id) {
+        if (this.performanceCategory._id != toplevel_category._id && toplevel_category._id != this.parent_id) {
+          this.groups.push({ _id: toplevel_category._id, name: toplevel_category.name });
+        }
+        toplevel_category.children.map((first_level_child) => {
+          if (this.isGroup(first_level_child) && first_level_child._id != this.performanceCategory._id) {
+            if (this.performanceCategory._id != first_level_child._id && first_level_child._id != this.parent_id) {
+              this.groups.push({ _id: first_level_child._id, name: first_level_child.name });
+            }
+            first_level_child.children.map((second_level_child) => {
+              if (this.isGroup(second_level_child) && second_level_child._id != this.performanceCategory._id) {
+                if (this.performanceCategory._id != second_level_child._id && second_level_child._id != this.parent_id) {
+                  this.groups.push({ _id: second_level_child._id, name: second_level_child.name });
+                }
+                second_level_child.children.map((third_level_child) => {
+                  if (this.isGroup(third_level_child) && third_level_child._id != this.performanceCategory._id) {
+                    if (this.performanceCategory._id != third_level_child._id && third_level_child._id != this.parent_id) {
+                      this.groups.push({ _id: third_level_child._id, name: third_level_child.name });
+                    }
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
+    })
+  }
+
+  isGroup(category) {
+    return category.type && category.type == "group"
+  }
+
+  changeParent(category, newParent) {
+    if (newParent._id == 0) {
+      this.course.performanceCategories.push(category);
+      this.deleteCategory(this.topLevelCategory, this.parent, this.performanceCategory);
+    } else {
+      if (this.course.performanceCategories.length > 0) this.course.performanceCategories.map((toplevel_category) => {
+        if (this.isGroup(toplevel_category)) {
+          if (toplevel_category._id == newParent._id) {
+            toplevel_category.children.push(category)
+            this.deleteCategory(this.topLevelCategory, this.parent, this.performanceCategory);
+          } else {
+            toplevel_category.children.map((first_level_child) => {
+              if (this.isGroup(first_level_child)) {
+                if (first_level_child._id == newParent._id) {
+                  first_level_child.children.push(category)
+                  this.deleteCategory(this.topLevelCategory, this.parent, this.performanceCategory);
+                } else {
+                  first_level_child.children.map((second_level_child) => {
+                    if (this.isGroup(second_level_child)) {
+                      if (second_level_child._id == newParent._id) {
+                        second_level_child.children.push(category)
+                        this.deleteCategory(this.topLevelCategory, this.parent, this.performanceCategory);
+                      }
+                    }
+                  })
+                }
+              }
+            })
+          }
+        }
+      })
+    }
+  }
+
+  deleteCategory(category, parent, child) {
+    let isTopLevel;
+    if (!this.parent) isTopLevel = true;
+    if (isTopLevel) {
+      let index = this.course.performanceCategories.indexOf(category);
+      if (index > -1) this.course.performanceCategories.splice(index, 1);
+      //if it is not a top level category, the performanceCategories array of the course must be updated
+    } else {
+      let index = parent.children.indexOf(child);
+      if (index > -1) parent.children.splice(index, 1);
+    }
+  }
+
+  //
+  // ─── AUTOWEIGHT FEATURE ─────────────────────────────────────────────────────────
+  //
+
+  // weigthChange(ev) {
+  //   this.weight_changed = true;
+  // }
+
+  autoWeight() {
+    //Equally distribute weight of other categories on same level if weight of one category is changed manually
+
+    //the following definitions are valid if we EDIT a toplevel-category or a child
+    let group_to_autoweight = this.parent ? this.parent.children : this.course.performanceCategories;
+    let edited_category = this.child ? this.child : this.performanceCategory;
+    //or - because it is now unneccesary to distinguish between a child or a category - we can just put:
+    // let edited_category = this.performanceCategory;
+    //or now just use this.performanceCategory directly in the function
+
+
+    //if we ADD a subgroup to a parent things are slightly different
+    if (this.addToGroup) {
+      edited_category = this.subgroup;
+    }
+
+    let cats = [];
+    for (let category of group_to_autoweight) {
+      if (category._id != edited_category._id && category.type != 'incremental') {
+        cats.push(Number(category.category_weight));
+      }
+    }
+    for (let category of group_to_autoweight) {
+      if (category._id != edited_category._id && category.type != 'incremental') {
+        category.category_weight = (1 - edited_category.category_weight) / cats.length;
+        if (category.category_weight < 0) category.category_weight = 0;
+      }
+    }
+  }
+
+
+
 
 }

@@ -89,7 +89,7 @@
             </ion-fab>
         </ion-list>
         <ion-list *ngSwitchCase="'categories'">
-            <div *ngFor="let category of course.performanceCategories">
+            <div *ngFor="let category of course.performanceCategories | orderBy : 'name'">
                 <ion-card class="top-level-card">
                     <ion-card-header class="header">
                         <div float-left class="title">
@@ -117,7 +117,7 @@
                         {{category.description}}
                     </ion-card-content>
                 </ion-card>
-                <div *ngFor="let child of category.children" class="top-level-children-border">
+                <div *ngFor="let child of category.children | orderBy : 'name'" class="top-level-children-border">
                     <ion-card class="sub-level-card">
                         <ion-card-header class="header">
                             <div float-left class="title">
@@ -147,7 +147,7 @@
                             {{child.description}}
                         </ion-card-content>
                     </ion-card>
-                    <div *ngFor="let baby of child.children" class="sub-level-children-border">
+                    <div *ngFor="let baby of child.children | orderBy : 'name'" class="sub-level-children-border">
                         <ion-card class="sub-sub-level-card">
                             <ion-card-header class="header">
                                 <div float-left class="title">
@@ -175,7 +175,7 @@
                                 {{baby.description}}
                             </ion-card-content>
                         </ion-card>
-                        <div *ngFor="let subSubSubGroup of baby.children" class="sub-sub-level-children-border">
+                        <div *ngFor="let subSubSubGroup of baby.children | orderBy : 'name'" class="sub-sub-level-children-border">
                             <ion-card class="sub-sub-sub-level-card">
                                 <ion-card-header class="header">
                                     <div float-left class="title">

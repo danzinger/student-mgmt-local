@@ -8,9 +8,6 @@
           <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
             <ion-icon name="information-circle"></ion-icon>
         </button>
-        <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printTable()">
-          <ion-icon name="information-circle"></ion-icon>
-      </button>
         </ion-buttons>
     </ion-navbar>
     <ion-toolbar no-border-top class="segment-bar">
@@ -54,22 +51,22 @@
                 <ion-item no-lines>
                     <ion-label class="total-points">Kurs: {{calculateGrade()}} %</ion-label>
                 </ion-item>
-                <div *ngFor="let category of selected_course.performanceCategories">
+                <div *ngFor="let category of selected_course.performanceCategories | orderBy : 'name'">
                     <button class="toplevel-button" *ngIf="category.type != 'group'" (click)="addNewRating(category._id, category.name)" ion-button full>{{category.name}}: {{getStudentsRatingInACat(category._id, student._id)}}{{getCategoryInfo(category)}}</button>
                     <ion-item no-lines class="toplevel-grouplabel" *ngIf="category.type == 'group'">
                         <ion-label>{{category.name}}: {{calculateGrade(category.children)}} %</ion-label>
                     </ion-item>
-                    <div class="toplevel-group" *ngFor="let subgroup of category.children">
+                    <div class="toplevel-group" *ngFor="let subgroup of category.children | orderBy : 'name'">
                         <button class="subgroup-button" *ngIf="subgroup.type != 'group'" (click)="addNewRating(subgroup._id, subgroup.name)" ion-button full>{{subgroup.name}}: {{getStudentsRatingInACat(subgroup._id, student._id)}}{{getCategoryInfo(subgroup)}}</button>
                         <ion-item no-lines  class="subgroup-grouplabel" *ngIf="subgroup.type == 'group'">
                             <ion-label>{{subgroup.name}}: {{calculateGrade(subgroup.children)}} %</ion-label>
                         </ion-item>
-                        <div class="sublevel-group" *ngFor="let subsubgroup of subgroup.children">
+                        <div class="sublevel-group" *ngFor="let subsubgroup of subgroup.children | orderBy : 'name'">
                             <button class="subsubgroup-button" *ngIf="subsubgroup.type != 'group'" (click)="addNewRating(subsubgroup._id, subsubgroup.name)" ion-button full>{{subsubgroup.name}}: {{getStudentsRatingInACat(subsubgroup._id, student._id)}}{{getCategoryInfo(subsubgroup)}}</button>
                             <ion-item no-lines class="subsubgroup-grouplabel" *ngIf="subsubgroup.type == 'group'">
                                 <ion-label>{{subsubgroup.name}}: {{calculateGrade(subsubgroup.children)}} %</ion-label>
                             </ion-item>
-                            <div  class="subsublevel-group" *ngFor="let subsubsubgroup of subsubgroup.children">
+                            <div  class="subsublevel-group" *ngFor="let subsubsubgroup of subsubgroup.children | orderBy : 'name'">
                                 <button class="subsubsubgroup-button" (click)="addNewRating(subsubsubgroup._id, subsubsubgroup.name)" ion-button full>{{subsubsubgroup.name}}: {{getStudentsRatingInACat(subsubsubgroup._id, student._id)}}{{getCategoryInfo(subsubsubgroup)}}</button>
                             </div>
                         </div>

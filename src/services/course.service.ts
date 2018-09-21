@@ -9,10 +9,12 @@ import 'rxjs/add/observable/from';
 //import 'rxjs/add/observable/fromPromise';
 //import { fromPromise } from 'rxjs/observable/fromPromise';
 import { Course } from '../app/models/course';
+import { StudentService } from './student-service';
 
 @Injectable()
 export class CourseService {
-  constructor(private storage: Storage) {
+  constructor(
+    private storage: Storage) {
   }
 
   //

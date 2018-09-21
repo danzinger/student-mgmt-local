@@ -33,9 +33,16 @@ $app-direction: ltr;
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
 
+// $colors: (
+//   primary:    #488aff,
+//   secondary:  #32db64,
+//   danger:     #f53d3d,
+//   light:      #f4f4f4,
+//   dark:       #222
+// );
 $colors: (
-  primary:    #488aff,
-  secondary:  #32db64,
+  primary:    rgb(73, 93, 206),
+  secondary:  rgb(73, 93, 206),
   danger:     #f53d3d,
   light:      #f4f4f4,
   dark:       #222
@@ -53,8 +60,10 @@ $colors: (
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 
-
-
+ $toolbar-background: rgba(198, 204, 253, 0.507);
+ $tabs-background: rgba(198, 204, 253, 0.507);
+//$toolbar-background: #c5cae9;
+//$tabs-background: #c5cae9;
 
 // App Windows Variables
 // --------------------------------------------------
