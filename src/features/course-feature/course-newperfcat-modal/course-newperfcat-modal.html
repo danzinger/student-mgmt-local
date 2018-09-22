@@ -55,7 +55,7 @@
             <ion-input formControlName="description"></ion-input>
         </ion-item>
         <ion-item>
-            <ion-label floating>Wert pro Einheit</ion-label>
+            <ion-label floating>Prozentpunkte pro Einheit</ion-label>
             <ion-input type="number" formControlName="percentage_points_per_unit"></ion-input>
         </ion-item>
     </form>
@@ -69,12 +69,12 @@
             <ion-input formControlName="description"></ion-input>
         </ion-item>
         <ion-item>
-            <ion-label floating>Gewichtung</ion-label>
+            <ion-label floating>Gewichtung in Prozent</ion-label>
             <ion-input type="number" formControlName="category_weight"></ion-input>
         </ion-item>
     </form>
     <div *ngIf="type == 'group' || type == 'max_and_weight'">
-        <ion-item>
+        <ion-item *ngIf="settingsService.EXPERIMENTAL_FEATURES">
             <ion-label>Diese Ebene automatisch gewichten</ion-label>
             <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
         </ion-item>

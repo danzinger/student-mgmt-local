@@ -51,7 +51,7 @@ export class CourseNewperfcatModalPage {
       name: ['', Validators.required],
       description: [''],
       point_maximum: ['', [Validators.required, Validators.min(0)]],
-      category_weight: ['', [Validators.required, Validators.min(0), Validators.max(1)]],
+      category_weight: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
       type: [''],
     });
 
@@ -60,14 +60,14 @@ export class CourseNewperfcatModalPage {
       name: ['', Validators.required],
       description: [''],
       type: [''],
-      percentage_points_per_unit: ['', [Validators.required, Validators.min(0), Validators.max(1)]]
+      percentage_points_per_unit: ['', [Validators.required, Validators.min(0), Validators.max(100)]]
     });
 
     this.form_group = formBuilder.group({
       _id: [''],
       name: ['', Validators.required],
       description: [''],
-      category_weight: ['', [Validators.required, Validators.min(0), Validators.max(1)]],
+      category_weight: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
       type: [''],
     });
 
@@ -117,8 +117,8 @@ export class CourseNewperfcatModalPage {
 
     //Convert the input-values to the correct type and prepare data for saving
     this.form.value.point_maximum = this.form.value.point_maximum ? Number(this.form.value.point_maximum) : null;
-    this.form.value.category_weight = this.form.value.category_weight ? Number(this.form.value.category_weight) : null;
-    this.form.value.percentage_points_per_unit = this.form.value.percentage_points_per_unit ? Number(this.form.value.percentage_points_per_unit) : null;
+    this.form.value.category_weight = this.form.value.category_weight ? Number(this.form.value.category_weight)/100 : null;
+    this.form.value.percentage_points_per_unit = this.form.value.percentage_points_per_unit ? Number(this.form.value.percentage_points_per_unit)/100 : null;
 
     this.form.value._id = this.mongoIdService.newObjectId();
     this.form.value.type = this.type;

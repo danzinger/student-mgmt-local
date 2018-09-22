@@ -40,17 +40,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497474"
-     inkscape:cx="1050.5408"
-     inkscape:cy="2111.6791"
+     inkscape:zoom="0.175"
+     inkscape:cx="869.74426"
+     inkscape:cy="1826.8207"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="1912"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1218"
+     inkscape:window-height="951"
+     inkscape:window-x="3964"
+     inkscape:window-y="99"
+     inkscape:window-maximized="0"
      units="px"
      showguides="true"
      inkscape:guide-bbox="true">
@@ -68,7 +68,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -78,7 +78,7 @@
      id="layer1"
      transform="translate(-13.976576,-31.526199)">
     <rect
-       style="opacity:0.75;fill:#000000;stroke-width:0.27956975"
+       style="opacity:0.75;fill:#c6ccfd;stroke-width:0.27956975;fill-opacity:0.50588238"
        id="rect10"
        width="618.2486"
        height="618.2486"
@@ -86,7 +86,7 @@
        y="14.551447" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:34.80023956px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto Light';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.40781528"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:34.80023956px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto Light';letter-spacing:0px;word-spacing:0px;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.40781528;"
        x="244.10585"
        y="192.54968"
        id="text4508"><tspan
@@ -94,15 +94,15 @@
          id="tspan4506"
          x="244.10585"
          y="192.54968"
-         style="fill:#ffffff;stroke-width:0.40781528">student</tspan><tspan
+         style="fill:#1a1a1a;stroke-width:0.40781528;">student</tspan><tspan
          sodipodi:role="line"
          x="244.10585"
          y="236.04999"
-         style="fill:#ffffff;stroke-width:0.40781528"
+         style="fill:#1a1a1a;stroke-width:0.40781528;"
          id="tspan4510" /></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:34.80024338px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto Light';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.40781528"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:34.80024338px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto Light';letter-spacing:0px;word-spacing:0px;fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.40781528;"
        x="203.97397"
        y="221.67143"
        id="text4508-0"><tspan
@@ -110,16 +110,16 @@
          id="tspan4506-7"
          x="203.97397"
          y="221.67143"
-         style="fill:#ffffff;stroke-width:0.40781528">management</tspan><tspan
+         style="fill:#1a1a1a;stroke-width:0.40781528;">management</tspan><tspan
          sodipodi:role="line"
          x="203.97397"
          y="265.17175"
-         style="fill:#ffffff;stroke-width:0.40781528"
+         style="fill:#1a1a1a;stroke-width:0.40781528;"
          id="tspan4510-7" /></text>
     <path
        id="path4554"
        d="m 281.89233,474.6563 v 12.4121 l 20.73533,11.85915 20.73533,-11.85915 v -12.4121 l -20.73533,11.85915 z m 20.73533,-31.60501 -32.59448,18.62542 32.59448,18.62542 26.67218,-15.23501 v 21.44833 h 5.92231 v -24.83874 z"
        inkscape:connector-curvature="0"
-       style="fill:#ffffff;stroke-width:0.14551109" />
+       style="fill:#1a1a1a;stroke-width:0.14551109" />
   </g>
 </svg>

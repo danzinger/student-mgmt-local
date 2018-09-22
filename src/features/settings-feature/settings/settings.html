@@ -22,6 +22,18 @@
         <ion-label>Backup beim Wiederherstellen</ion-label>
         <ion-toggle [(ngModel)]="settingsService.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
     </ion-item>
+    <ion-item>
+        <ion-label>Ziffernnote anzeigen</ion-label>
+        <ion-toggle [(ngModel)]="settingsService.SHOW_MARK" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item>
+        <ion-label>Experimentelle Features</ion-label>
+        <ion-toggle [(ngModel)]="settingsService.EXPERIMENTAL_FEATURES" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item>
+        <ion-label>Test Features</ion-label>
+        <ion-toggle [(ngModel)]="settingsService.TEST_FEATURES" color="secondary"></ion-toggle>
+    </ion-item>
     <div *ngIf="settingsService.ENVIRONMENT_IS_DEV">
         <ion-item>
             <ion-label>Android Features</ion-label>
@@ -43,6 +55,13 @@
             <button ion-button color="primary" block (click)="deleteDirManually()">deleteDir</button>
             <button ion-button color="primary" block (click)="checkDirManually()">checkDir</button>
             <button ion-button color="primary" block (click)="listDir()">ListDir</button>
+        </ion-list>
+    </div>
+    <div *ngIf="settingsService.TEST_FEATURES">
+        <ion-list>
+            <button ion-button color="primary" block (click)="addMockData()">Testdaten hinzufügen</button>
+            <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
+            <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
         </ion-list>
     </div>
     <ion-list *ngIf="show_desktop_features">

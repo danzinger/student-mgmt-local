@@ -291,7 +291,12 @@ export class StudentDetailPage {
     }
     grade_object.grade = this.precisionRound(grade * 100, 2);
     grade_object.mark = this.getMarkFromPercentage(grade);
-    let returnvalue = grade_object.grade + ' % ' + '(' + grade_object.mark + ')';
+    let returnvalue;
+    if(this.settingsService.SHOW_MARK){
+      returnvalue = grade_object.grade + ' % ' + '(' + grade_object.mark + ')';
+    }else{
+      returnvalue = grade_object.grade + ' %';
+    }
     
     return returnvalue
   }

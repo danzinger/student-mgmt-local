@@ -49,6 +49,7 @@ export class CoursePerfcatUpdateModalPage {
     this.topLevelCategory = this.performanceCategory;
     if (this.child) this.performanceCategory = this.child;
 
+
     this.subgroup = {}
     if (this.settingsService.ENVIRONMENT_IS_DEV) {
       this.subgroup = {
@@ -67,12 +68,16 @@ export class CoursePerfcatUpdateModalPage {
   //
 
   ionViewDidEnter() {
+    //To let the user edit the percentage value
+    this.performanceCategory.category_weight = this.performanceCategory.category_weight*100;
+    this.performanceCategory.percentage_points_per_unit = this.performanceCategory.percentage_points_per_unit*100;
     this.gatherAllGroups();
-    console.log(this.parent)
   }
 
   cancel() {
     this.viewCtrl.dismiss();
+    this.performanceCategory.category_weight = this.performanceCategory.category_weight/100;
+    this.performanceCategory.percentage_points_per_unit = this.performanceCategory.percentage_points_per_unit/100;
   }
 
   done() {
@@ -82,13 +87,16 @@ export class CoursePerfcatUpdateModalPage {
   makeDataReady() {
     if (this.subgroup.type == 'max_and_weight') {
       delete this.subgroup.percentage_points_per_unit;
+      this.subgroup.category_weight = this.subgroup.category_weight/100;
     }
     if (this.subgroup.type == 'incremental') {
       delete this.subgroup.point_maximum;
+      this.subgroup.percentage_points_per_unit = this.subgroup.percentage_points_per_unit/100;
       //this was needed for the grade-calculation to work. 
       this.subgroup.category_weight = 1;
     } if (this.subgroup.type == 'group') {
       this.subgroup.children = [];
+      this.subgroup.category_weight = this.subgroup.category_weight/100;
       delete this.subgroup.percentage_points_per_unit;
       delete this.subgroup.point_maximum;
     }
@@ -127,6 +135,8 @@ export class CoursePerfcatUpdateModalPage {
           text: 'Ok',
           handler: () => {
             this.makeDataReady();
+            this.performanceCategory.category_weight = this.performanceCategory.category_weight/100;
+            this.performanceCategory.percentage_points_per_unit = this.performanceCategory.percentage_points_per_unit/100;
             if (this.newParent) this.changeParent(this.performanceCategory, this.newParent);
             if (this.distribute_others_equally) this.autoWeight();
             this.courseService.updateCourse(this.course).subscribe(
