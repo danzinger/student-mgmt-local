@@ -17,9 +17,9 @@
    id="svg8"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    sodipodi:docname="icon192x192.svg"
-   inkscape:export-filename="C:\MEDIA\DEV\javascript\ionic\student-mgmt-local\resources\icon.png"
-   inkscape:export-xdpi="97.12587"
-   inkscape:export-ydpi="97.12587">
+   inkscape:export-filename="C:\MEDIA\DEV\javascript\ionic\student-mgmt-local\resources\design\icon.png"
+   inkscape:export-xdpi="125.32665"
+   inkscape:export-ydpi="125.32665">
   <defs
      id="defs2">
     <linearGradient
@@ -46,9 +46,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="-44.543354"
-     inkscape:cy="111.35073"
+     inkscape:zoom="2.8"
+     inkscape:cx="69.962146"
+     inkscape:cy="110.08154"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -80,14 +80,14 @@
      transform="translate(-31.75,-43)"
      style="display:inline">
     <circle
-       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.51264381;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.81194299;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path831-3"
-       cx="57.140606"
-       cy="68.54303"
-       r="24.849245" />
+       cx="57.2351"
+       cy="68.371597"
+       r="24.927828" />
     <path
        id="path816"
-       d="M 42.25107,71.377058 V 79.70993 L 56.171754,87.671585 70.092438,79.70993 V 71.377058 L 56.171754,79.33871 Z M 56.171754,50.159005 34.289417,62.6632 56.171754,75.167396 74.078151,64.939354 V 79.33871 h 3.975942 V 62.6632 Z"
+       d="m 42.25107,71.042971 v 8.332872 l 13.920684,7.961655 13.920684,-7.961655 V 71.042971 L 56.171754,79.004623 Z M 56.171754,49.824918 34.289417,62.329113 56.171754,74.833309 74.078151,64.605267 v 14.399356 h 3.975942 v -16.67551 z"
        inkscape:connector-curvature="0"
        style="stroke-width:0.09768899" />
   </g>

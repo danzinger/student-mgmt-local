@@ -4,7 +4,6 @@ import { CourseService } from '../../../services/course.service';
 import { MongoIdService } from '../../../services/mongo-id.service';
 import { SettingsService } from '../../../services/settings.service';
 import { ToastService } from '../../../services/toast.service';
-import { Course } from '../../../app/models/course';
 import { StudentService } from '../../../services/student-service';
 
 @IonicPage()

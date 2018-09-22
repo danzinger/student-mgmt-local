@@ -234,20 +234,20 @@ export class StudentDetailPage {
 
   calculateGrade(partialGradingForGroup?) {
 
-/*
-This Function computes the overall grade and the partial gradings for a student.
-If a subgroup is passed, a partial grading will be returned and if not, the overall grade is computed.
-The functions iterates over the performance_categories of the course, or a subgroup of these (to compute a partial grading).
-For each category, the corresponding weight is computed and some information is stored (slightly different "max_and_weight" or "incremental" grading types)
-We obtain a datastructure like this:
-{
-PERFORMANCE-CATEGORY-1-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
-PERFORMANCE-CATEGORY-2-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
-PERFORMANCE-CATEGORY-3-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
-...
-}
-Then it is easily possible to compute the final/partial grade.
-*/ 
+    /*
+    This Function computes the overall grade and the partial gradings for a student.
+    If a subgroup is passed, a partial grading will be returned and if not, the overall grade is computed.
+    The functions iterates over the performance_categories of the course, or a subgroup of these (to compute a partial grading).
+    For each category, the corresponding weight is computed and some information is stored (slightly different "max_and_weight" or "incremental" grading types)
+    We obtain a datastructure like this:
+    {
+    PERFORMANCE-CATEGORY-1-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
+    PERFORMANCE-CATEGORY-2-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
+    PERFORMANCE-CATEGORY-3-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
+    ...
+    }
+    Then it is easily possible to compute the final/partial grade.
+    */
 
     let table = {};
     let submarks = [];
@@ -273,7 +273,6 @@ Then it is easily possible to compute the final/partial grade.
         })
       }
     })
-    //console.log(table);
 
     //then the grade is computed
     this.student.computed_gradings.map((grading) => {
@@ -285,12 +284,59 @@ Then it is easily possible to compute the final/partial grade.
       }
     })
     grade = (submarks.length > 0) ? submarks.reduce((a, b) => { return a + b; }) : 0;
-    return this.precisionRound(grade * 100, 2);
+
+    let grade_object = {
+      grade: 0,
+      mark: 0
+    }
+    grade_object.grade = this.precisionRound(grade * 100, 2);
+    grade_object.mark = this.getMarkFromPercentage(grade);
+    let returnvalue = grade_object.grade + ' % ' + '(' + grade_object.mark + ')';
+    
+    return returnvalue
   }
 
   //
   // ─── HELPER FUNCTIONS ────────────────────────────────────────────
   //
+
+  getMarkFromPercentage(percentage_value) {
+    let mark;
+    if (percentage_value < 0.5) {
+      mark = '5';
+    }
+    if (percentage_value >= 0.5 && percentage_value < 0.5416) {
+      mark = '4-';
+    }
+    if (percentage_value >= 0.5416 && percentage_value < 0.5833) {
+      mark = '4'
+    }
+    if (percentage_value >= 0.5833 && percentage_value < 0.625) {
+      mark = '4+';
+    }
+    if (percentage_value >= 0.625 && percentage_value < 0.6666) {
+      mark = '3-'
+    }
+    if (percentage_value >= 0.6666 && percentage_value < 0.7083) {
+      mark = '3'
+    }
+    if (percentage_value >= 0.7083 && percentage_value < 0.75) {
+      mark = '3+'
+    }
+    if (percentage_value >= 0.750 && percentage_value < 0.7916) {
+      mark = '2-'
+    }
+    if (percentage_value >= 0.7916 && percentage_value < 0.8333) {
+      mark = '2'
+    }
+    if (percentage_value >= 0.8333 && percentage_value < 0.875) {
+      mark = '2+'
+    }
+    if (percentage_value >= 0.875) {
+      mark = '1'
+    }
+    return mark;
+  }
 
   precisionRound(number, precision) {
     var factor = Math.pow(10, precision);
@@ -300,6 +346,8 @@ Then it is easily possible to compute the final/partial grade.
   categoryHasChildren(category) {
     return category.children && category.children.length > 0 && category.type == "group"
   }
+
+
 
   //
   // ──────────────────────────────────────────────────────────────────────────────────── IV ──────────
