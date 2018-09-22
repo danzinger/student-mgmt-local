@@ -410,7 +410,7 @@ export class StudentDetailPage {
       return ' / ' + category.point_maximum;
     }
     if (category.type == 'incremental' && category.percentage_points_per_unit) {
-      return ' (' + category.percentage_points_per_unit + ')'
+      return ' (' + Number(category.percentage_points_per_unit)*100 + ')'
     }
     if (!category.type || category.type == 'group') {
       return ''

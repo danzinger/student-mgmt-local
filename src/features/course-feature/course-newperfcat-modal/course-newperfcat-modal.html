@@ -74,7 +74,7 @@
         </ion-item>
     </form>
     <div *ngIf="type == 'group' || type == 'max_and_weight'">
-        <ion-item *ngIf="settingsService.EXPERIMENTAL_FEATURES">
+        <ion-item>
             <ion-label>Diese Ebene automatisch gewichten</ion-label>
             <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
         </ion-item>

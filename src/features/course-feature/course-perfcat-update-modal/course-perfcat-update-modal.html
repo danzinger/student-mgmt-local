@@ -68,12 +68,12 @@
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'group' || performanceCategory.type == 'max_and_weight'">
-                <ion-item *ngIf="settingsService.EXPERIMENTAL_FEATURES">
+                <ion-item>
                     <ion-label>Diese Ebene automatisch gewichten</ion-label>
                     <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>
             </div>
-            <ion-item *ngIf="settingsService.EXPERIMENTAL_FEATURES">
+            <ion-item>
                 <ion-label floating>In andere Gruppe verschieben</ion-label>
                 <ion-select name="group" [(ngModel)]="newParent" multiple="false" cancelText="Abbrechen" okText="Ok">
                     <ion-option *ngFor="let group of groups" [value]="group">{{group.name}}</ion-option>
@@ -165,7 +165,7 @@
                 </ion-item>
             </div>
             <div *ngIf="subgroup.type == 'group' || subgroup.type == 'max_and_weight'">
-                <ion-item *ngIf="settingsService.EXPERIMENTAL_FEATURES">
+                <ion-item>
                     <ion-label>Diese Ebene automatisch gewichten</ion-label>
                     <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>

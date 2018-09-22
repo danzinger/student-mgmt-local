@@ -19,19 +19,19 @@
         <ion-toggle [(ngModel)]="settingsService.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
     </ion-item> -->
     <ion-item>
-        <ion-label>Backup beim Wiederherstellen</ion-label>
+        <ion-label>Autobackup beim Wiederherstellen</ion-label>
         <ion-toggle [(ngModel)]="settingsService.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
     </ion-item>
     <ion-item>
         <ion-label>Ziffernnote anzeigen</ion-label>
         <ion-toggle [(ngModel)]="settingsService.SHOW_MARK" color="secondary"></ion-toggle>
     </ion-item>
-    <ion-item>
+    <!-- <ion-item>
         <ion-label>Experimentelle Features</ion-label>
         <ion-toggle [(ngModel)]="settingsService.EXPERIMENTAL_FEATURES" color="secondary"></ion-toggle>
-    </ion-item>
+    </ion-item> -->
     <ion-item>
-        <ion-label>Test Features</ion-label>
+        <ion-label>Testdaten und schnelles Löschen</ion-label>
         <ion-toggle [(ngModel)]="settingsService.TEST_FEATURES" color="secondary"></ion-toggle>
     </ion-item>
     <div *ngIf="settingsService.ENVIRONMENT_IS_DEV">
