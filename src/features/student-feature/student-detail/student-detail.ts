@@ -293,11 +293,10 @@ export class StudentDetailPage {
     grade_object.mark = this.getMarkFromPercentage(grade);
     let returnvalue;
     if(this.settingsService.SHOW_MARK){
-      returnvalue = grade_object.grade + ' % ' + '(' + grade_object.mark + ')';
+      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : grade_object.grade + ' ' + '(' + grade_object.mark + ')';
     }else{
-      returnvalue = grade_object.grade + ' %';
+      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? grade_object.grade + ' %' : grade_object.grade;
     }
-    
     return returnvalue
   }
 
@@ -305,43 +304,56 @@ export class StudentDetailPage {
   // ─── HELPER FUNCTIONS ────────────────────────────────────────────
   //
 
-  getMarkFromPercentage(percentage_value) {
+  getMarkFromPercentage(percentage_value){
     let mark;
-    if (percentage_value < 0.5) {
-      mark = '5';
-    }
-    if (percentage_value >= 0.5 && percentage_value < 0.5416) {
-      mark = '4-';
-    }
-    if (percentage_value >= 0.5416 && percentage_value < 0.5833) {
-      mark = '4'
-    }
-    if (percentage_value >= 0.5833 && percentage_value < 0.625) {
-      mark = '4+';
-    }
-    if (percentage_value >= 0.625 && percentage_value < 0.6666) {
-      mark = '3-'
-    }
-    if (percentage_value >= 0.6666 && percentage_value < 0.7083) {
-      mark = '3'
-    }
-    if (percentage_value >= 0.7083 && percentage_value < 0.75) {
-      mark = '3+'
-    }
-    if (percentage_value >= 0.750 && percentage_value < 0.7916) {
-      mark = '2-'
-    }
-    if (percentage_value >= 0.7916 && percentage_value < 0.8333) {
-      mark = '2'
-    }
-    if (percentage_value >= 0.8333 && percentage_value < 0.875) {
-      mark = '2+'
-    }
-    if (percentage_value >= 0.875) {
-      mark = '1'
+    let mark_string = this.settingsService.MARK_STRING;
+    let array = mark_string.split("|")
+    for(let mark_range of array){
+      let sub = mark_range.split(",")
+      if (percentage_value >= Number(sub[0]) && percentage_value < Number(sub[1])) {
+        mark = sub[2];
+      }
     }
     return mark;
   }
+
+  // getMarkFromPercentage(percentage_value) {
+  //   let mark;
+  //   if (percentage_value < 0.5) {
+  //     mark = '5';
+  //   }
+  //   if (percentage_value >= 0.5 && percentage_value < 0.5416) {
+  //     mark = '4-';
+  //   }
+  //   if (percentage_value >= 0.5416 && percentage_value < 0.5833) {
+  //     mark = '4'
+  //   }
+  //   if (percentage_value >= 0.5833 && percentage_value < 0.625) {
+  //     mark = '4+';
+  //   }
+  //   if (percentage_value >= 0.625 && percentage_value < 0.6666) {
+  //     mark = '3-'
+  //   }
+  //   if (percentage_value >= 0.6666 && percentage_value < 0.7083) {
+  //     mark = '3'
+  //   }
+  //   if (percentage_value >= 0.7083 && percentage_value < 0.75) {
+  //     mark = '3+'
+  //   }
+  //   if (percentage_value >= 0.750 && percentage_value < 0.7916) {
+  //     mark = '2-'
+  //   }
+  //   if (percentage_value >= 0.7916 && percentage_value < 0.8333) {
+  //     mark = '2'
+  //   }
+  //   if (percentage_value >= 0.8333 && percentage_value < 0.875) {
+  //     mark = '2+'
+  //   }
+  //   if (percentage_value >= 0.875) {
+  //     mark = '1'
+  //   }
+  //   return mark;
+  // }
 
   precisionRound(number, precision) {
     var factor = Math.pow(10, precision);

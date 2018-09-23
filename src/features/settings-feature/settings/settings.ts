@@ -25,6 +25,7 @@ export class SettingsPage {
   env;
   show_desktop_features: boolean = false;
   show_android_features: boolean = true;
+  set_custom_mark_string:boolean = false;
 
   constructor(
     public navCtrl: NavController,
@@ -52,11 +53,28 @@ export class SettingsPage {
   closeSlidingItem(slidingItem: ItemSliding) {
     slidingItem.close();
   }
+
   //
   // ────────────────────────────────────────────────────────────────────── I ──────────
   //   :::::: C O M M O N   F E A T U R E S : :  :   :    :     :        :          :
   // ────────────────────────────────────────────────────────────────────────────────
   //
+
+  checkMarkString(){
+    let mark_string = this.settingsService.MARK_STRING;
+    let array = mark_string.split("|")
+    let resultstring = "";
+    for(let mark_range of array){
+      let sub = mark_range.split(",")
+      resultstring += "<pre>"+Number(sub[0])+" &le; x < "+Number(sub[1])+" : "+sub[2]+"<br></pre>"
+    }
+    let alert = this.alertCtrl.create({
+      title: 'Notendefinition:',
+      subTitle: resultstring,
+      buttons: ['Verstanden']
+    });
+    alert.present();
+  }
 
   addMockData() {
     this.storage.set('courses', COURSES).then(() => {

@@ -42,9 +42,6 @@
               ///2018-09-02
                 An option is to let the user change between type "incremental" and "maximum and weight" 
                 A Group pf course cant be changed to something else -->
-            <ion-item>
-                <ion-label>Typspezifische Parameter:</ion-label>
-            </ion-item>
             <div *ngIf="performanceCategory.type == 'max_and_weight'">
                 <ion-item>
                     <ion-label floating>Maximale Punkte</ion-label>
@@ -137,8 +134,8 @@
             <ion-item>
                 <ion-label floating>Kategorietyp</ion-label>
                 <ion-select name="type" [(ngModel)]="subgroup.type" (ngModelChange)="clearInitialSelection()" multiple="false" cancelText="Abbrechen" okText="Ok">
-                    <ion-option value="incremental">Incremental</ion-option>
-                    <ion-option value="max_and_weight">Maximum und Gewicht</ion-option>
+                    <ion-option value="incremental">Einzelne Punkte</ion-option>
+                    <ion-option value="max_and_weight">Anteilige Punkte</ion-option>
                     <ion-option *ngIf="number_of_parents < 3" value="group">Gruppe</ion-option>
                 </ion-select>
             </ion-item>
