@@ -62,7 +62,6 @@ export class StudentAddPage {
         dynamicTyping: true,
         skipEmptyLines: true,
         complete: function (results) {
-          //alert('ok'+results.data.length);
           if (me.checkData(results)) {
             results.data.forEach(student => {
               student._id = me.mongoIdService.newObjectId();

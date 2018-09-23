@@ -37,7 +37,6 @@ export class SettingsPage {
     public settingsService: SettingsService,
     public file: File,
     private fileChooser: FileChooser,
-    //public fileEntry: FileEntry,
     public filePath: FilePath,
     public alertCtrl: AlertController, ) {
   }
@@ -133,7 +132,6 @@ export class SettingsPage {
 
 
   handleError(err) {
-    //console.log(err);
     this.toastService.showToast(JSON.stringify(err));
   }
 
@@ -162,7 +160,6 @@ export class SettingsPage {
           {
             text: 'Abbrechen',
             handler: data => {
-              console.log('Cancel clicked');
             }
           },
           {
@@ -182,17 +179,16 @@ export class SettingsPage {
 
   openFileChooser() {
     this.fileChooser.open()
-      //.then(uri => console.log(uri))
       .then(uri => {
-        //console.log(file)
         this.filePath.resolveNativePath(uri).then((x) => {
           this.file.resolveLocalFilesystemUrl(x).then((file) => {
             this.presentRestoreFromBackupOnAndroidConfirm(file);
           });
         })
-        //this.presentRestoreFromBackupOnAndroidConfirm(file);
       })
-      .catch(e => console.log(e));
+      .catch(e => {
+        this.toastService.showToast('Filechooser konnte nicht geöffnet werden');
+      });
   }
 
   presentRestoreFromBackupOnAndroidConfirm(file) {
@@ -286,14 +282,12 @@ export class SettingsPage {
   //
 
   getBackupDataFromFileOnAndroid(file) {
-    //console.log(JSON.stringify(file))
     return new Promise(
       (resolve, reject) => {
         this.file.readAsText(this.file.externalRootDirectory, 'StudentMgmt/' + file.name).then((res) => {
           let parsed_data = JSON.parse(res);
-          //just a ridicolous check, but I'd like to use older data for testing. So I dont introduce a more complex check.
+          //just a ridiculous check, but I needed like to use older data for testing. So I dont introduce a more complex check.
           if (!parsed_data || !parsed_data.meta) reject("wrong file");
-          //console.log(JSON.stringify(parsed_data.meta))
           resolve(parsed_data);
         }).catch((err) => {
           reject(err);
@@ -357,7 +351,6 @@ export class SettingsPage {
   // ─── HELPER FUNCTIONS ───────────────────────────────────────────────────────────
   //
 
-
   filesInDir;
   listDir() {
     this.file.listDir(this.file.externalRootDirectory, 'StudentMgmt').then((res) => {
@@ -366,14 +359,6 @@ export class SettingsPage {
       this.toastService.showToast('Backupverzeichnis nicht gefunden');
     });
   }
-
-  // fileInfo;
-  // getMetaDataFromFile(file) {
-  //   // https://github.com/ionic-team/ionic-native/issues/1411
-  //   this.file.resolveLocalFilesystemUrl(file.nativeURL).then((file: FileEntry) => {
-  //     file.file(meta => { return meta })
-  //   })
-  // }
 
   checkDir() {
     return this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt')
@@ -397,25 +382,6 @@ export class SettingsPage {
       this.toastService.showToast(err.message);
     });
   }
-
-  // getMetaDataFromFile(file){
-  //   // https://github.com/ionic-team/ionic-native/issues/1411
-  //   return this.file.resolveLocalFilesystemUrl(file.nativeURL).then((fileentry:FileEntry)=>{
-  //     return fileentry.file(file=>{
-  //       var reader = new FileReader();
-  //       let me = this;
-  //       reader.onloadend = function() {
-  //         console.log("Successful file read: " + this.result);
-  //         return me.fileInfo = JSON.parse(this.result).meta;
-  //       };        
-  //       reader.readAsText(file);
-  //     },
-  //     err=>{
-  //       alert(err);
-  //     });
-  //   })
-  // }
-
 
   //
   // ──────────────────────────────────────────────────────────────────────── III ──────────

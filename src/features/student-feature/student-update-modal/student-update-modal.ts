@@ -26,7 +26,6 @@ export class StudentUpdateModalPage {
     public toastService:ToastService) {
 
     this.student = navParams.get('student');
-    console.log(this.student)
   }
 
 

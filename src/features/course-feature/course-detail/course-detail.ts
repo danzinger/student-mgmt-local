@@ -61,11 +61,6 @@ export class CourseDetailPage {
     });
   }
 
-  // If it should be possible to edit the CourseDetails from this view as well (its already possible from the list-view) and we have so many icons already in the participants-tab
-  // manageCourse(course) {
-  //   this.navCtrl.push('CourseManagePage', { course: course })
-  // }
-
   reverseList() {
     return this.reverse = this.reverse ? false : true;
   }
@@ -167,7 +162,6 @@ export class CourseDetailPage {
   //
 
   presentStudentUpdateModal(student_from_table) {
-    console.log(student_from_table);
     let student = this.participants.filter(participant => {
       return participant._id == student_from_table._id
     })
@@ -467,7 +461,6 @@ export class CourseDetailPage {
   
   */
 
-  //resultcats;
   exportCourseData() {
     let resultcats = this.flattenCategories();
     let exportData = this.generateExportData(resultcats);
@@ -515,17 +508,19 @@ export class CourseDetailPage {
     return exportData;
   }
 
-  parseAndDownloadGradingsOnDesktop(exportData) {
-    let csv_string = this.papa.unparse(exportData);
-    var blob = new Blob([csv_string]);
-    var a = window.document.createElement("a");
-    a.href = window.URL.createObjectURL(blob);
-    let time = new Date().toJSON().slice(0, 10);
-    a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
+  //This method was used for development purpose and cannot be used on Android
+
+  // parseAndDownloadGradingsOnDesktop(exportData) {
+  //   let csv_string = this.papa.unparse(exportData);
+  //   var blob = new Blob([csv_string]);
+  //   var a = window.document.createElement("a");
+  //   a.href = window.URL.createObjectURL(blob);
+  //   let time = new Date().toJSON().slice(0, 10);
+  //   a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
+  //   document.body.appendChild(a);
+  //   a.click();
+  //   document.body.removeChild(a);
+  // }
 
   parseAndDownloadGradingsOnAndroid(exportData) {
     return new Promise((resolve, reject) => {

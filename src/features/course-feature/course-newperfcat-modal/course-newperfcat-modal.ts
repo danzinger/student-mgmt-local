@@ -34,8 +34,8 @@ export class CourseNewperfcatModalPage {
     public settingsService: SettingsService
   ) {
 
+    //For testing purpose this is how the form could be filled automatically:
     //if (this.settingsService.ENVIRONMENT_IS_DEV) {
-    // Könnte man so automatisch ausfüllen:
     // this.form_max_and_weight = formBuilder.group({
     //   _id: [''],
     //   name: ['Testkategorie', Validators.required],
@@ -117,8 +117,8 @@ export class CourseNewperfcatModalPage {
 
     //Convert the input-values to the correct type and prepare data for saving
     this.form.value.point_maximum = this.form.value.point_maximum ? Number(this.form.value.point_maximum) : null;
-    this.form.value.category_weight = this.form.value.category_weight ? Number(this.form.value.category_weight)/100 : 1;
-    this.form.value.percentage_points_per_unit = this.form.value.percentage_points_per_unit ? Number(this.form.value.percentage_points_per_unit)/100 : 0.01;
+    this.form.value.category_weight = this.form.value.category_weight ? Number(this.form.value.category_weight) / 100 : 1;
+    this.form.value.percentage_points_per_unit = this.form.value.percentage_points_per_unit ? Number(this.form.value.percentage_points_per_unit) / 100 : 0.01;
 
     this.form.value._id = this.mongoIdService.newObjectId();
     this.form.value.type = this.type;
@@ -140,7 +140,7 @@ export class CourseNewperfcatModalPage {
 
     if (!this.course.performanceCategories) this.course.performanceCategories = [];
     this.course.performanceCategories.push(this.form.value);
-    
+
     this.courseService.updateCourse(this.course).subscribe(
       data => {
         this.toastService.showToast('Kategorie hinzugefügt');

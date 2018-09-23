@@ -3,9 +3,6 @@
     <ion-navbar color="stdt-mgmt-theme">
         <ion-title small>{{course.name}} <span *ngIf="currentSortingCategoryName">|</span> {{currentSortingCategoryName}}</ion-title>
         <ion-buttons end>
-            <!-- <button *ngIf="view=='students'" ion-button icon-only (click)="manageCourse(course)">
-                <ion-icon name="create"></ion-icon>
-            </button> -->
             <button *ngIf="view=='students'" ion-button icon-only (click)="createAndregisterStudents()">
                 <ion-icon name="add"></ion-icon>
             </button>
@@ -54,6 +51,7 @@
                 <button ion-item (click)="goToStudentDetail(participant)">
                   <text-avatar [text]="participant.firstname"  item-left></text-avatar>
                   <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
+                  <!-- Previously the Notes where displayed. But they are not part of the Data-Table for some reasons. Therefore this feature is not avalible now... -->
                   <!-- <ion-badge *ngIf="participant.notes && participant.notes.length == 1" item-end>1 Notiz</ion-badge>
                   <ion-badge *ngIf="participant.notes && participant.notes.length > 1" item-end>{{participant.notes.length}}&nbsp;Notizen</ion-badge> -->
                   <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>{{participant[listOrderBy]}}</ion-badge>
@@ -134,7 +132,7 @@
                                               <ion-icon name="add"></ion-icon>
                                       </button>
                                 <!-- The "category" is passed two times for the sake of clearer code. First time as the Toplevel-category which is edited, second time as the parent of the child that is edited (used for autoweight feature) -->
-                                                                 <!-- editPerformanceCategory(TOPLEVEL, CATEGORY TO CHANGE, PARENT CATEGORY) -->
+                                <!-- editPerformanceCategory(TOPLEVEL, CATEGORY TO CHANGE, PARENT CATEGORY) -->
                                 <button ion-button icon-only (click)="editPerformanceCategory(category, child, category)">
                                                       <ion-icon name="create"></ion-icon>
                                               </button>
@@ -188,9 +186,6 @@
                                         </div>
                                     </div>
                                     <div float-right class="right">
-                                        <!-- <button *ngIf="subSubSubGroup.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,baby,3,baby)">
-                                                              <ion-icon name="add"></ion-icon>
-                                                      </button> -->
                                         <button ion-button icon-only (click)="editPerformanceCategory(category, subSubSubGroup, baby)">
                                                               <ion-icon name="create"></ion-icon>
                                                       </button>

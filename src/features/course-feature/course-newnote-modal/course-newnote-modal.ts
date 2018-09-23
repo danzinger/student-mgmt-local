@@ -48,18 +48,6 @@ export class CourseNewnoteModalPage {
   }
   done() {
     this.presentConfirm();
-  //   this.course.notes.push(this.form.value);
-  //   this.courseService.updateCourse(this.course).subscribe(
-  //     data => {
-  //       this.toastService.showToast('Notiz eingetragen')
-  //     },
-  //     error => {
-  //       this.toastService.showToast('Fehler beim Eintragen der Notiz')
-  //     });
-  //   this.viewCtrl.dismiss();
-  // }
-  // cancel() {
-  //   this.viewCtrl.dismiss()
   }
 
   presentConfirm() {

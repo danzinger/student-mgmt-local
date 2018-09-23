@@ -119,9 +119,7 @@ export class CourseListPage {
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
   manageCourse(course) {
-    //this.navCtrl.push('CourseManagePage', { course: course })
     let manageModal = this.modalCtrl.create('CourseManagePage', { course: course });
-    // manageModal.onDidDismiss()
     manageModal.present();
   }
   //

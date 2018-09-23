@@ -254,10 +254,6 @@ export class CoursePerfcatUpdateModalPage {
   // ─── AUTOWEIGHT FEATURE ─────────────────────────────────────────────────────────
   //
 
-  // weigthChange(ev) {
-  //   this.weight_changed = true;
-  // }
-
   autoWeight() {
     //Equally distribute weight of other categories on same level if weight of one category is changed manually
 
@@ -267,7 +263,6 @@ export class CoursePerfcatUpdateModalPage {
     //or - because it is now unneccesary to distinguish between a child or a category - we can just put:
     // let edited_category = this.performanceCategory;
     //or now just use this.performanceCategory directly in the function
-
 
     //if we ADD a subgroup to a parent things are slightly different
     if (this.addToGroup) {

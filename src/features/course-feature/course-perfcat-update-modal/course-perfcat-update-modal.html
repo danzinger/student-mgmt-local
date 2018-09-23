@@ -77,49 +77,6 @@
                 </ion-select>
             </ion-item>
         </div>
-        <!-- This one is for editing a child -->
-        <!-- <div *ngIf="child && !addToGroup">
-                <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">Edit a child</span>
-            <ion-item>
-                <ion-label floating>Name</ion-label>
-                <ion-input type="text" [(ngModel)]="child.name" name="name"></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label floating>Beschreibung</ion-label>
-                <ion-input type="text" [(ngModel)]="child.description" name="description"></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label>Typspezifische Parameter:</ion-label>
-            </ion-item>
-            <div *ngIf="child.type == 'max_and_weight'">
-                <ion-item>
-                    <ion-label floating>Maximale Punkte</ion-label>
-                    <ion-input [(ngModel)]="child.point_maximum" name="point_maximum"></ion-input>
-                </ion-item>
-                <ion-item>
-                    <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="child.category_weight" name="weight" (ionChange)='weigthChange($event)'></ion-input>
-                </ion-item>
-            </div>
-            <div *ngIf="child.type == 'incremental'">
-                <ion-item>
-                    <ion-label floating>Wert pro Einheit</ion-label>
-                    <ion-input [(ngModel)]="child.percentage_points_per_unit" name="percentage_points_per_unit"></ion-input>
-                </ion-item>
-            </div>
-            <div *ngIf="child.type == 'group'">
-                <ion-item>
-                    <ion-label floating>Gewichtung</ion-label>
-                    <ion-input [(ngModel)]="child.category_weight" name="category_weight" (ionChange)='weigthChange($event)'></ion-input>
-                </ion-item>
-            </div>
-            <div *ngIf="child.type == 'group' || child.type == 'max_and_weight'">
-                <ion-item>
-                    <ion-label>Diese Ebene automatisch gewichten</ion-label>
-                    <ion-toggle [(ngModel)]="distribute_others_equally"  name="distribute_others_equally" color="secondary"></ion-toggle>
-                </ion-item>
-            </div>
-        </div> -->
         <!-- This one is for adding a subgroup to a child -->
         <div *ngIf="addToGroup">
             <span *ngIf="settingsService.ENVIRONMENT_IS_DEV">adding a subgroup to a top level category OR to a child</span>

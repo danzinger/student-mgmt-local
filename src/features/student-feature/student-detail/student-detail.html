@@ -28,11 +28,9 @@
 <ion-content *ngIf="student">
     <div [ngSwitch]="view">
         <ion-list *ngSwitchCase="'grade'">
+            <!-- Maybe in future release add back posibility to use a picture (however, the students personal data should be very little only) -->
             <!-- <div class="item-profile" text-center #profilePic style="background-image:url('http://lorempixel.com/400/200/people')"></div> -->
             <!-- <div class="item-profile" style="font-size: 5rem" text-center> -->
-            <!-- For some values some strange numerical problems ocurres. The -(...)%1 part prevents them -->
-            <!-- {{calculateGrade()}} -->
-            <!-- </div> -->
             <ion-list>
                 <ion-item *ngIf="courses && courses.length > 0">
                     <ion-label>Kurs</ion-label>
