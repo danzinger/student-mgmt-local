@@ -248,6 +248,8 @@ export class StudentDetailPage {
     }
     Then it is easily possible to compute the final/partial grade.
     */
+    let returnvalue;
+    if(this.settingsService.GRADE_CALCULATION_FEATURE){
 
     let table = {};
     let submarks = [];
@@ -291,12 +293,16 @@ export class StudentDetailPage {
     }
     grade_object.grade = this.precisionRound(grade * 100, 2);
     grade_object.mark = this.getMarkFromPercentage(grade);
-    let returnvalue;
+
     if(this.settingsService.SHOW_MARK){
-      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : grade_object.grade + ' ' + '(' + grade_object.mark + ')';
+      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? ": "+grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : ": "+grade_object.grade + ' ' + '(' + grade_object.mark + ')';
     }else{
-      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? grade_object.grade + ' %' : grade_object.grade;
+      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? ": "+grade_object.grade + ' %' : ": "+grade_object.grade;
     }
+    
+  }else{
+      returnvalue = "";
+  }
     return returnvalue
   }
 
@@ -421,7 +427,7 @@ export class StudentDetailPage {
     if (category.type == 'max_and_weight' && category.point_maximum) {
       return ' / ' + category.point_maximum;
     }
-    if (category.type == 'incremental' && category.percentage_points_per_unit) {
+    if (category.type == 'incremental' && category.percentage_points_per_unit &&  this.settingsService.GRADE_CALCULATION_FEATURE) {
       return ' (' + Number(category.percentage_points_per_unit)*100 + ')'
     }
     if (!category.type || category.type == 'group') {

@@ -23,24 +23,30 @@
         <ion-toggle [(ngModel)]="settingsService.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
     </ion-item>
     <ion-item>
-        <ion-label>Gesamtbewertung in Note umwandeln</ion-label>
-        <ion-toggle [(ngModel)]="settingsService.SHOW_MARK" color="secondary"></ion-toggle>
+        <ion-label>Leistungsberechnung aktivieren</ion-label>
+        <ion-toggle [(ngModel)]="settingsService.GRADE_CALCULATION_FEATURE" color="secondary"></ion-toggle>
     </ion-item>
-    <ion-item *ngIf="settingsService.SHOW_MARK">
-        <ion-label>Notendefinition Bearbeiten</ion-label>
-        <ion-toggle [(ngModel)]="set_custom_mark_string" color="secondary"></ion-toggle>
-    </ion-item>
-    <ion-item *ngIf="settingsService.SHOW_MARK && set_custom_mark_string">
-        <ion-label>Notendefinition:</ion-label>
-        <ion-input [(ngModel)]="settingsService.MARK_STRING" color="secondary"></ion-input>
-    </ion-item>
-    <ion-item *ngIf="settingsService.SHOW_MARK && set_custom_mark_string">
-        <button ion-button color="primary" block (click)="checkMarkString()">Notendefinition prüfen</button>
-    </ion-item>
-    <ion-item>
-        <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
-        <ion-toggle [(ngModel)]="settingsService.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
-    </ion-item>
+    <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
+        <ion-item>
+            <ion-label>Gesamtbewertung in Note umwandeln</ion-label>
+            <ion-toggle [(ngModel)]="settingsService.SHOW_MARK" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item *ngIf="settingsService.SHOW_MARK">
+            <ion-label>Notendefinition bearbeiten</ion-label>
+            <ion-toggle [(ngModel)]="set_custom_mark_string" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item *ngIf="settingsService.SHOW_MARK && set_custom_mark_string">
+            <ion-label>Notendefinition:</ion-label>
+            <ion-input [(ngModel)]="settingsService.MARK_STRING" color="secondary"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="settingsService.SHOW_MARK && set_custom_mark_string">
+            <button ion-button color="primary" block (click)="checkMarkString()">Notendefinition prüfen</button>
+        </ion-item>
+        <ion-item>
+            <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
+            <ion-toggle [(ngModel)]="settingsService.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
+        </ion-item>
+    </div>
     <ion-item>
         <ion-label>Testdaten und schnelles Löschen</ion-label>
         <ion-toggle [(ngModel)]="settingsService.TEST_FEATURES" color="secondary"></ion-toggle>
@@ -77,7 +83,7 @@
         </ion-item>
         <ion-title>Import</ion-title>
         <ion-item>
-            <ng2-file-input [drop-text]="' '"  [extensions]="['stmb']" [invalid-file-text]="'Keine .stmb Datei ausgewählt'" [browse-text]="'Ziehe .stmb Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
+            <ng2-file-input [drop-text]="' '" [extensions]="['stmb']" [invalid-file-text]="'Keine .stmb Datei ausgewählt'" [browse-text]="'Ziehe .stmb Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
         </ion-item>
     </ion-list>
     <ion-list>

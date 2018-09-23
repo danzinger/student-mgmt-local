@@ -94,10 +94,10 @@
                     <ion-card-header class="header">
                         <div float-left class="title">
                             <strong>{{category.name}}</strong>
-                            <div *ngIf="category.type != 'incremental'" class="weight-display">
+                            <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && category.type != 'incremental'" class="weight-display">
                                 Gewichtung: {{precisionRound(category.category_weight*100,2)}}%
-                            </div>
-                            <div *ngIf="category.type == 'incremental'" class="weight-display">
+                            </div> 
+                            <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && category.type == 'incremental'" class="weight-display">
                                 Prozentpunkte: &plusmn;{{category.percentage_points_per_unit*100}}
                             </div>
                         </div>
@@ -122,10 +122,10 @@
                         <ion-card-header class="header">
                             <div float-left class="title">
                                 <strong>{{child.name}}</strong>
-                                <div *ngIf="child.type != 'incremental'" class="weight-display">
+                                <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && child.type != 'incremental'" class="weight-display">
                                     Gewichtung: {{precisionRound(child.category_weight*100,2)}}%
                                 </div>
-                                <div *ngIf="child.type == 'incremental'" class="weight-display">
+                                <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && child.type == 'incremental'" class="weight-display">
                                     Prozentpunkte: &plusmn;{{child.percentage_points_per_unit*100}}
                                 </div>
                             </div>
@@ -152,10 +152,10 @@
                             <ion-card-header class="header">
                                 <div float-left class="title">
                                     <strong>{{baby.name}}</strong>
-                                    <div *ngIf="baby.type != 'incremental'" class="weight-display">
+                                    <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && baby.type != 'incremental'" class="weight-display">
                                         Gewichtung: {{precisionRound(baby.category_weight*100,2)}}%
                                     </div>
-                                    <div *ngIf="baby.type == 'incremental'" class="weight-display">
+                                    <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && baby.type == 'incremental'" class="weight-display">
                                         Prozentpunkte: &plusmn;{{baby.percentage_points_per_unit*100}}
                                     </div>
                                 </div>
@@ -180,10 +180,10 @@
                                 <ion-card-header class="header">
                                     <div float-left class="title">
                                         <strong>{{subSubSubGroup.name}}</strong>
-                                        <div *ngIf="subSubSubGroup.type != 'incremental'" class="weight-display">
+                                        <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && subSubSubGroup.type != 'incremental'" class="weight-display">
                                             Gewichtung: {{precisionRound(subSubSubGroup.category_weight*100,2)}}%
                                         </div>
-                                        <div *ngIf="subSubSubGroup.type == 'incremental'" class="weight-display">
+                                        <div *ngIf="settingsService.GRADE_CALCULATION_FEATURE && subSubSubGroup.type == 'incremental'" class="weight-display">
                                             Prozentpunkte: &plusmn;{{subSubSubGroup.percentage_points_per_unit*100}}
                                         </div>
                                     </div>

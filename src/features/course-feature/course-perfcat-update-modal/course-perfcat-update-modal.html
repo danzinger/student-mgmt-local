@@ -47,25 +47,25 @@
                     <ion-label floating>Maximale Punkte</ion-label>
                     <ion-input type="number" [(ngModel)]="performanceCategory.point_maximum" name="point_maximum"></ion-input>
                 </ion-item>
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label floating>Gewichtung in Prozent</ion-label>
                     <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'incremental'">
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label floating>Wert pro Einheit</ion-label>
                     <ion-input type="number" [(ngModel)]="performanceCategory.percentage_points_per_unit" name="percentage_points_per_unit"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'group'">
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label floating>Gewichtung in Prozent</ion-label>
                     <ion-input type="number" [(ngModel)]="performanceCategory.category_weight" name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="performanceCategory.type == 'group' || performanceCategory.type == 'max_and_weight'">
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label>Diese Ebene automatisch gewichten</ion-label>
                     <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>
@@ -144,25 +144,25 @@
                     <ion-label floating>Maximale Punkte</ion-label>
                     <ion-input type="number" [(ngModel)]="subgroup.point_maximum" name="point_maximum"></ion-input>
                 </ion-item>
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label floating>Gewichtung in Prozent</ion-label>
                     <ion-input type="number" [(ngModel)]="subgroup.category_weight" name="weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="subgroup.type == 'incremental'">
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label floating>Wert pro Einheit</ion-label>
                     <ion-input type="number" [(ngModel)]="subgroup.percentage_points_per_unit" name="percentage_points_per_unit"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="subgroup.type == 'group'">
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label floating>Gewichtung in Prozent</ion-label>
                     <ion-input type="number" [(ngModel)]="subgroup.category_weight" name="category_weight"></ion-input>
                 </ion-item>
             </div>
             <div *ngIf="subgroup.type == 'group' || subgroup.type == 'max_and_weight'">
-                <ion-item>
+                <ion-item *ngIf="settingsService.GRADE_CALCULATION_FEATURE">
                     <ion-label>Diese Ebene automatisch gewichten</ion-label>
                     <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
                 </ion-item>
