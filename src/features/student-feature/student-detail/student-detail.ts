@@ -20,7 +20,7 @@ export class StudentDetailPage {
   view = "grade";
   computedGradings = [];
   notes;
-
+settings;
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -43,8 +43,9 @@ export class StudentDetailPage {
     }
   }
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     //this.final_grade = this.calculateGrade(this.selected_course.performanceCategories[0].children);
+    this.settingsService.getAllSettings().subscribe(s => this.settings = s);
   }
 
   getCourses() {
@@ -249,7 +250,8 @@ export class StudentDetailPage {
     Then it is easily possible to compute the final/partial grade.
     */
     let returnvalue;
-    if(this.settingsService.GRADE_CALCULATION_FEATURE){
+    //TODO: Fix type error later
+    if(this.settings && this.settings.GRADE_CALCULATION_FEATURE){
 
     let table = {};
     let submarks = [];
@@ -294,10 +296,10 @@ export class StudentDetailPage {
     grade_object.grade = this.precisionRound(grade * 100, 2);
     grade_object.mark = this.getMarkFromPercentage(grade);
 
-    if(this.settingsService.SHOW_MARK){
-      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? ": "+grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : ": "+grade_object.grade + ' ' + '(' + grade_object.mark + ')';
+    if(this.settings && this.settings.SHOW_MARK){
+      returnvalue = (this.settings && this.settings.SHOW_PERCENT_SIGN) ? ": "+grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : ": "+grade_object.grade + ' ' + '(' + grade_object.mark + ')';
     }else{
-      returnvalue = this.settingsService.SHOW_PERCENT_SIGN ? ": "+grade_object.grade + ' %' : ": "+grade_object.grade;
+      returnvalue = (this.settings && this.settings.SHOW_PERCENT_SIGN) ? ": "+grade_object.grade + ' %' : ": "+grade_object.grade;
     }
     
   }else{
@@ -312,7 +314,7 @@ export class StudentDetailPage {
 
   getMarkFromPercentage(percentage_value){
     let mark;
-    let mark_string = this.settingsService.MARK_STRING;
+    let mark_string = this.settings.MARK_STRING;
     let array = mark_string.split("|")
     for(let mark_range of array){
       let sub = mark_range.split(",")
@@ -427,7 +429,7 @@ export class StudentDetailPage {
     if (category.type == 'max_and_weight' && category.point_maximum) {
       return ' / ' + category.point_maximum;
     }
-    if (category.type == 'incremental' && category.percentage_points_per_unit &&  this.settingsService.GRADE_CALCULATION_FEATURE) {
+    if (category.type == 'incremental' && category.percentage_points_per_unit &&  this.settings && this.settings.GRADE_CALCULATION_FEATURE) {
       return ' (' + Number(category.percentage_points_per_unit)*100 + ')'
     }
     if (!category.type || category.type == 'group') {

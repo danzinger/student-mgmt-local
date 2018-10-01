@@ -5,7 +5,7 @@
             <button ion-button icon-only (click)="presentStudentUpdateModal()">
             <ion-icon name="create"></ion-icon>
           </button>
-          <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+          <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
             <ion-icon name="information-circle"></ion-icon>
         </button>
         </ion-buttons>
@@ -46,7 +46,7 @@
             </ion-list>
             <ion-list *ngIf="selected_course && selected_course.performanceCategories">
 
-                <ion-item  *ngIf="settingsService.GRADE_CALCULATION_FEATURE" no-lines>
+                <ion-item  *ngIf="settings && settings.GRADE_CALCULATION_FEATURE" no-lines>
                     <ion-label class="total-points">Kurs{{calculateGrade()}}</ion-label>
                 </ion-item>
                 <div *ngFor="let category of selected_course.performanceCategories | orderBy : 'name'">

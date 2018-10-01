@@ -26,6 +26,8 @@ export class CoursePerfcatUpdateModalPage {
   weight_changed = false;
   distribute_others_equally = false;
   topLevelCategory;
+  
+  settings;
 
   constructor(
     public navCtrl: NavController,
@@ -51,7 +53,7 @@ export class CoursePerfcatUpdateModalPage {
 
 
     this.subgroup = {}
-    if (this.settingsService.ENVIRONMENT_IS_DEV) {
+    if (this.settings && this.settings.ENVIRONMENT_IS_DEV) {
       this.subgroup = {
         name: 'Testkategorie',
         description: 'Testbeschreibung der Ersten',
@@ -67,11 +69,12 @@ export class CoursePerfcatUpdateModalPage {
   // ─── CORE FEATURES ──────────────────────────────────────────────────────────────
   //
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     //To let the user edit the percentage value
     this.performanceCategory.category_weight = this.performanceCategory.category_weight*100;
     this.performanceCategory.percentage_points_per_unit = this.performanceCategory.percentage_points_per_unit*100;
     this.gatherAllGroups();
+    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
   }
 
   cancel() {

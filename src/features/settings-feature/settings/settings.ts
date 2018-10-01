@@ -12,11 +12,13 @@ import { File } from '@ionic-native/file';
 import { SettingsService } from '../../../services/settings.service';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
+
 @IonicPage()
 @Component({
   selector: 'page-settings',
   templateUrl: 'settings.html',
 })
+
 export class SettingsPage {
   firstname;
   lastname;
@@ -25,7 +27,11 @@ export class SettingsPage {
   env;
   show_desktop_features: boolean = false;
   show_android_features: boolean = true;
-  set_custom_mark_string:boolean = false;
+  set_custom_mark_string: boolean = false;
+
+  settings = {
+    //ENVIRONMENT_IS_DEV: true
+  };
 
   constructor(
     public navCtrl: NavController,
@@ -39,33 +45,59 @@ export class SettingsPage {
     private fileChooser: FileChooser,
     public filePath: FilePath,
     public alertCtrl: AlertController, ) {
+
   }
 
-  ionViewDidLoad() {
-    this.courseService.getCourses().subscribe(data => this.courses = data)
+  ionViewWillEnter() {
+    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
+    console.log(this.settings);
+    this.courseService.getCourses().subscribe(data => this.courses = data);
     this.studentService.getStudents().subscribe(data => this.students = data);
+    this.listDir();
 
   }
-  ionViewDidEnter() {
-    this.listDir();
+
+  ENVIRONMENT_IS_DEV
+  test(set_value, key) {
+    this.settingsService.updateSetting(key, set_value).subscribe(s => this.settings = s)
   }
+
+
   closeSlidingItem(slidingItem: ItemSliding) {
     slidingItem.close();
   }
 
+  getSetting() {
+    //console.log(this.settingsService.getSetting('ENVIRONMENT_IS_DEV'));
+    this.settingsService.getSetting('ENVIRONMENT_IS_DEV').subscribe((s) => {
+      console.log(s);
+    })
+  }
+
+  setSetting() {
+    this.settingsService.updateSetting('ENVIRONMENT_IS_DEV', true).subscribe(() => {
+      console.log('ok');
+    })
+  }
+
+  getAllSettings() {
+    this.settingsService.getAllSettings().subscribe((s) => console.log(s))
+  }
+
   //
-  // ────────────────────────────────────────────────────────────────────── I ──────────
+  // ────────────────────────────────────────────────────────────────────── I ───────
   //   :::::: C O M M O N   F E A T U R E S : :  :   :    :     :        :          :
   // ────────────────────────────────────────────────────────────────────────────────
   //
 
-  checkMarkString(){
-    let mark_string = this.settingsService.MARK_STRING;
+  checkMarkString() {
+    //TODO: fix type-error by using proper class definition
+    let mark_string = this.settings.MARK_STRING ? this.settings.MARK_STRING : "";
     let array = mark_string.split("|")
     let resultstring = "";
-    for(let mark_range of array){
+    for (let mark_range of array) {
       let sub = mark_range.split(",")
-      resultstring += "<pre>"+Number(sub[0])+" &le; x < "+Number(sub[1])+" : "+sub[2]+"<br></pre>"
+      resultstring += "<pre>" + Number(sub[0]) + " &le; x < " + Number(sub[1]) + " : " + sub[2] + "<br></pre>"
     }
     let alert = this.alertCtrl.create({
       title: 'Notendefinition:',
@@ -146,10 +178,10 @@ export class SettingsPage {
     this.getBackupDataFromFileOnAndroid(file).then((data => {
       backup_data = data;
       let backup_data_courses_length = backup_data.courses ? backup_data.courses.length : 0;
-      let backup_data_students_length = backup_data.students ? backup_data.students.length : 0; 
+      let backup_data_students_length = backup_data.students ? backup_data.students.length : 0;
       let prompt = this.alertCtrl.create({
         title: 'Details',
-        message: "Datum: " + backup_data.meta.date+"<br>Uhrzeit: "+backup_data.meta.time+"<br>Kurse: "+backup_data_courses_length+"<br>Studenten: "+backup_data_students_length,
+        message: "Datum: " + backup_data.meta.date + "<br>Uhrzeit: " + backup_data.meta.time + "<br>Kurse: " + backup_data_courses_length + "<br>Studenten: " + backup_data_students_length,
         inputs: [
           {
             name: 'new_filename',
@@ -165,7 +197,7 @@ export class SettingsPage {
           {
             text: 'Speichern',
             handler: data => {
-              if(data.new_filename && data.new_filename != '' ) this.file.copyFile(this.file.externalRootDirectory, 'StudentMgmt/' + file.name, this.file.externalRootDirectory, 'StudentMgmt/' + data.new_filename).then(() => {
+              if (data.new_filename && data.new_filename != '') this.file.copyFile(this.file.externalRootDirectory, 'StudentMgmt/' + file.name, this.file.externalRootDirectory, 'StudentMgmt/' + data.new_filename).then(() => {
                 this.deleteBackupFileOnAndroid(file);
                 this.listDir()
               });

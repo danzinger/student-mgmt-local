@@ -14,6 +14,7 @@ import { StudentService } from '../../../services/student-service';
 export class CourseListPage {
   courses = [];
   ENV = 'dev';
+  settings;
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -22,13 +23,14 @@ export class CourseListPage {
     public alertCtrl: AlertController,
     public mongoIdService: MongoIdService,
     public settingsService: SettingsService,
-    public toastService:ToastService,
+    public toastService: ToastService,
     private studentService: StudentService
-    
+
   ) {
   }
 
   ionViewDidEnter() {
+    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
     this.courseService.getCourses().subscribe(courses => this.courses = courses);
   }
   //
@@ -46,7 +48,7 @@ export class CourseListPage {
       });
   }
 
-  
+
   addCourse() {
     let addModal = this.modalCtrl.create('CourseCreatePage');
     addModal.onDidDismiss((data) => {
@@ -68,11 +70,11 @@ export class CourseListPage {
     this.createCourse(course)
   }
 
-  copyCourse(old_course){
+  copyCourse(old_course) {
     let new_course = {
       _id: this.mongoIdService.newObjectId(),
       performanceCategories: old_course.performanceCategories,
-      name: old_course.name+" (Kopie)",
+      name: old_course.name + " (Kopie)",
       time: '',
       location: '',
       institution: old_course.institution,
@@ -148,8 +150,9 @@ export class CourseListPage {
               data => {
                 this.courses = data;
                 this.deleteAllGradingsInPerfcatsFromAllStudents(course._id);
-                this.toastService.showToast('Löschen erfolgreich'); }
-              ,error => {
+                this.toastService.showToast('Löschen erfolgreich');
+              }
+              , error => {
                 this.toastService.showToast('Löschen fehlgeschlagen');
               });
           }
@@ -158,7 +161,7 @@ export class CourseListPage {
     });
     alert.present();
   }
-  
+
   initializeDeletionArray(child): String[] {
     //returns an array of a grading_category and all of its subgroups
     let deletion_array = []
@@ -190,8 +193,8 @@ export class CourseListPage {
         if (students) {
           students.forEach((student) => {
             //filter the student.gradings and the student.computed_gradings array, to delete the gradings of the course being deleted
-              if (student.gradings) { student.gradings = student.gradings.filter(grading => grading.course_id != course_id) };
-              if (student.computed_gradings) { student.computed_gradings = student.computed_gradings.filter(computed_grading => computed_grading.course_id != course_id) };
+            if (student.gradings) { student.gradings = student.gradings.filter(grading => grading.course_id != course_id) };
+            if (student.computed_gradings) { student.computed_gradings = student.computed_gradings.filter(computed_grading => computed_grading.course_id != course_id) };
             //});
             students_to_update.push(student);
           });
@@ -204,9 +207,9 @@ export class CourseListPage {
       })
   }
 
-//
-// ─── HELPER FUNCTIONS ───────────────────────────────────────────────────────────
-//
+  //
+  // ─── HELPER FUNCTIONS ───────────────────────────────────────────────────────────
+  //
 
   closeSlidingItem(slidingItem: ItemSliding) {
     slidingItem.close();

@@ -1,11 +1,11 @@
 <ion-header>
     <ion-navbar color="stdt-mgmt-theme">
-        <ion-title>Kurse</ion-title>
+        <ion-title>Kurse  </ion-title>
         <ion-buttons end>
             <button ion-button icon-only (click)="addCourse()">
         <ion-icon name="add"></ion-icon>
       </button>
-            <button *ngIf="settingsService.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="addMockCourse()">
+            <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="addMockCourse()">
         <ion-icon name="done-all"></ion-icon>
       </button>
         </ion-buttons>

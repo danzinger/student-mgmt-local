@@ -31,6 +31,8 @@ export class CourseDetailPage {
   dataTable;
   reverse = false;
 
+  settings;
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -59,6 +61,7 @@ export class CourseDetailPage {
       // If this table would be needed elsewhere, it might be useful to outsource this work to the student-service.
       this.dataTable = this.generateGradingTable(participants);
     });
+    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
   }
 
   reverseList() {
