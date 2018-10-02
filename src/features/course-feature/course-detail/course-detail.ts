@@ -611,6 +611,7 @@ export class CourseDetailPage {
     //flatten the nested categories
     let resultcats: any[] = [];
     if (this.course.performanceCategories) {
+      resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
       this.course.performanceCategories.map((cat) => {
         if (this.isNonEmptyGroup(cat)) {
           resultcats.push(cat);

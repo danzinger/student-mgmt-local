@@ -28,10 +28,10 @@
             <button ion-button color="primary" block (click)="getAllSettings()">getAllSettings</button>
         </ion-item>
     </div>
-    <ion-item>
+    <!-- <ion-item>
         <ion-label>Entwicklungsmodus</ion-label>
         <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'ENVIRONMENT_IS_DEV')" [(ngModel)]="settings.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
-    </ion-item>
+    </ion-item> -->
     <ion-item>
         <ion-label>Autobackup beim Wiederherstellen</ion-label>
         <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'AUTOBACKUP_ON_RESTORE')" [(ngModel)]="settings.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
