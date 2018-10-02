@@ -6,6 +6,7 @@ import { CourseService } from '../../../services/course.service';
 import { ToastService } from '../../../services/toast.service';
 import { MongoIdService } from '../../../services/mongo-id.service';
 import { SettingsService } from '../../../services/settings.service';
+import { Settings } from '../../../app/models/settings';
 
 
 @IonicPage()
@@ -22,6 +23,7 @@ export class CourseNewperfcatModalPage {
   type;
   weight_changed = false;
   distribute_others_equally = false;
+  settings = new Settings;
 
   constructor(
     public navCtrl: NavController,
@@ -72,6 +74,7 @@ export class CourseNewperfcatModalPage {
     });
 
     this.course = navParams.get('course');
+    this.settings = navParams.get('settings');
 
   }
 

@@ -307,7 +307,8 @@ export class CourseDetailPage {
 
   presentAddNewPerfCatModal() {
     let addPerfCatModal = this.modalCtrl.create('CourseNewperfcatModalPage', {
-      course: this.course
+      course: this.course,
+      settings: this.settings
     });
     addPerfCatModal.present();
   }
@@ -343,7 +344,8 @@ export class CourseDetailPage {
       parent: parent,
       number_of_parents: number_of_parents,
       child: child,
-      course: this.course
+      course: this.course,
+      settings: this.settings
     })
     CoursePerfcatUpdateModal.present();
   }
@@ -611,10 +613,10 @@ export class CourseDetailPage {
     //flatten the nested categories
     let resultcats: any[] = [];
     if (this.course.performanceCategories) {
-      resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
+      if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
       this.course.performanceCategories.map((cat) => {
         if (this.isNonEmptyGroup(cat)) {
-          resultcats.push(cat);
+          if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(cat);
           this.digDeeper(cat, resultcats);
         } else {
           resultcats.push(cat);
@@ -629,7 +631,7 @@ export class CourseDetailPage {
     return category.children.map((subgroup) => {
       //if the child is also a nonempty group, go one level deeper
       if (this.isNonEmptyGroup(subgroup)) {
-        resultcats.push(subgroup);
+        if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(subgroup);
         this.digDeeper(subgroup, resultcats)
       } else {
         return resultcats.push(subgroup);
