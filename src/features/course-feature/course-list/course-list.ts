@@ -5,6 +5,7 @@ import { MongoIdService } from '../../../services/mongo-id.service';
 import { SettingsService } from '../../../services/settings.service';
 import { ToastService } from '../../../services/toast.service';
 import { StudentService } from '../../../services/student-service';
+import { Settings } from '../../../app/models/settings';
 
 @IonicPage()
 @Component({
@@ -14,7 +15,8 @@ import { StudentService } from '../../../services/student-service';
 export class CourseListPage {
   courses = [];
   ENV = 'dev';
-  settings;
+  settings = new Settings;
+  
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,

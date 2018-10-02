@@ -14,6 +14,7 @@ import { ToastService } from '../services/toast.service';
 import { MongoIdService } from '../services/mongo-id.service';
 import { PapaParseService } from 'ngx-papaparse';
 import { SettingsService } from '../services/settings.service';
+import { GradeCalculationService } from '../services/gradeCalculation.service';
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { SettingsService } from '../services/settings.service';
     MongoIdService,
     PapaParseService,
     SettingsService,
+    GradeCalculationService,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

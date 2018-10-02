@@ -13,6 +13,8 @@ import { PapaParseService } from 'ngx-papaparse';
 import { File } from '@ionic-native/file';
 
 //import { OrderPipe } from 'ngx-order-pipe';
+import { Settings } from '../../../app/models/settings';
+import { GradeCalculationService } from '../../../services/gradeCalculation.service';
 
 @IonicPage()
 @Component({
@@ -31,7 +33,7 @@ export class CourseDetailPage {
   dataTable;
   reverse = false;
 
-  settings;
+  settings = new Settings;
 
   constructor(
     public navCtrl: NavController,
@@ -45,7 +47,8 @@ export class CourseDetailPage {
     public settingsService: SettingsService,
     private papa: PapaParseService,
     public file: File,
-    public ref: ChangeDetectorRef) {
+    public ref: ChangeDetectorRef,
+    public gradeCalculationService: GradeCalculationService) {
 
     this.courses = navParams.get('courses');
     this.course = navParams.get('course');
@@ -54,6 +57,7 @@ export class CourseDetailPage {
 
   }
   ionViewDidEnter() {
+    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
     this.getParticipants().then((participants) => {
       this.participants = participants;
       //for easy sorting, we generate a 2-Dimensional dataTable here. We use this table - not the original array of participants - to display the students in the view.
@@ -61,7 +65,6 @@ export class CourseDetailPage {
       // If this table would be needed elsewhere, it might be useful to outsource this work to the student-service.
       this.dataTable = this.generateGradingTable(participants);
     });
-    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
   }
 
   reverseList() {
@@ -113,10 +116,16 @@ export class CourseDetailPage {
       }
       let flattenedCategories = this.flattenCategories();
       flattenedCategories.map((cat) => {
-        dataTableRow[cat._id] = this.getStudentsRatingInACat(cat._id, student._id);
+        if (cat.type != 'group') {
+          dataTableRow[cat._id] = this.getStudentsRatingInACat(cat._id, student._id);
+        } else {
+          dataTableRow[cat._id] = this.gradeCalculationService.calculateGrade(this.course.performanceCategories, student.computed_gradings, this.settings, cat.children)
+        }
+        dataTableRow['total_grading'] = this.gradeCalculationService.calculateGrade(this.course.performanceCategories, student.computed_gradings, this.settings)
       });
       dataTable.push(dataTableRow);
     });
+    console.log(dataTable)
     return dataTable;
   }
 
@@ -504,25 +513,32 @@ export class CourseDetailPage {
         Nachname: student.lastname,
       }
       resultcats.map((cat) => {
-        exportObject[cat.name] = this.getStudentsRatingInACat(cat._id, student._id);
+        exportObject['Note'] = this.gradeCalculationService.calculateGrade(this.course.performanceCategories, student.computed_gradings, this.settings)
+        if (cat.type == 'group') {
+          exportObject[cat.name] = this.gradeCalculationService.calculateGrade(this.course.performanceCategories, student.computed_gradings, this.settings, cat.children)
+        } else {
+          exportObject[cat.name] = this.getStudentsRatingInACat(cat._id, student._id);
+        }
       });
       exportData.push(exportObject);
     });
     return exportData;
   }
 
-  //This method was used for development purpose and cannot be used on Android
-
+  //This method was used for development purposes and cannot be used on Android
   // parseAndDownloadGradingsOnDesktop(exportData) {
-  //   let csv_string = this.papa.unparse(exportData);
-  //   var blob = new Blob([csv_string]);
-  //   var a = window.document.createElement("a");
-  //   a.href = window.URL.createObjectURL(blob);
-  //   let time = new Date().toJSON().slice(0, 10);
-  //   a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
-  //   document.body.appendChild(a);
-  //   a.click();
-  //   document.body.removeChild(a);
+  //   return new Promise((resolve, reject) => {
+  //     let csv_string = this.papa.unparse(exportData);
+  //     var blob = new Blob([csv_string]);
+  //     var a = window.document.createElement("a");
+  //     a.href = window.URL.createObjectURL(blob);
+  //     let time = new Date().toJSON().slice(0, 10);
+  //     a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     document.body.removeChild(a);
+  //     resolve();
+  //   });
   // }
 
   parseAndDownloadGradingsOnAndroid(exportData) {
@@ -597,6 +613,7 @@ export class CourseDetailPage {
     if (this.course.performanceCategories) {
       this.course.performanceCategories.map((cat) => {
         if (this.isNonEmptyGroup(cat)) {
+          resultcats.push(cat);
           this.digDeeper(cat, resultcats);
         } else {
           resultcats.push(cat);
@@ -611,10 +628,9 @@ export class CourseDetailPage {
     return category.children.map((subgroup) => {
       //if the child is also a nonempty group, go one level deeper
       if (this.isNonEmptyGroup(subgroup)) {
+        resultcats.push(subgroup);
         this.digDeeper(subgroup, resultcats)
       } else {
-        //not of type "group" (a potential candiate), or an empty(=no children) group (which cannot have any ratings)
-        // return exportObject[subgroup.name] = this.getStudentsRatingInACat(subgroup._id, student._id)
         return resultcats.push(subgroup);
       }
     })

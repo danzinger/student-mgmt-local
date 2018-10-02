@@ -35,7 +35,7 @@ export class CourseNewperfcatModalPage {
   ) {
 
     //For testing purpose this is how the form could be filled automatically:
-    //if (this.settingsService.ENVIRONMENT_IS_DEV) {
+    //if (this.settings && this.settings.ENVIRONMENT_IS_DEV) {
     // this.form_max_and_weight = formBuilder.group({
     //   _id: [''],
     //   name: ['Testkategorie', Validators.required],

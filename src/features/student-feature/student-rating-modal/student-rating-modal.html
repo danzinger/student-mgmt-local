@@ -35,10 +35,11 @@
     </div>
 </ion-item>
 <ion-item>
-  <ion-input [(ngModel)]="tmp.points" name="points" type="number" placeholder="Punkte"></ion-input>
+  <!-- <ion-input #input [(ngModel)]="tmp.points" name="points" type="number" placeholder="Punkte"></ion-input> -->
+  <ion-input #input  [(ngModel)]="points"  name="points" type="number" placeholder="Punkte"></ion-input>
 </ion-item>
 <ion-item>
-    <ion-textarea [(ngModel)]="tmp.remarks" name="remarks" placeholder="Anmerkungen"></ion-textarea>
+    <ion-textarea [(ngModel)]="remarks" name="remarks" placeholder="Anmerkungen"></ion-textarea>
   </ion-item>
     </form>
 </ion-content>

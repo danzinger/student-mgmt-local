@@ -7,6 +7,8 @@ import { Student } from '../../../app/models/student';
 import { Course } from '../../../app/models/course';
 import { SettingsService } from '../../../services/settings.service';
 import { PerfCat } from '../../../app/models/performance-category';
+import { Settings } from '../../../app/models/settings';
+import { GradeCalculationService } from '../../../services/gradeCalculation.service';
 
 @IonicPage()
 @Component({
@@ -20,7 +22,8 @@ export class StudentDetailPage {
   view = "grade";
   computedGradings = [];
   notes;
-settings;
+  settings = new Settings;
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -29,7 +32,8 @@ settings;
     public toastService: ToastService,
     public studentService: StudentService,
     public alertCtrl: AlertController,
-    public settingsService: SettingsService) {
+    public settingsService: SettingsService,
+    public gradeCalculationService: GradeCalculationService) {
 
     //STUDENT must always be avalible (not matter from which view we come from)
     this.student = this.navParams.get('student');
@@ -234,145 +238,8 @@ settings;
   //
 
   calculateGrade(partialGradingForGroup?) {
-
-    /*
-    This Function computes the overall grade and the partial gradings for a student.
-    If a subgroup is passed, a partial grading will be returned and if not, the overall grade is computed.
-    The functions iterates over the performance_categories of the course, or a subgroup of these (to compute a partial grading).
-    For each category, the corresponding weight is computed and some information is stored (slightly different "max_and_weight" or "incremental" grading types)
-    We obtain a datastructure like this:
-    {
-    PERFORMANCE-CATEGORY-1-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
-    PERFORMANCE-CATEGORY-2-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
-    PERFORMANCE-CATEGORY-3-ID : [WEIGHT, TYPE, POINT-MAXIMUM, PERFENTAGE-PPU]
-    ...
-    }
-    Then it is easily possible to compute the final/partial grade.
-    */
-    let returnvalue;
-    //TODO: Fix type error later
-    if(this.settings && this.settings.GRADE_CALCULATION_FEATURE){
-
-    let table = {};
-    let submarks = [];
-    let grade = 0;
-    let group = partialGradingForGroup ? partialGradingForGroup : this.selected_course.performanceCategories;
-
-    //first the table is generated:
-    if (group.length > 0) group.map((toplevel_category) => {
-      table[toplevel_category._id] = [Number(toplevel_category.category_weight), toplevel_category.type, toplevel_category.point_maximum, toplevel_category.percentage_points_per_unit]
-      if (this.categoryHasChildren(toplevel_category)) {
-        toplevel_category.children.map((first_level_child) => {
-          table[first_level_child._id] = [Number(toplevel_category.category_weight * first_level_child.category_weight), first_level_child.type, first_level_child.point_maximum, first_level_child.percentage_points_per_unit]
-          if (this.categoryHasChildren(first_level_child)) {
-            first_level_child.children.map((second_level_child) => {
-              table[second_level_child._id] = [Number(toplevel_category.category_weight * first_level_child.category_weight * second_level_child.category_weight), second_level_child.type, second_level_child.point_maximum, second_level_child.percentage_points_per_unit]
-              if (this.categoryHasChildren(second_level_child)) {
-                second_level_child.children.map((third_level_child) => {
-                  table[third_level_child._id] = [Number(toplevel_category.category_weight * first_level_child.category_weight * second_level_child.category_weight * third_level_child.category_weight), third_level_child.type, third_level_child.point_maximum, third_level_child.percentage_points_per_unit]
-                })
-              }
-            })
-          }
-        })
-      }
-    })
-
-    //then the grade is computed
-    this.student.computed_gradings.map((grading) => {
-      if (table[grading.category_id] && table[grading.category_id][1] == "max_and_weight") {
-        submarks.push(table[grading.category_id][0] * (grading.total_points / table[grading.category_id][2]))
-      }
-      if (table[grading.category_id] && table[grading.category_id][1] == "incremental") {
-        submarks.push(table[grading.category_id][0] * grading.total_points * table[grading.category_id][3])
-      }
-    })
-    grade = (submarks.length > 0) ? submarks.reduce((a, b) => { return a + b; }) : 0;
-
-    let grade_object = {
-      grade: 0,
-      mark: 0
-    }
-    grade_object.grade = this.precisionRound(grade * 100, 2);
-    grade_object.mark = this.getMarkFromPercentage(grade);
-
-    if(this.settings && this.settings.SHOW_MARK){
-      returnvalue = (this.settings && this.settings.SHOW_PERCENT_SIGN) ? ": "+grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : ": "+grade_object.grade + ' ' + '(' + grade_object.mark + ')';
-    }else{
-      returnvalue = (this.settings && this.settings.SHOW_PERCENT_SIGN) ? ": "+grade_object.grade + ' %' : ": "+grade_object.grade;
-    }
-    
-  }else{
-      returnvalue = "";
+    return (this.settings && this.settings.GRADE_CALCULATION_FEATURE) ? this.gradeCalculationService.calculateGrade(this.selected_course.performanceCategories, this.student.computed_gradings, this.settings, partialGradingForGroup, true) : "";
   }
-    return returnvalue
-  }
-
-  //
-  // ─── HELPER FUNCTIONS ────────────────────────────────────────────
-  //
-
-  getMarkFromPercentage(percentage_value){
-    let mark;
-    let mark_string = this.settings.MARK_STRING;
-    let array = mark_string.split("|")
-    for(let mark_range of array){
-      let sub = mark_range.split(",")
-      if (percentage_value >= Number(sub[0]) && percentage_value < Number(sub[1])) {
-        mark = sub[2];
-      }
-    }
-    return mark;
-  }
-
-  // getMarkFromPercentage(percentage_value) {
-  //   let mark;
-  //   if (percentage_value < 0.5) {
-  //     mark = '5';
-  //   }
-  //   if (percentage_value >= 0.5 && percentage_value < 0.5416) {
-  //     mark = '4-';
-  //   }
-  //   if (percentage_value >= 0.5416 && percentage_value < 0.5833) {
-  //     mark = '4'
-  //   }
-  //   if (percentage_value >= 0.5833 && percentage_value < 0.625) {
-  //     mark = '4+';
-  //   }
-  //   if (percentage_value >= 0.625 && percentage_value < 0.6666) {
-  //     mark = '3-'
-  //   }
-  //   if (percentage_value >= 0.6666 && percentage_value < 0.7083) {
-  //     mark = '3'
-  //   }
-  //   if (percentage_value >= 0.7083 && percentage_value < 0.75) {
-  //     mark = '3+'
-  //   }
-  //   if (percentage_value >= 0.750 && percentage_value < 0.7916) {
-  //     mark = '2-'
-  //   }
-  //   if (percentage_value >= 0.7916 && percentage_value < 0.8333) {
-  //     mark = '2'
-  //   }
-  //   if (percentage_value >= 0.8333 && percentage_value < 0.875) {
-  //     mark = '2+'
-  //   }
-  //   if (percentage_value >= 0.875) {
-  //     mark = '1'
-  //   }
-  //   return mark;
-  // }
-
-  precisionRound(number, precision) {
-    var factor = Math.pow(10, precision);
-    return Math.round(number * factor) / factor;
-  }
-
-  categoryHasChildren(category) {
-    return category.children && category.children.length > 0 && category.type == "group"
-  }
-
-
 
   //
   // ──────────────────────────────────────────────────────────────────────────────────── IV ──────────
@@ -429,8 +296,8 @@ settings;
     if (category.type == 'max_and_weight' && category.point_maximum) {
       return ' / ' + category.point_maximum;
     }
-    if (category.type == 'incremental' && category.percentage_points_per_unit &&  this.settings && this.settings.GRADE_CALCULATION_FEATURE) {
-      return ' (' + Number(category.percentage_points_per_unit)*100 + ')'
+    if (category.type == 'incremental' && category.percentage_points_per_unit && this.settings && this.settings.GRADE_CALCULATION_FEATURE) {
+      return ' (' + Number(category.percentage_points_per_unit) * 100 + ')'
     }
     if (!category.type || category.type == 'group') {
       return ''

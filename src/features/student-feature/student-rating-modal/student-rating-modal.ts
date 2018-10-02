@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, ViewController, AlertController, IonicPage } from 'ionic-angular';
 import { StudentService } from '../../../services/student-service';
 import { ToastService } from '../../../services/toast.service';
@@ -21,16 +21,17 @@ import { MongoIdService } from '../../../services/mongo-id.service';
   templateUrl: 'student-rating-modal.html',
 })
 export class StudentRatingModalPage {
+  @ViewChild('input') myInput;
 
   rating;
   //newRating: Rating;
   rating_details;
   student;
-  tmp = {
-    points: 0,
-    remarks: ''
-  };
   category_name;
+
+  points;
+  remarks;
+
   constructor(
     private alertCtrl: AlertController,
     public navCtrl: NavController,
@@ -46,19 +47,27 @@ export class StudentRatingModalPage {
 
   }
 
+  ionViewDidEnter() {
+    //https://forum.ionicframework.com/t/setting-focus-to-an-input-in-ionic/62789
+    setTimeout(() => {
+      this.myInput.setFocus();
+    },10);
+
+ }
+
   cancel() {
     this.viewCtrl.dismiss();
   }
 
   addPoint(point: any) {
-    this.tmp.points = Number(this.tmp.points);
-    this.tmp.points += point;
+    this.points = this.points ? Number(this.points) : 0;
+    this.points += point;
   }
 
   done() {
-    this.rating.points = Number(this.tmp.points);
-    if (this.tmp.remarks != '') {
-      this.rating.remarks = this.tmp.remarks
+    this.rating.points = Number(this.points);
+    if (this.remarks != '') {
+      this.rating.remarks = this.remarks
     } else {
       delete this.rating.remarks;
     }
@@ -127,11 +136,11 @@ export class StudentRatingModalPage {
             this.addToComputedGradings();
             this.studentService.updateStudent(this.student).subscribe(
               data => {
-                this.toastService.showToast('Eintragung erfolgreich!');
+                this.toastService.showToast('Eintragung erfolgreich');
                 this.viewCtrl.dismiss();
               },
               error => {
-                this.toastService.showToast('Fehler beim Anlegen. Server meldet: ' + error._body);
+                this.toastService.showToast('Fehler beim Anlegen');
               });
           }
         }

@@ -12,6 +12,7 @@ import { File } from '@ionic-native/file';
 import { SettingsService } from '../../../services/settings.service';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
+import { Settings } from '../../../app/models/settings';
 
 @IonicPage()
 @Component({
@@ -29,9 +30,7 @@ export class SettingsPage {
   show_android_features: boolean = true;
   set_custom_mark_string: boolean = false;
 
-  settings = {
-    //ENVIRONMENT_IS_DEV: true
-  };
+  settings = new Settings;
 
   constructor(
     public navCtrl: NavController,
@@ -50,26 +49,22 @@ export class SettingsPage {
 
   ionViewWillEnter() {
     this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
-    console.log(this.settings);
     this.courseService.getCourses().subscribe(data => this.courses = data);
     this.studentService.getStudents().subscribe(data => this.students = data);
     this.listDir();
 
   }
 
-  ENVIRONMENT_IS_DEV
-  test(set_value, key) {
+  updateSetting(set_value, key) {
     this.settingsService.updateSetting(key, set_value).subscribe(s => this.settings = s)
   }
-
 
   closeSlidingItem(slidingItem: ItemSliding) {
     slidingItem.close();
   }
 
   getSetting() {
-    //console.log(this.settingsService.getSetting('ENVIRONMENT_IS_DEV'));
-    this.settingsService.getSetting('ENVIRONMENT_IS_DEV').subscribe((s) => {
+    this.settingsService.getSetting('GRADE_CALCULATION_FEATURE').subscribe((s) => {
       console.log(s);
     })
   }
@@ -224,7 +219,7 @@ export class SettingsPage {
   }
 
   presentRestoreFromBackupOnAndroidConfirm(file) {
-    let message = !this.settingsService.AUTOBACKUP_ON_RESTORE ? 'Backup "' + file.name + '" wiederherstellen?<br><br><strong>ACHTUNG</strong>: Dadurch werden alle derzeitigen Daten gelöscht!' : 'Backup "' + file.name + '" wiederherstellen? Es wird ein automatisches Backup der derzeitigen Daten angelegt.'
+    let message = (this.settings && !this.settings.AUTOBACKUP_ON_RESTORE) ? 'Backup "' + file.name + '" wiederherstellen?<br><br><strong>ACHTUNG</strong>: Dadurch werden alle derzeitigen Daten gelöscht!' : 'Backup "' + file.name + '" wiederherstellen? Es wird ein automatisches Backup der derzeitigen Daten angelegt.'
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
       message: message,
@@ -248,7 +243,7 @@ export class SettingsPage {
 
   restoreBackupFromFileOnAndroid(file) {
     // Repetitive code. How to avoid this here?
-    if (this.settingsService.AUTOBACKUP_ON_RESTORE == true) {
+    if (this.settings && this.settings.AUTOBACKUP_ON_RESTORE == true) {
       this.makeBackup().then(() => {
         this.getBackupDataFromFileOnAndroid(file).then((parsed_data) => {
           this.restoreFromBackup(parsed_data).then(() => {

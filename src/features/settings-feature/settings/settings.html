@@ -14,34 +14,40 @@
 
 <ion-content padding>
     <ion-title>Einstellungen</ion-title>
-    <ion-item><pre>{{settings | json}}</pre>
-        <button ion-button color="primary" block (click)="setSetting()">setSetting()</button>
-    </ion-item>
-    <ion-item>
-        <button ion-button color="primary" block (click)="getSetting()">getSetting()</button>
-    </ion-item>
-    <ion-item>
-        <button ion-button color="primary" block (click)="settingsService.deleteSettings()">delete</button>
-    </ion-item>
-    <ion-item>
-        <button ion-button color="primary" block (click)="getAllSettings()">getAllSettings</button>
-    </ion-item>
+    <div *ngIf="settings && settings.ENVIRONMENT_IS_DEV">
+        <ion-item><pre>{{settings | json}}</pre>
+            <button ion-button color="primary" block (click)="setSetting()">setSetting()</button>
+        </ion-item>
+        <ion-item>
+            <button ion-button color="primary" block (click)="getSetting()">getSetting()</button>
+        </ion-item>
+        <ion-item>
+            <button ion-button color="primary" block (click)="settingsService.deleteSettings()">delete</button>
+        </ion-item>
+        <ion-item>
+            <button ion-button color="primary" block (click)="getAllSettings()">getAllSettings</button>
+        </ion-item>
+    </div>
     <ion-item>
         <ion-label>Entwicklungsmodus</ion-label>
-        <ion-toggle *ngIf="settings" (ngModelChange)="test($event, 'ENVIRONMENT_IS_DEV')" [(ngModel)]="settings.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'ENVIRONMENT_IS_DEV')" [(ngModel)]="settings.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
     </ion-item>
     <ion-item>
         <ion-label>Autobackup beim Wiederherstellen</ion-label>
-        <ion-toggle *ngIf="settings" (ngModelChange)="test($event, 'AUTOBACKUP_ON_RESTORE')" [(ngModel)]="settings.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'AUTOBACKUP_ON_RESTORE')" [(ngModel)]="settings.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
     </ion-item>
     <ion-item>
         <ion-label>Leistungsberechnung aktivieren</ion-label>
-        <ion-toggle *ngIf="settings" (ngModelChange)="test($event, 'GRADE_CALCULATION_FEATURE')" [(ngModel)]="settings.GRADE_CALCULATION_FEATURE" color="secondary"></ion-toggle>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'GRADE_CALCULATION_FEATURE')" [(ngModel)]="settings.GRADE_CALCULATION_FEATURE" color="secondary"></ion-toggle>
     </ion-item>
     <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
         <ion-item>
+            <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
+            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'SHOW_PERCENT_SIGN')" [(ngModel)]="settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item>
             <ion-label>Gesamtbewertung in Note umwandeln</ion-label>
-            <ion-toggle *ngIf="settings" (ngModelChange)="test($event, 'SHOW_MARK')" [(ngModel)]="settings.SHOW_MARK" color="secondary"></ion-toggle>
+            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'SHOW_MARK')" [(ngModel)]="settings.SHOW_MARK" color="secondary"></ion-toggle>
         </ion-item>
         <ion-item *ngIf="settings && settings.SHOW_MARK">
             <ion-label>Notendefinition bearbeiten</ion-label>
@@ -49,19 +55,15 @@
         </ion-item>
         <ion-item *ngIf="settings && settings.SHOW_MARK && set_custom_mark_string">
             <ion-label>Notendefinition:</ion-label>
-            <ion-input *ngIf="settings" [(ngModel)]="settings.MARK_STRING" color="secondary"></ion-input>
+            <ion-input *ngIf="settings" (ngModelChange)="updateSetting($event, 'MARK_STRING')" [(ngModel)]="settings.MARK_STRING" color="secondary"></ion-input>
         </ion-item>
         <ion-item *ngIf="settings && settings.SHOW_MARK && set_custom_mark_string">
             <button ion-button color="primary" block (click)="checkMarkString()">Notendefinition prüfen</button>
         </ion-item>
-        <ion-item>
-            <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
-            <ion-toggle *ngIf="settings" (ngModelChange)="test($event, 'SHOW_PERCENT_SIGN')" [(ngModel)]="settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
-        </ion-item>
     </div>
     <ion-item>
         <ion-label>Testdaten und schnelles Löschen</ion-label>
-        <ion-toggle *ngIf="settings" (ngModelChange)="test($event, 'TEST_FEATURES')" [(ngModel)]="settings.TEST_FEATURES" color="secondary"></ion-toggle>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'TEST_FEATURES')" [(ngModel)]="settings.TEST_FEATURES" color="secondary"></ion-toggle>
     </ion-item>
     <div *ngIf="settings && settings.ENVIRONMENT_IS_DEV">
         <ion-item>
