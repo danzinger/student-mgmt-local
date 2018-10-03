@@ -90,9 +90,11 @@ export class StudentRatingModalPage {
           handler: () => {
             if (!student.gradings) student.gradings = [];
             this.studentService.addGradingToStudent(student, rating).then(
-                data => {
-                  this.toastService.showToast('Eintragung erfolgreich');
-                  this.viewCtrl.dismiss();
+                student => {
+                  this.studentService.updateStudent(student).subscribe(()=>{
+                    this.toastService.showToast('Eintragung erfolgreich');
+                    this.viewCtrl.dismiss();
+                  })
                 },
                 error => {
                   this.toastService.showToast('Fehler beim Anlegen');
