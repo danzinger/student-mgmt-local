@@ -110,9 +110,9 @@
                     <ion-row>
                         <ion-col>
                             <button ion-button icon-left clear small>
-                                  <span style="display:flex; align-items:center;justify-content:center;color:green" *ngIf="grading.points >= 1">
+                                  <span style="display:flex; align-items:center;justify-content:center;color:green" *ngIf="grading.points >= 0">
                                       <ion-icon name="thumbs-up" ></ion-icon>
-                                      <span *ngIf="grading.points > 1">{{grading.points}} Punkte</span>
+                                      <span *ngIf="grading.points == 0 || grading.points > 1">{{grading.points}} Punkte</span>
                                       <span *ngIf="grading.points == 1">{{grading.points}} Punkt</span>
                                   </span>
                                   <span style="display:flex; align-items:center;color:red" *ngIf="grading.points <= -1">

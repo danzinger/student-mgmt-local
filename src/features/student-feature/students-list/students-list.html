@@ -31,7 +31,7 @@
                 </ion-select>
                 <p *ngIf="courses.length < 1">Erstelle in der Kursansicht einen Kurs.</p>
             </ion-item>
-            <ion-item-sliding #slidingItem *ngFor="let student of students | filter:term | orderBy : 'firstname'">
+            <ion-item-sliding #slidingItem *ngFor="let student of students | filter:term | orderBy : 'lastname'">
                 <button ion-item *ngIf="!registerMode" (click)="goToStudentDetail(student)">
                 <text-avatar [text]="student.firstname"  item-left></text-avatar>
                 <ion-label>{{student.firstname}} {{student.lastname}}</ion-label>

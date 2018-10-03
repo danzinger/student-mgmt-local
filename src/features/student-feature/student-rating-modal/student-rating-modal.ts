@@ -51,9 +51,9 @@ export class StudentRatingModalPage {
     //https://forum.ionicframework.com/t/setting-focus-to-an-input-in-ionic/62789
     setTimeout(() => {
       this.myInput.setFocus();
-    },10);
+    }, 10);
 
- }
+  }
 
   cancel() {
     this.viewCtrl.dismiss();
@@ -71,53 +71,10 @@ export class StudentRatingModalPage {
     } else {
       delete this.rating.remarks;
     }
-    this.presentConfirm();
+    this.presentConfirm(this.student, this.rating);
   }
 
-  addGradingToStudent() {
-    this.student.gradings.push(this.rating)
-  }
-
-  tmp_index;
-  addToComputedGradings() {
-    //adds a grading to the computed gradings. if no computed_gradings object exists it creates one and inserts the first value.
-    //if the grading sum is 0 the computed gradings objects gets removed from the array
-    this.tmp_index = -1;
-    if (!this.student.computed_gradings || this.student.computed_gradings.length == 0) {
-      //if this is the first rating in this category
-      this.student.computed_gradings = []
-      this.addNewComputedGrading();
-    } else {
-      //else if there are already computed gradings avalible
-      let found = false;
-      this.student.computed_gradings.forEach((computed_grading) => {
-        if (computed_grading.category_id == this.rating.category_id) {
-          computed_grading.total_points += this.rating.points;
-          found = true;
-          if(computed_grading.total_points == 0){
-            this.tmp_index = this.student.computed_gradings.indexOf(computed_grading);
-          }
-        }
-      })
-      if (found == false) {
-        this.addNewComputedGrading();
-      }
-      found = false;
-      if (this.tmp_index > -1) this.student.computed_gradings.splice(this.tmp_index, 1);
-      this.tmp_index = -1;
-    }
-  }
-
-  addNewComputedGrading() {
-    this.student.computed_gradings.push({
-      category_id: this.rating.category_id,
-      course_id: this.rating.course_id,
-      category_name: this.category_name,
-      total_points: this.rating.points
-    })
-  }
-
-  presentConfirm() {
+  presentConfirm(student, rating) {
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
       message: 'Bewertung speichern?',
@@ -131,17 +88,15 @@ export class StudentRatingModalPage {
         {
           text: 'Ok',
           handler: () => {
-            if (!this.student.gradings) this.student.gradings = [];
-            this.addGradingToStudent();
-            this.addToComputedGradings();
-            this.studentService.updateStudent(this.student).subscribe(
-              data => {
-                this.toastService.showToast('Eintragung erfolgreich');
-                this.viewCtrl.dismiss();
-              },
-              error => {
-                this.toastService.showToast('Fehler beim Anlegen');
-              });
+            if (!student.gradings) student.gradings = [];
+            this.studentService.addGradingToStudent(student, rating).then(
+                data => {
+                  this.toastService.showToast('Eintragung erfolgreich');
+                  this.viewCtrl.dismiss();
+                },
+                error => {
+                  this.toastService.showToast('Fehler beim Anlegen');
+                });
           }
         }
       ]

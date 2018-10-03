@@ -96,4 +96,43 @@ export class CourseService {
     return this.storage.remove('courses');
   }
 
+  //
+  // ─── HELPER ─────────────────────────────────────────────────────────────────────
+  //
+
+  flattenCategories(course, includeGroups?) {
+    //flatten the nested categories
+    let resultcats: any[] = [];
+    if (course.performanceCategories) {
+      if(includeGroups) resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
+      course.performanceCategories.map((cat) => {
+        if (this.isNonEmptyGroup(cat)) {
+          if(includeGroups) resultcats.push(cat);
+          this.digDeeper(cat, resultcats, includeGroups);
+        } else {
+          resultcats.push(cat);
+        }
+      });
+    }
+    return resultcats;
+  }
+
+  
+  digDeeper(category, resultcats: any[], includeGroups?) {
+    //this function searches the tree of subchildren recursively.
+    return category.children.map((subgroup) => {
+      //if the child is also a nonempty group, go one level deeper
+      if (this.isNonEmptyGroup(subgroup)) {
+        if(includeGroups) resultcats.push(subgroup);
+        this.digDeeper(subgroup, resultcats)
+      } else {
+        return resultcats.push(subgroup);
+      }
+    })
+  }
+
+  isNonEmptyGroup(category) {
+    return category.children && category.children.length > 0 && category.type == "group"
+  }
+
 }

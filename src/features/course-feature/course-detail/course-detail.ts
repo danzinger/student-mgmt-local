@@ -82,7 +82,7 @@ export class CourseDetailPage {
   //
 
   createAndregisterStudents() {
-    this.navCtrl.push('StudentAddPage', { control_data: { registerForCourse: true, course: this.course, students: this.students } })
+    this.navCtrl.push('StudentAddPage', { control_data: { registerForCourse: true, course: this.course, students: this.participants } })
   }
 
   //
@@ -158,7 +158,7 @@ export class CourseDetailPage {
       });
     }
 
-    alert.addButton('Cancel');
+    alert.addButton('Abbrechen');
     alert.addButton({
       text: 'OK',
       handler: data => {
@@ -332,7 +332,8 @@ export class CourseDetailPage {
       category: category,
       child: child,
       course: this.course,
-      parent: parent
+      parent: parent,
+      settings: this.settings
     });
     CoursePerfcatEditModal.present();
   }
@@ -481,7 +482,7 @@ export class CourseDetailPage {
     //this.parseAndDownloadGradingsOnDesktop(exportData);
     this.parseAndDownloadGradingsOnAndroid(exportData).then(() => {
       this.toastService.showToast('Datenexport erfolgreich!');
-    }).catch(err => alert(JSON.stringify(err)))
+    }).catch(err => this.toastService.showToast('Datenexport fehlgeschlagen! Grund: ' + JSON.stringify(err)))
   }
 
   presentExportCourseDataConfirm() {
@@ -515,7 +516,7 @@ export class CourseDetailPage {
         Nachname: student.lastname,
       }
       resultcats.map((cat) => {
-        exportObject['Note'] = this.gradeCalculationService.calculateGrade(this.course.performanceCategories, student.computed_gradings, this.settings)
+        exportObject['Gesamtnote'] = this.gradeCalculationService.calculateGrade(this.course.performanceCategories, student.computed_gradings, this.settings)
         if (cat.type == 'group') {
           exportObject[cat.name] = this.gradeCalculationService.calculateGrade(this.course.performanceCategories, student.computed_gradings, this.settings, cat.children)
         } else {
@@ -548,7 +549,7 @@ export class CourseDetailPage {
       this.checkDir().then(() => {
         let csv_string = this.papa.unparse(exportData);
         let time = new Date().toJSON().slice(0, 10);
-        let filename: string = 'StudentMgmt/csv-export/' + this.course.name + '-' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
+        let filename: string = 'StudentMgmt/csv-export/kurs-csv/' + this.course.name + '-' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
         this.file.writeFile(this.file.externalRootDirectory, filename, csv_string).then(() => {
           //this.listDir();
           resolve();
@@ -572,11 +573,13 @@ export class CourseDetailPage {
   }
 
   checkDir() {
-    return this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt/csv-export')
+    return this.file.checkDir(this.file.externalRootDirectory, 'StudentMgmt/csv-export/kurs-csv')
   }
   createDir() {
     return this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt', true).then(() => {
-      return this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt/csv-export', true)
+      return this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt/csv-export', true).then(() => {
+        return this.file.createDir(this.file.externalRootDirectory, 'StudentMgmt/csv-export/kurs-csv', true)
+      })
     })
   }
   //
@@ -609,39 +612,44 @@ export class CourseDetailPage {
   //
 
   resultcats: any[];
+
   flattenCategories() {
-    //flatten the nested categories
-    let resultcats: any[] = [];
-    if (this.course.performanceCategories) {
-      if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
-      this.course.performanceCategories.map((cat) => {
-        if (this.isNonEmptyGroup(cat)) {
-          if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(cat);
-          this.digDeeper(cat, resultcats);
-        } else {
-          resultcats.push(cat);
-        }
-      });
-    }
-    return resultcats;
+    return this.settings.GRADE_CALCULATION_FEATURE ? this.courseService.flattenCategories(this.course, true) : this.courseService.flattenCategories(this.course, false)
   }
 
-  digDeeper(category, resultcats: any[]) {
-    //this function searches the tree of subchildren recursively.
-    return category.children.map((subgroup) => {
-      //if the child is also a nonempty group, go one level deeper
-      if (this.isNonEmptyGroup(subgroup)) {
-        if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(subgroup);
-        this.digDeeper(subgroup, resultcats)
-      } else {
-        return resultcats.push(subgroup);
-      }
-    })
-  }
+  // flattenCategories2() {
+  //   //flatten the nested categories
+  //   let resultcats: any[] = [];
+  //   if (this.course.performanceCategories) {
+  //     if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
+  //     this.course.performanceCategories.map((cat) => {
+  //       if (this.isNonEmptyGroup(cat)) {
+  //         if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(cat);
+  //         this.digDeeper(cat, resultcats);
+  //       } else {
+  //         resultcats.push(cat);
+  //       }
+  //     });
+  //   }
+  //   return resultcats;
+  // }
 
-  isNonEmptyGroup(category) {
-    return category.children && category.children.length > 0 && category.type == "group"
-  }
+  // digDeeper(category, resultcats: any[]) {
+  //   //this function searches the tree of subchildren recursively.
+  //   return category.children.map((subgroup) => {
+  //     //if the child is also a nonempty group, go one level deeper
+  //     if (this.isNonEmptyGroup(subgroup)) {
+  //       if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(subgroup);
+  //       this.digDeeper(subgroup, resultcats)
+  //     } else {
+  //       return resultcats.push(subgroup);
+  //     }
+  //   })
+  // }
+
+  // isNonEmptyGroup(category) {
+  //   return category.children && category.children.length > 0 && category.type == "group"
+  // }
 
   printInfo() {
     console.log('this.course: ', this.course, '\nthis.courses: ', this.courses, '\nthis.participants: ', this.participants)
