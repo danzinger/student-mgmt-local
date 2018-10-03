@@ -1,0 +1,37 @@
+<ion-header>
+    <ion-navbar color="stdt-mgmt-theme">
+        <ion-title>Kurse  </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="addCourse()">
+        <ion-icon name="add"></ion-icon>
+      </button>
+            <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="addMockCourse()">
+        <ion-icon name="done-all"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+
+</ion-header>
+<ion-content>
+    <ion-list>
+        <ion-item-sliding #slidingItem *ngFor="let course of courses | orderBy : ['name']">
+            <button ion-item (click)="openCourse(course)">
+              <text-avatar [text]="course.name"  item-left></text-avatar>
+              <div>{{course.name}}</div>
+            <div style="font-size:80%;padding-top:5px;" *ngIf="course.institution != ''">{{course.institution}}</div>
+          </button>
+            <!-- <ion-item-options (ionSwipe)="deleteCourse(course)"> -->
+            <ion-item-options>
+                <button large style="width:75px;" ion-button color="danger" (click)="deleteCourse(course); closeSlidingItem(slidingItem)">
+                  <ion-icon  name="trash"></ion-icon>
+              </button>
+              <button large style="width:75px;" ion-button color="primary" (click)="manageCourse(course); closeSlidingItem(slidingItem)">
+                <ion-icon name="create"></ion-icon>
+            </button>
+            <button large style="width:75px;" ion-button color="dark" (click)="copyCourse(course); closeSlidingItem(slidingItem)">
+              <ion-icon name="copy"></ion-icon>
+          </button>
+            </ion-item-options>
+        </ion-item-sliding>
+    </ion-list>
+</ion-content>

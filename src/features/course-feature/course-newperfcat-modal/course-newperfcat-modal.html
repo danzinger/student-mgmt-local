@@ -1,0 +1,82 @@
+<ion-header>
+    <ion-navbar color="stdt-mgmt-theme">
+        <ion-title>Neue Leistungskategorie</ion-title>
+        <ion-buttons end>
+            <button ion-button (click)="cancel()" strong>
+          <span color="primary" showWhen="ios">
+            Cancel
+          </span>
+          <ion-icon style="font-size:25px" name="close" showWhen="core,android,windows"></ion-icon>
+        </button>
+            <button ion-button [disabled]="!form_max_and_weight.valid && !form_incremental.valid && !form_group.valid" (click)="done(performanceCategory)" strong>
+          <span color="primary" showWhen="ios">
+            Done
+          </span>
+          <ion-icon style="font-size:25px" name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+        </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-item>
+        <ion-label floating>Kategorietyp</ion-label>
+        <ion-select name="type" [(ngModel)]="type" multiple="false" cancelText="Abbrechen" okText="Ok">
+            <ion-option value="max_and_weight">Anteilige Punkte</ion-option>
+            <ion-option value="incremental">Einzelne Punkte</ion-option>
+            <ion-option value="group">Gruppe</ion-option>
+        </ion-select>
+    </ion-item>
+    <form *ngIf="type == 'max_and_weight'" [formGroup]="form_max_and_weight" (ngSubmit)="done()">
+        <ion-item>
+            <ion-label floating>Name</ion-label>
+            <ion-input type="text" formControlName="name"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Beschreibung</ion-label>
+            <ion-input formControlName="description"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Maximale Punkte</ion-label>
+            <ion-input type="number" formControlName="point_maximum"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
+            <ion-label floating>Gewichtung in Prozent</ion-label>
+            <ion-input type="number" formControlName="category_weight"></ion-input>
+        </ion-item>
+    </form>
+    <form *ngIf="type == 'incremental'" [formGroup]="form_incremental" (ngSubmit)="done()">
+        <ion-item>
+            <ion-label floating>Name</ion-label>
+            <ion-input type="text" formControlName="name"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Beschreibung</ion-label>
+            <ion-input formControlName="description"></ion-input>
+        </ion-item>
+        <ion-item  *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
+            <ion-label floating>Punkte pro Einheit</ion-label>
+            <ion-input type="number" formControlName="percentage_points_per_unit"></ion-input>
+        </ion-item>
+    </form>
+    <form *ngIf="type == 'group'" [formGroup]="form_group" (ngSubmit)="done()">
+        <ion-item>
+            <ion-label floating>Name</ion-label>
+            <ion-input type="text" formControlName="name"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Beschreibung</ion-label>
+            <ion-input formControlName="description"></ion-input>
+        </ion-item>
+        <ion-item  *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
+            <ion-label floating>Gewichtung in Prozent</ion-label>
+            <ion-input type="number" formControlName="category_weight"></ion-input>
+        </ion-item>
+    </form>
+    <div *ngIf="type == 'group' || type == 'max_and_weight'">
+        <ion-item  *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
+            <ion-label>Diese Ebene automatisch gewichten</ion-label>
+            <ion-toggle [(ngModel)]="distribute_others_equally" name="distribute_others_equally" color="secondary"></ion-toggle>
+        </ion-item>
+    </div>
+</ion-content>

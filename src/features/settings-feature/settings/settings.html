@@ -1,0 +1,137 @@
+<!--
+  Generated template for the SettingsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>Daten</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+<ion-content padding>
+    <ion-title>Einstellungen</ion-title>
+    <div *ngIf="settings && settings.ENVIRONMENT_IS_DEV">
+        <ion-item><pre>{{settings | json}}</pre>
+            <button ion-button color="primary" block (click)="setSetting()">setSetting()</button>
+        </ion-item>
+        <ion-item>
+            <button ion-button color="primary" block (click)="getSetting()">getSetting()</button>
+        </ion-item>
+        <ion-item>
+            <button ion-button color="primary" block (click)="settingsService.deleteSettings()">delete</button>
+        </ion-item>
+        <ion-item>
+            <button ion-button color="primary" block (click)="getAllSettings()">getAllSettings</button>
+        </ion-item>
+    </div>
+    <!-- <ion-item>
+        <ion-label>Entwicklungsmodus</ion-label>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'ENVIRONMENT_IS_DEV')" [(ngModel)]="settings.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
+    </ion-item> -->
+    <ion-item>
+        <ion-label>Autobackup beim Wiederherstellen</ion-label>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'AUTOBACKUP_ON_RESTORE')" [(ngModel)]="settings.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item>
+        <ion-label>Leistungsberechnung aktivieren</ion-label>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'GRADE_CALCULATION_FEATURE')" [(ngModel)]="settings.GRADE_CALCULATION_FEATURE" color="secondary"></ion-toggle>
+    </ion-item>
+    <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
+        <ion-item>
+            <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
+            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'SHOW_PERCENT_SIGN')" [(ngModel)]="settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item>
+            <ion-label>Gesamtbewertung in Note umwandeln</ion-label>
+            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'SHOW_MARK')" [(ngModel)]="settings.SHOW_MARK" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item *ngIf="settings && settings.SHOW_MARK">
+            <ion-label>Notendefinition bearbeiten</ion-label>
+            <ion-toggle [(ngModel)]="set_custom_mark_string" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item *ngIf="settings && settings.SHOW_MARK && set_custom_mark_string">
+            <ion-label>Notendefinition:</ion-label>
+            <ion-input *ngIf="settings" (ngModelChange)="updateSetting($event, 'MARK_STRING')" [(ngModel)]="settings.MARK_STRING" color="secondary"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="settings && settings.SHOW_MARK && set_custom_mark_string">
+            <button ion-button color="primary" block (click)="checkMarkString()">Notendefinition prüfen</button>
+        </ion-item>
+    </div>
+    <ion-item>
+        <ion-label>Testdaten und schnelles Löschen</ion-label>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'TEST_FEATURES')" [(ngModel)]="settings.TEST_FEATURES" color="secondary"></ion-toggle>
+    </ion-item>
+    <div *ngIf="settings && settings.ENVIRONMENT_IS_DEV">
+        <ion-item>
+            <ion-label>Android Features</ion-label>
+            <ion-toggle [(ngModel)]="show_android_features" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-item>
+            <ion-label>Desktop Features</ion-label>
+            <ion-toggle [(ngModel)]="show_desktop_features" color="secondary"></ion-toggle>
+        </ion-item>
+        <ion-list *ngIf="show_android_features">
+            <h3>Android Debug Functions</h3>
+            <button ion-button color="primary" block (click)="createDirManually()">createDir</button>
+            <button ion-button color="primary" block (click)="deleteDirManually()">deleteDir</button>
+            <button ion-button color="primary" block (click)="checkDirManually()">checkDir</button>
+            <button ion-button color="primary" block (click)="listDir()">ListDir</button>
+        </ion-list>
+    </div>
+    <div *ngIf="settings && settings.TEST_FEATURES">
+        <ion-list>
+            <button ion-button color="primary" block (click)="addMockData()">Testdaten hinzufügen</button>
+            <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
+            <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>
+        </ion-list>
+    </div>
+    <ion-list *ngIf="show_desktop_features">
+        <h3>Data (Browser)</h3>
+        <ion-title>Export</ion-title>
+        <ion-item>
+            <button ion-button color="primary" block (click)="downloadDataOnBrowser()">Daten Exportieren</button>
+        </ion-item>
+        <ion-title>Import</ion-title>
+        <ion-item>
+            <ng2-file-input [drop-text]="' '" [extensions]="['stmb']" [invalid-file-text]="'Keine .stmb Datei ausgewählt'" [browse-text]="'Ziehe .stmb Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
+        </ion-item>
+    </ion-list>
+    <ion-list>
+        <div *ngIf="show_android_features">
+            <div *ngIf="settings && settings.ENVIRONMENT_IS_DEV">
+                <h3>Data (Android)</h3>
+            </div>
+            <br>
+            <button ion-button color="primary" block (click)="openFileChooser()"><ion-icon float-left name="folder"></ion-icon>&nbsp;Backup auswählen</button>
+            <br>
+            <button ion-button color="primary" block (click)="makeBackup()"><ion-icon name="download"></ion-icon>&nbsp;Backup erstellen</button>
+            <h4 *ngIf="filesInDir && filesInDir.length > 0">In ./StudentMgmt verfügbare Backups:</h4>
+            <ion-list><br>
+                <!-- <ion-title>Datenimport</ion-title>
+                <ion-item>
+                    <ng2-file-input [drop-text]="' '"  [extensions]="['stmb']" [invalid-file-text]="'Keine .stmb Datei ausgewählt'" [browse-text]="'Ziehe .stmb Datei oder klicke zum Auswählen'" (onAction)="onAction($event)"></ng2-file-input>
+                </ion-item> -->
+                <ion-item-sliding #slidingItem *ngFor="let file of filesInDir | orderBy : 'name' : true">
+                    <ion-item *ngIf="file.isFile" block (click)="toastService.showToast('Links-Swipe für Optionen')">
+                        <ion-icon name="document"></ion-icon>&nbsp;{{file.name}}{{file.lastModified}}
+                    </ion-item>
+                    <ion-item-options>
+                        <button large style="width:75px;" ion-button color="danger" (click)="presentDeleteBackupOnAndroidConfirm(file);closeSlidingItem(slidingItem)">
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                        <button large style="width:75px;" ion-button color="primary" (click)="editFileName(file);closeSlidingItem(slidingItem)">
+                            <ion-icon name="information-circle"></ion-icon>
+                        </button>
+                        <button large style="width:75px;" ion-button color="dark" (click)="presentRestoreFromBackupOnAndroidConfirm(file);closeSlidingItem(slidingItem)">
+                            <ion-icon name="checkmark"></ion-icon>
+                        </button>
+                    </ion-item-options>
+                </ion-item-sliding>
+            </ion-list>
+        </div>
+    </ion-list>
+</ion-content>

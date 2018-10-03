@@ -1,0 +1,207 @@
+<ion-header>
+
+    <ion-navbar color="stdt-mgmt-theme">
+        <ion-title small>{{course.name}} <span *ngIf="currentSortingCategoryName">|</span> {{currentSortingCategoryName}}</ion-title>
+        <ion-buttons end>
+            <button *ngIf="view=='students'" ion-button icon-only (click)="createAndregisterStudents()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="view=='students'" ion-button icon-only (click)="showOrderByDialogue()">
+                <ion-icon name="list"></ion-icon>
+            </button>
+            <button *ngIf="view == 'students' && reverse == false" ion-button icon-only (click)="reverseList()">
+              <ion-icon name="arrow-dropup-circle"></ion-icon>
+              </button>
+            <button *ngIf="view == 'students' && reverse == true" ion-button icon-only (click)="reverseList()">
+                <ion-icon name="arrow-dropdown-circle"></ion-icon>
+            </button>
+            <button *ngIf="view=='students'" ion-button icon-only (click)="presentExportCourseDataConfirm()">
+                <ion-icon name="download"></ion-icon>
+            </button>
+            <button *ngIf="view=='notes'" ion-button icon-only (click)="addNewNote()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="view=='categories'" ion-button icon-only (click)="presentAddNewPerfCatModal()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+                <ion-icon name="information-circle"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+    <ion-toolbar no-border-top class="segment-bar">
+        <ion-segment [(ngModel)]="view">
+            <ion-segment-button value="students">
+                Teilnehmer
+            </ion-segment-button>
+            <ion-segment-button value="notes">
+                Kursnotizen
+            </ion-segment-button>
+            <ion-segment-button value="categories">
+                Bewertung
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <div [ngSwitch]="view">
+        <ion-list *ngSwitchCase="'students'">
+            <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche"></ion-searchbar>
+            <ion-item-sliding #slidingItem *ngFor="let participant of dataTable | orderBy : listOrderBy : reverse | filter:term">
+                <button ion-item (click)="goToStudentDetail(participant)">
+                  <text-avatar [text]="participant.firstname"  item-left></text-avatar>
+                  <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
+                  <!-- Previously the Notes where displayed. But they are not part of the Data-Table for some reasons. Therefore this feature is not avalible now... -->
+                  <!-- <ion-badge *ngIf="participant.notes && participant.notes.length == 1" item-end>1 Notiz</ion-badge>
+                  <ion-badge *ngIf="participant.notes && participant.notes.length > 1" item-end>{{participant.notes.length}}&nbsp;Notizen</ion-badge> -->
+                  <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>{{participant[listOrderBy]}}</ion-badge>
+              </button>
+                <ion-item-options>
+                    <button large style="width:75px;" ion-button color="danger" (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
+                      <ion-icon  name="trash"></ion-icon>
+                  </button>
+                    <button large style="width:75px;" ion-button color="primary" (click)="presentStudentUpdateModal(participant); closeSlidingItem(slidingItem)">
+                      <ion-icon name="create"></ion-icon>
+                  </button>
+                </ion-item-options>
+            </ion-item-sliding>
+        </ion-list>
+        <ion-list *ngSwitchCase="'notes'">
+            <div *ngFor="let note of course.notes">
+                <ion-card>
+                    <ion-card-header class="header">
+                        <div float-left class="title">
+                            <strong>{{note.header}}</strong>
+                        </div>
+                        <div float-right class="right">
+                            <ion-icon (click)="deleteNote(note)" name="close"></ion-icon>
+                        </div>
+                    </ion-card-header>
+                    <ion-card-content>
+                        {{note.content}}
+                    </ion-card-content>
+                </ion-card>
+            </div>
+            <ion-fab right bottom>
+                <button (click)="addNewNote()" ion-fab color="light" color="secondary"><ion-icon name="add"></ion-icon></button>
+            </ion-fab>
+        </ion-list>
+        <ion-list *ngSwitchCase="'categories'">
+            <div *ngFor="let category of course.performanceCategories | orderBy : 'name'">
+                <ion-card class="top-level-card">
+                    <ion-card-header class="header">
+                        <div float-left class="title">
+                            <strong>{{category.name}}</strong>
+                            <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && category.type != 'incremental'" class="weight-display">
+                                Gewichtung: {{precisionRound(category.category_weight*100,2)}}%
+                            </div> 
+                            <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && category.type == 'incremental'" class="weight-display">
+                                Prozentpunkte: &plusmn;{{category.percentage_points_per_unit*100}}
+                            </div>
+                        </div>
+                        <div float-right class="right">
+                            <button *ngIf="category.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,category,1,child)">
+                                      <ion-icon name="add"></ion-icon>
+                              </button>
+                            <button ion-button icon-only (click)="editPerformanceCategory(category)">
+                                      <ion-icon name="create"></ion-icon>
+                              </button>
+                            <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, category, category, true)">
+                                      <ion-icon name="close-circle"></ion-icon>
+                              </button>
+                        </div>
+                    </ion-card-header>
+                    <ion-card-content>
+                        {{category.description}}
+                    </ion-card-content>
+                </ion-card>
+                <div *ngFor="let child of category.children | orderBy : 'name'" class="top-level-children-border">
+                    <ion-card class="sub-level-card">
+                        <ion-card-header class="header">
+                            <div float-left class="title">
+                                <strong>{{child.name}}</strong>
+                                <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && child.type != 'incremental'" class="weight-display">
+                                    Gewichtung: {{precisionRound(child.category_weight*100,2)}}%
+                                </div>
+                                <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && child.type == 'incremental'" class="weight-display">
+                                    Prozentpunkte: &plusmn;{{child.percentage_points_per_unit*100}}
+                                </div>
+                            </div>
+                            <div float-right class="right">
+                                <button *ngIf="child.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,child,2,child)">
+                                              <ion-icon name="add"></ion-icon>
+                                      </button>
+                                <!-- The "category" is passed two times for the sake of clearer code. First time as the Toplevel-category which is edited, second time as the parent of the child that is edited (used for autoweight feature) -->
+                                <!-- editPerformanceCategory(TOPLEVEL, CATEGORY TO CHANGE, PARENT CATEGORY) -->
+                                <button ion-button icon-only (click)="editPerformanceCategory(category, child, category)">
+                                                      <ion-icon name="create"></ion-icon>
+                                              </button>
+                                <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, category, child, false)">
+                                              <ion-icon name="close-circle"></ion-icon>
+                                      </button>
+                            </div>
+                        </ion-card-header>
+                        <ion-card-content>
+                            {{child.description}}
+                        </ion-card-content>
+                    </ion-card>
+                    <div *ngFor="let baby of child.children | orderBy : 'name'" class="sub-level-children-border">
+                        <ion-card class="sub-sub-level-card">
+                            <ion-card-header class="header">
+                                <div float-left class="title">
+                                    <strong>{{baby.name}}</strong>
+                                    <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && baby.type != 'incremental'" class="weight-display">
+                                        Gewichtung: {{precisionRound(baby.category_weight*100,2)}}%
+                                    </div>
+                                    <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && baby.type == 'incremental'" class="weight-display">
+                                        Prozentpunkte: &plusmn;{{baby.percentage_points_per_unit*100}}
+                                    </div>
+                                </div>
+                                <div float-right class="right">
+                                    <button *ngIf="baby.type == 'group'" ion-button icon-only (click)="addPerformanceCategoryGroupMember(category,baby,3,baby)">
+                                                      <ion-icon name="add"></ion-icon>
+                                              </button>
+                                    <button ion-button icon-only (click)="editPerformanceCategory(category, baby, child)">
+                                                      <ion-icon name="create"></ion-icon>
+                                              </button>
+                                    <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, child, baby, false)">
+                                                      <ion-icon name="close-circle"></ion-icon>
+                                              </button>
+                                </div>
+                            </ion-card-header>
+                            <ion-card-content>
+                                {{baby.description}}
+                            </ion-card-content>
+                        </ion-card>
+                        <div *ngFor="let subSubSubGroup of baby.children | orderBy : 'name'" class="sub-sub-level-children-border">
+                            <ion-card class="sub-sub-sub-level-card">
+                                <ion-card-header class="header">
+                                    <div float-left class="title">
+                                        <strong>{{subSubSubGroup.name}}</strong>
+                                        <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && subSubSubGroup.type != 'incremental'" class="weight-display">
+                                            Gewichtung: {{precisionRound(subSubSubGroup.category_weight*100,2)}}%
+                                        </div>
+                                        <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE && subSubSubGroup.type == 'incremental'" class="weight-display">
+                                            Prozentpunkte: &plusmn;{{subSubSubGroup.percentage_points_per_unit*100}}
+                                        </div>
+                                    </div>
+                                    <div float-right class="right">
+                                        <button ion-button icon-only (click)="editPerformanceCategory(category, subSubSubGroup, baby)">
+                                                              <ion-icon name="create"></ion-icon>
+                                                      </button>
+                                        <button ion-button icon-only (click)="presentPerfCatDeleteConfirm(category, baby, subSubSubGroup, false)">
+                                                              <ion-icon name="close-circle"></ion-icon>
+                                                      </button>
+                                    </div>
+                                </ion-card-header>
+                                <ion-card-content>
+                                    {{subSubSubGroup.description}}
+                                </ion-card-content>
+                            </ion-card>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ion-list>
+    </div>
+</ion-content>

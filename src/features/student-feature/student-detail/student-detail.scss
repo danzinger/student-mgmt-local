@@ -1,0 +1,85 @@
+page-student-detail {
+
+  $button-height: 45px;
+  $first-level-color: transparentize( #5c6bc0, 0.7);
+  $second-level-color: transparentize(#00695c, 0.7);
+  $third-level-color: transparentize(#7b1fa2, 0.7);
+
+  $first-level-light-color:transparentize( #5c6bc0, 0.8);
+  $second-level-light-color: transparentize(#00695c, 0.8);
+  $third-level-light-color: transparentize(#7b1fa2, 0.8);
+
+    .item-profile {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        background-size: cover;
+        height: 250px;
+        background-color: lightblue;
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .toplevel-button {
+      height: 45px;
+      //color:black;
+    }
+    .total-points{
+      font-weight: bolder;
+      text-transform: uppercase;
+      font-size: 130%;
+    }
+    .toplevel-grouplabel {
+       background-color: $first-level-color;
+       font-weight: bolder;
+       text-transform: uppercase!important;
+       font-size: 110%;
+    }
+    .toplevel-group{
+      border-left:10px solid $first-level-color;
+    }
+    .subgroup-grouplabel {
+      text-transform: uppercase!important;
+      margin-left: 4px;
+      margin-top: 4px;
+      background-color: $second-level-color;
+      font-weight: bolder;
+      font-size: 100%;
+    }
+    .sublevel-group{
+      margin-left: 4px;
+      border-left:10px solid $second-level-color;
+    }
+    .subgroup-button {
+      margin-left: 3px;
+      height: 45px;
+      //color:black;
+    }
+
+    .subsublevel-group{
+      margin-left: 3px;
+      border-left: 10px solid $third-level-color;
+    }
+
+    .subsubgroup-button {
+      margin-left: 3px;
+      height: 45px;
+      //color:black;
+    }
+    .subsubgroup-grouplabel {
+      text-transform: uppercase!important;
+      background-color: $third-level-color;
+      margin-left: 3px; 
+      margin-top: 4px;
+      font-weight: bolder;
+      font-size: 95%;
+    }
+    .subsubsubgroup-button{
+      margin-left: 3px;
+      height: 45px;
+      //color:black;
+    }
+    button{
+      text-transform: none!important;
+    }
+}

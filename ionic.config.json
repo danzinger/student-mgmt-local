@@ -1,0 +1,7 @@
+{
+  "name": "student-mgmt-local",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
+}
