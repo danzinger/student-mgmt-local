@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="eu.matthiasdanzinger.studentmgmt" version="0.9.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Student Management</name>
-    <description>App for teachers to grade students</description>
+    <name>GradeMe - Lehrer App</name>
+    <description>App für Lehrende, um Leistungsdaten von Lernenden zu sammeln und auszuwerten</description>
     <author email="matthias.danzinger@gmail.com" href="https://matthiasdanzinger.eu">Matthias Danzinger</author>
     <content src="index.html" />
     <access origin="*" />
