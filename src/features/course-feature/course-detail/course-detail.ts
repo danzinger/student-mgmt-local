@@ -5,7 +5,7 @@ import { StudentService } from '../../../services/student-service';
 import { CourseService } from '../../../services/course.service';
 import { ToastService } from '../../../services/toast.service';
 
-import { Course } from '../../../app/models/course';
+import { Course } from '../../../app/models/course'; 
 import { Student } from '../../../app/models/student';
 import { SettingsService } from '../../../services/settings.service';
 import { PapaParseService } from 'ngx-papaparse';
