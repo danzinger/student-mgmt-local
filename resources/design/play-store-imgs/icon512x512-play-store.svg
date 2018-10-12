@@ -10,16 +10,16 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="500"
-   height="500"
-   viewBox="0 0 132.29166 132.29166"
+   width="512"
+   height="512"
+   viewBox="0 0 135.46666 135.46666"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
-   sodipodi:docname="icon500x500-play-store.svg"
-   inkscape:export-filename="C:\MEDIA\DEV\javascript\ionic\student-mgmt-local\resources\design\play-store-imgs\icon500x500-play-store.png"
-   inkscape:export-xdpi="125.32665"
-   inkscape:export-ydpi="125.32665">
+   sodipodi:docname="icon512x512-play-store.svg"
+   inkscape:export-filename="C:\MEDIA\DEV\javascript\ionic\student-mgmt-local\resources\design\play-store-imgs\icon512x512-play-store.png"
+   inkscape:export-xdpi="96.175659"
+   inkscape:export-ydpi="96.175659">
   <defs
      id="defs2">
     <linearGradient
@@ -46,9 +46,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="-68.491347"
-     inkscape:cy="193.48877"
+     inkscape:zoom="0.7"
+     inkscape:cx="81.361299"
+     inkscape:cy="248.80605"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -74,22 +74,22 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Ebene 2"
-     transform="translate(0,81.491666)" />
+     transform="translate(0,84.666666)" />
   <g
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-31.75,38.491666)"
+     transform="translate(-31.75,41.666666)"
      style="display:inline">
     <circle
-       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.11547899;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.17293167;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path831-3"
-       cx="97.907318"
-       cy="27.793879"
-       r="64.948273" />
+       cx="99.699921"
+       cy="26.37925"
+       r="66.712151" />
     <g
        id="g836"
-       transform="matrix(0.25790462,0,0,0.25790462,29.101781,-39.536106)">
+       transform="matrix(0.26490885,0,0,0.26490885,29.02575,-42.779297)">
       <path
          id="path822"
          d="M 96.9,270.3 V 363 c 0,2.9 1.5,5.5 4,7 l 132,75.9 c 5.3,3.1 12,-0.8 12,-7 v -93.8 c 0,-2.9 -1.5,-5.5 -4,-7 l -132,-74.9 c -5.4,-2.9 -12,1 -12,7.1 z M 280.9,445.9 413,370 c 2.5,-1.4 4,-4.1 4,-7 v -93.7 c 0,-6.2 -6.6,-10 -12,-7 l -132,75.9 c -2.5,1.4 -4,4.1 -4,7 V 439 c -0.1,6.1 6.6,10 11.9,6.9 z"
