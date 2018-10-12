@@ -47,6 +47,7 @@ export class CourseNewnoteModalPage {
   this.viewCtrl.dismiss()
   }
   done() {
+    this.form.value.date = new Date;
     this.presentConfirm();
   }
 

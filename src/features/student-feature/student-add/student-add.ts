@@ -59,14 +59,12 @@ export class StudentAddPage {
   }
 
   ionViewDidEnter() {
-    console.log(this.control_data)
     if (this.control_data) {
       this.flatened_categories = this.courseService.flattenCategories(this.course, false);
     }
   }
 
   onCategorySelect(selected_categories) {
-    console.log(selected_categories)
     //this.studentService.getParticipants(this.control_data.course._id).subscribe(students => console.log(students))
     this.selected_categories = selected_categories;
 
@@ -142,11 +140,11 @@ export class StudentAddPage {
               });
             }
             //in any case the students are created and the view gets dismissed
-            this.studentService.addStudents(this.students).subscribe(
+            this.studentService.addStudents(students).subscribe(
               data => this.viewCtrl.dismiss({
                 students: data,
               }),
-              error => { this.toastService.showToast('Fehler: '+JSON.stringify(error)) }
+              error => { this.toastService.showToast('Fehler: ' + JSON.stringify(error)) }
             );
 
           }
@@ -184,13 +182,16 @@ export class StudentAddPage {
 
   exportCourseData() {
     //this.parseAndDownloadGradingsOnDesktop(exportData);
-    this.studentService.getParticipants(this.course._id).subscribe(s => {
-      console.log(s)
+    if(this.selected_categories && this.selected_categories.length > 0){
+      this.studentService.getParticipants(this.course._id).subscribe(s => {
       let exportData = this.generateExportData(s);
       this.parseAndDownloadGradingsOnAndroid(exportData).then(() => {
         this.toastService.showToast('Datenexport erfolgreich!');
       }).catch(err => alert(JSON.stringify(err)))
     })
+    }else{
+      this.toastService.showToast('Zuerst die Kategorien auswählen, für die Bewertungen hinzugefügt werden sollen')
+    }
   }
 
   presentExportCourseDataConfirm() {
@@ -217,7 +218,6 @@ export class StudentAddPage {
 
   generateExportData(students) {
     //flatten the categories
-    console.log(this.selected_categories)
     let exportData = [];
     students.map((student) => {
       let exportObject = {
@@ -299,7 +299,7 @@ export class StudentAddPage {
         skipEmptyLines: true,
         complete: function (results) {
           if (me.checkCsvgradingImportData(results)) {
-            me.presentAddGradingsConfirm(results, "Bewertungen für "+ results.data.length + ' Studenten hinzufügen?')
+            me.presentAddGradingsConfirm(results, "Bewertungen für " + results.data.length + ' Studenten hinzufügen?')
           } else {
             me.toastService.showToast('Fehler: Daten nicht im richtigen Format')
           }
@@ -314,22 +314,22 @@ export class StudentAddPage {
 
   array_of_students_to_update = [];
   updateStudents(results) {
-    return new Promise(resolve =>{
+    return new Promise(resolve => {
       if (this.control_data && this.control_data.course) {
         results.data.map(data_row_student => {
           let student_to_update = this.students.find(c => c._id == data_row_student._id);
           for (let i of results.meta.fields.keys()) {
-            if (i > 2 && i%2==1) {
-              let grading = { 
-                category_id: results.meta.fields[i+1],
+            if (i > 2 && i % 2 == 1) {
+              let grading = {
+                category_id: results.meta.fields[i + 1],
                 category_name: results.meta.fields[i],
                 course_id: this.course._id,
-                date_readable: new Date().toJSON().slice(0, 10).replace(/-/g, '/'),
-                points: data_row_student[results.meta.fields[i+1]],
+                date: new Date(),
+                points: data_row_student[results.meta.fields[i + 1]],
                 remarks: undefined
-               }
+              }
               //do not include empty fields (if student lack a grading)
-              if(grading.points != undefined){
+              if (grading.points != undefined) {
                 this.studentService.addGradingToStudent(student_to_update, grading).then(updated_student => {
                   student_to_update = updated_student;
                 })
@@ -338,7 +338,7 @@ export class StudentAddPage {
           }
           this.array_of_students_to_update.push(student_to_update)
         });
-        this.studentService.updateManyStudents(this.array_of_students_to_update).then(()=>{
+        this.studentService.updateManyStudents(this.array_of_students_to_update).then(() => {
           resolve();
         })
       }
@@ -359,7 +359,7 @@ export class StudentAddPage {
         {
           text: 'Ok',
           handler: () => {
-            this.updateStudents(results).then(()=>{
+            this.updateStudents(results).then(() => {
               this.toastService.showToast('Bewertungen erfolgreich hinzugefügt!')
             });
           }

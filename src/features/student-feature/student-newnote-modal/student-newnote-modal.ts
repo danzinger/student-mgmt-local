@@ -20,7 +20,8 @@ export class StudentNewnoteModalPage {
   student;
   note = {
     header: '',
-    content: ''
+    content: '',
+    date: new Date()
   };
   selected_course;
 

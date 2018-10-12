@@ -73,7 +73,7 @@
             </ion-list>
         </ion-list>
         <ion-list *ngSwitchCase="'notes'">
-            <div *ngFor="let note of student.notes">
+            <div *ngFor="let note of student.notes | orderBy : date : true">
                 <ion-card *ngIf="note.course_id == selected_course.course_id">
                     <ion-card-header class="header">
                         <div float-left class="title">
@@ -86,6 +86,14 @@
                     <ion-card-content>
                         {{note.content}}
                     </ion-card-content>
+                    <ion-row>
+                        <ion-col *ngIf="note.date">
+                            <button ion-button icon-left clear small float-right>
+                              <ion-icon name="clock"></ion-icon>
+                              <div>{{convertToReadableDate(note.date)}}</div>
+                            </button>
+                        </ion-col>
+                    </ion-row>
                 </ion-card>
             </div>
             <ion-fab bottom right>
@@ -93,7 +101,7 @@
             </ion-fab>
         </ion-list>
         <ion-list *ngSwitchCase="'ratings'">
-            <div *ngFor="let grading of student.gradings  | orderBy : date_readable : true">
+            <div *ngFor="let grading of student.gradings  | orderBy : date : true">
                 <ion-card *ngIf="grading && selected_course && grading.course_id == selected_course._id">
                     <ion-card-header class="header">
                         <div float-left class="title">
@@ -122,10 +130,10 @@
                                   </span>
                             </button>
                         </ion-col>
-                        <ion-col>
+                        <ion-col *ngIf="grading.date || grading.date_readable">
                             <button ion-button icon-left clear small float-right>
                               <ion-icon name="clock"></ion-icon>
-                              <div>{{grading.date_readable}}</div>
+                              <div>{{convertToReadableDate(grading.date)}}</div>
                             </button>
                         </ion-col>
                     </ion-row>

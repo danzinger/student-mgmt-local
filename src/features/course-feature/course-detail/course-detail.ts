@@ -125,7 +125,6 @@ export class CourseDetailPage {
       });
       dataTable.push(dataTableRow);
     });
-    console.log(dataTable)
     return dataTable;
   }
 
@@ -658,6 +657,10 @@ export class CourseDetailPage {
   precisionRound(number, precision) {
     var factor = Math.pow(10, precision);
     return Math.round(number * factor) / factor;
+  }
+  convertToReadableDate(dateObject){
+    var utc = typeof(dateObject) == "object" ? dateObject.toJSON().slice(0, 10).replace(/-/g, '/') : dateObject;
+    return utc;
   }
 
 }

@@ -34,6 +34,7 @@ export class StudentDetailPage {
     public alertCtrl: AlertController,
     public settingsService: SettingsService,
     public gradeCalculationService: GradeCalculationService) {
+    // We can enter this view from student-list or from course-detail view
 
     //STUDENT must always be avalible (not matter from which view we come from)
     this.student = this.navParams.get('student');
@@ -43,6 +44,7 @@ export class StudentDetailPage {
       this.courses = navParams.get('courses');
     } else {
       //if we come from the student list view, we fetch the courses from the service
+      //and later we autoselect the first course that the student is registered in.
       this.getCourses();
     }
   }
@@ -55,7 +57,12 @@ export class StudentDetailPage {
   getCourses() {
     this.courseService.getCourses().subscribe((courses) => {
       this.courses = courses;
-      if (!this.selected_course && this.courses && this.courses[0]) this.selected_course = this.courses[0];
+      if (!this.selected_course && this.courses && this.courses[0]) {
+        //if user comes from student-list-view no course is preselected. 
+        for (let course of this.courses) {
+          if (this.studentRegistered(course)) this.selected_course = course;
+        }
+      };
     });
   }
   //
@@ -73,7 +80,7 @@ export class StudentDetailPage {
       course_id: this.selected_course._id,
       category_name: category_name,
       category_id: category_id,
-      date_readable: this.getReadableDate(),
+      date: new Date()
     }
     this.presentRatingModal(rating_details);
   }
@@ -340,6 +347,10 @@ export class StudentDetailPage {
 
   getReadableDate() {
     var utc = new Date().toJSON().slice(0, 10).replace(/-/g, '/');
+    return utc;
+  }
+  convertToReadableDate(dateObject){
+    var utc = typeof(dateObject) == "object" ? dateObject.toJSON().slice(0, 10).replace(/-/g, '/') : dateObject;
     return utc;
   }
 

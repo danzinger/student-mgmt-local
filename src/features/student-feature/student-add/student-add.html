@@ -40,12 +40,12 @@
     <div *ngIf="control_data" padding-top>
         <h3>Bewertungen aus CSV</h3>
         <ol>
-            <li>Generiere CSV-Datei mit gewünschten Kategorien. Sie wird in <pre>./StudentMgmt/csv-export/bewertungs-csv</pre> gespeichert</li>
-            <li>Fülle die Bewertungen aus. Pro Kategorie gibt es zwei Spalten: NAME und ID. Die Bewertungen müssen unter der ID eingegeben werden.</li>
-            <li>Lade die Datei in die App</li>
+            <li>Kategorien auswählen, für die Bewertungen hinzugefügt werden sollen. Danach die Datei downloaden. Sie wird in <pre>./StudentMgmt/csv-export/bewertungs-csv</pre> gespeichert</li>
+            <li>Bewertungen in Tabellenkalkulationsprogramm (etwa <a href="https://de.libreoffice.org/discover/calc/">LibreOffice Calc</a>) in die Datei eintragen. Pro Kategorie gibt es zwei Spalten: NAME und ID. Die Bewertungen müssen unter der ID eingegeben werden.</li>
+            <li>Datei in die App laden</li>
         </ol>
         <ion-item>
-            <ion-label floating>Kategorie</ion-label>
+            <ion-label floating>Kategorien auswählen</ion-label>
             <ion-select *ngIf="flatened_categories" name="category" [(ngModel)]="selected_categories" multiple="true" (ngModelChange)="onCategorySelect(selected_categories)" cancelText="Abbrechen" okText="Ok">
                 <ion-option *ngFor="let category of flatened_categories" [value]="category">{{category.name}}</ion-option>
             </ion-select>

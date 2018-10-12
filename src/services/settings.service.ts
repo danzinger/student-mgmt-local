@@ -14,7 +14,7 @@ export class SettingsService {
   default_settings = {
     ENVIRONMENT_IS_DEV: false,
     AUTOBACKUP_ON_RESTORE: true,
-    GRADE_CALCULATION_FEATURE: false,
+    GRADE_CALCULATION_FEATURE: true,
     SHOW_PERCENT_SIGN: false,
     SHOW_MARK: false,
     TEST_FEATURES: false,

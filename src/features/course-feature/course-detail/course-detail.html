@@ -67,7 +67,7 @@
             </ion-item-sliding>
         </ion-list>
         <ion-list *ngSwitchCase="'notes'">
-            <div *ngFor="let note of course.notes">
+            <div *ngFor="let note of course.notes | orderBy : date : true">
                 <ion-card>
                     <ion-card-header class="header">
                         <div float-left class="title">
@@ -80,6 +80,14 @@
                     <ion-card-content>
                         {{note.content}}
                     </ion-card-content>
+                    <ion-row>
+                        <ion-col *ngIf="note.date">
+                            <button ion-button icon-left clear small float-right>
+                              <ion-icon name="clock"></ion-icon>
+                              <div>{{convertToReadableDate(note.date)}}</div>
+                            </button>
+                        </ion-col>
+                    </ion-row>
                 </ion-card>
             </div>
             <ion-fab right bottom>
