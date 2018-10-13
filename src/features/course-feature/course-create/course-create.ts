@@ -34,8 +34,6 @@ export class CourseCreatePage {
 
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
-      time: [''],
-      location: [''],
       institution: ['', Validators.required]
     })
     // Watch the form for changes
