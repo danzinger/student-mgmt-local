@@ -26,9 +26,9 @@ export class SettingsPage {
   courses;
   students;
   env;
-  show_desktop_features: boolean = false;
-  show_android_features: boolean = true;
-  set_custom_mark_string: boolean = false;
+  // show_desktop_features: boolean = false;
+  // show_android_features: boolean = true;
+  // set_custom_mark_string: boolean = false;
 
   settings = new Settings;
 
@@ -51,8 +51,11 @@ export class SettingsPage {
     this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
     this.courseService.getCourses().subscribe(data => this.courses = data);
     this.studentService.getStudents().subscribe(data => this.students = data);
-    this.listDir();
+    
+  }
 
+  ionViewDidEnter(){
+    if(this.settings.PLATFORM == 'android') this.listDir();
   }
 
   updateSetting(set_value, key) {
@@ -127,7 +130,7 @@ export class SettingsPage {
       this.courseService.getCourses().subscribe(courses => {
         this.studentService.getStudents().subscribe(students => {
           backupData = {
-            meta: { date: new Date().toLocaleDateString('de-DE'), time: new Date().toLocaleTimeString('de-DE') },
+            meta: { date: new Date().toLocaleDateString('de-DE'), time: new Date().toLocaleTimeString('de-DE')},
             students: students,
             courses: courses,
           }
@@ -139,24 +142,31 @@ export class SettingsPage {
 
   restoreFromBackup(parsed_data) {
     return new Promise(resolve => {
-      this.studentService.removeStudents().then(() => {
-        this.courseService.removeCourses().then(() => {
-          this.students = parsed_data.students;
-          this.courses = parsed_data.courses;
-          this.studentService.addStudents(parsed_data.students).subscribe(() => {
-            this.courseService.createCourses(parsed_data.courses).subscribe(() => {
-              resolve();
+      this.checkData(parsed_data).then(() => {
+        this.studentService.removeStudents().then(() => {
+          this.courseService.removeCourses().then(() => {
+            this.students = parsed_data.students;
+            this.courses = parsed_data.courses;
+            this.studentService.addStudents(parsed_data.students).subscribe(() => {
+              this.courseService.createCourses(parsed_data.courses).subscribe(() => {
+                resolve();
+              })
             })
-          })
-        }).catch((err) => {
-          this.toastService.showToast(JSON.stringify(err));
-        });
-      }).catch((err) => {
-        this.toastService.showToast(JSON.stringify(err));
-      });
+          }).catch(err=>this.handleError(err));
+        }).catch(err=>this.handleError(err));
+      }).catch(err=>this.handleError(err));
     })
   }
 
+  checkData(backup_data) {
+    return new Promise((resolve,reject) => {
+      if(backup_data.meta){
+        resolve();
+      }else{
+        reject('Daten nicht im richtigen Format');
+      }
+    })
+  }
 
   handleError(err) {
     this.toastService.showToast(JSON.stringify(err));
@@ -313,7 +323,7 @@ export class SettingsPage {
       (resolve, reject) => {
         this.file.readAsText(this.file.externalRootDirectory, 'StudentMgmt/' + file.name).then((res) => {
           let parsed_data = JSON.parse(res);
-          //just a ridiculous check, but I needed like to use older data for testing. So I dont introduce a more complex check.
+          //just a ridiculous check
           if (!parsed_data || !parsed_data.meta) reject("wrong file");
           resolve(parsed_data);
         }).catch((err) => {
@@ -416,8 +426,28 @@ export class SettingsPage {
   // ──────────────────────────────────────────────────────────────────────────────────
   // 
 
-  onAction(ev) {
-    return this.restoreBackupFromFileOnBrowser(ev);
+ 
+  presentRestoreFromBackupOnBrowserConfirm(ev) {
+    let message = 'Backup wiederherstellen?<br><br><strong>ACHTUNG</strong>: Dadurch werden alle derzeitigen Daten gelöscht!';
+    let alert = this.alertCtrl.create({
+      title: 'Bestätigen',
+      message: message,
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Ok',
+          handler: () => {
+            this.restoreBackupFromFileOnBrowser(ev);
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 
   restoreBackupFromFileOnBrowser(ev) {
@@ -427,7 +457,7 @@ export class SettingsPage {
     // InvalidDenied = 2,
     // CouldNotRemove = 3,
     // CouldNotAdd = 4,
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (ev.action == 1) {
         var reader = new FileReader();
         var me = this;
@@ -456,7 +486,7 @@ export class SettingsPage {
       var a = window.document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       let time = new Date().toJSON().slice(0, 10);
-      a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6);// + '.stmb' removed
+      a.download = time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-6) + '.json';// + '.stmb' removed
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -7,4 +7,6 @@ export class Settings {
     SHOW_MARK: boolean;
     TEST_FEATURES: boolean;
     MARK_STRING:string;
+    PLATFORM:string;
+    SHOWDEVSWITCH:boolean;
   }
