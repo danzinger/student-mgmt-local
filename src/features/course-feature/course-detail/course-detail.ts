@@ -56,15 +56,18 @@ export class CourseDetailPage {
 
 
   }
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
     this.getParticipants().then((participants) => {
       this.participants = participants;
-      //for easy sorting, we generate a 2-Dimensional dataTable here. We use this table - not the original array of participants - to display the students in the view.
-      // However, we need the original participants in this view to pass a selected participant to the next view and of course to generate the dataTable
-      // If this table would be needed elsewhere, it might be useful to outsource this work to the student-service.
-      this.dataTable = this.generateGradingTable(participants);
     });
+  }
+
+  ionViewDidEnter(){
+    //for easy sorting, we generate a 2-Dimensional dataTable here. We use this table - not the original array of participants - to display the students in the view.
+    // However, we need the original participants in this view to pass a selected participant to the next view and of course to generate the dataTable
+    // If this table would be needed elsewhere, it might be useful to outsource this work to the student-service.
+    this.dataTable = this.generateGradingTable(this.participants);
   }
 
   reverseList() {

@@ -31,7 +31,7 @@ export class CourseListPage {
   ) {
   }
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
     this.courseService.getCourses().subscribe(courses => this.courses = courses);
   }

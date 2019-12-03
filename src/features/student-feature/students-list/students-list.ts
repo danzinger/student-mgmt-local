@@ -27,7 +27,7 @@ export class StudentsListPage {
     if (this.selected_course) this.selected_course = this.selected_course;
   }
 
-  ionViewDidEnter() {
+  ionViewWillEnter() {
     this.studentService.getStudents().subscribe(students => {
       this.students = students;
       if (!students) {
