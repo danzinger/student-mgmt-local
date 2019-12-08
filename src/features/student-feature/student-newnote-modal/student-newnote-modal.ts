@@ -60,7 +60,7 @@ export class StudentNewnoteModalPage {
         },
         {
           text: 'Ok',
-          handler: () => {
+          handler: () => { 
             if(!this.student.notes) this.student.notes = []
             this.student.notes.push(this.note);
             this.studentService.updateStudent(this.student).subscribe(
@@ -72,7 +72,7 @@ export class StudentNewnoteModalPage {
                 this.toastService.showToast('Fehler beim Eintragen der Notiz');
                 this.viewCtrl.dismiss();
               });
-          }
+          } 
         }
       ]
     });

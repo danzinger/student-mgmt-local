@@ -350,7 +350,7 @@ export class StudentDetailPage {
     return utc;
   }
   convertToReadableDate(dateObject){
-    var utc = typeof(dateObject) == "object" ? dateObject.toJSON().slice(0, 10).replace(/-/g, '/') : dateObject;
+    var utc = typeof(dateObject) == "object" ? dateObject.toJSON().slice(0, 10).replace(/-/g, '/') : dateObject.slice(0, 10).replace(/-/g, '/');
     return utc;
   }
 

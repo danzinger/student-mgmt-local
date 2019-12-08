@@ -48,14 +48,13 @@ export class SettingsPage {
   }
 
   ionViewWillEnter() {
-    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
+    this.settingsService.getAllSettings().subscribe((s) =>{
+       this.settings = s;
+       if(this.settings.PLATFORM == 'android') this.listDir();
+      });
     this.courseService.getCourses().subscribe(data => this.courses = data);
     this.studentService.getStudents().subscribe(data => this.students = data);
     
-  }
-
-  ionViewDidEnter(){
-    if(this.settings.PLATFORM == 'android') this.listDir();
   }
 
   updateSetting(set_value, key) {
