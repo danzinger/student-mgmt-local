@@ -455,10 +455,10 @@ export class SettingsPage {
     }).then(() => {
       this.studentService.removeStudents().then(() => {
         this.studentService.addStudents(this.students).subscribe(() => {
-          this.toastService.showToast('Update der Datenstruktur auf 1.0.5 erfolgreich!')
+          this.toastService.showToast('Datenprüfung erfolgreich!')
         })
       })
-    }).catch(err => this.toastService.showToast('Fehler beim Update der Studenten'))
+    }).catch(err => this.toastService.showToast('Fehler bei der Datenprüfung'))
 
   }
 
