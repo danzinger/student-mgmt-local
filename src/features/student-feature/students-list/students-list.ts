@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ItemSliding, ModalController, AlertController} from 'ionic-angular';
 
-import { StudentService } from '../../../services/student-service';
 import { CourseService } from '../../../services/course.service';
+import { StudentService } from '../../../services/student-service';
 import { ToastService } from '../../../services/toast.service';
 import { Student } from '../../../app/models/student';
+import { SettingsService } from '../../../services/settings.service';
 
 @IonicPage()
 @Component({
@@ -15,19 +16,21 @@ export class StudentsListPage {
 
   students: Student[];
   term;
-  ENV = 'prod';
+  settings;
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    public studentService: StudentService,
     public courseService: CourseService,
+    public studentService: StudentService,
     public toastService: ToastService,
     public alertCtrl: AlertController,
+    public settingsService: SettingsService,
     public modalCtrl: ModalController) {
     if (this.selected_course) this.selected_course = this.selected_course;
   }
 
   ionViewWillEnter() {
+    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
     this.studentService.getStudents().subscribe(students => {
       this.students = students;
       if (!students) {
@@ -35,14 +38,15 @@ export class StudentsListPage {
         this.registerMode = false;
       }
     });
-    this.courseService.getCourses().subscribe(
-      courses => {
-        if (this.courses !== courses) this.courses = courses;
-        if(!this.selected_course && this.courses && this.courses[0]) this.selected_course = this.courses[0]
-        //if registerMode is ON and the courses are deleted/updated in the meantime, weired behavior would result. therefore this is needed:
-        if (!courses) this.registerMode = false;
-      });
-      
+    //2019-12-13 v1.0.5 update: fetch courses only when registerMode is turned on.
+    
+    // this.courseService.getCourses().subscribe(
+    //   courses => {
+    //     if (this.courses !== courses) this.courses = courses;
+    //     if(!this.selected_course && this.courses && this.courses[0]) this.selected_course = this.courses[0]
+    //     //if registerMode is ON and the courses are deleted/updated in the meantime, weired behavior would result. therefore this is needed:
+    //     if (!courses) this.registerMode = false;
+    //   });
   }
 
   ionViewWillLeave() {
@@ -102,8 +106,9 @@ export class StudentsListPage {
         {
           text: 'Löschen',
           handler: () => {
-            this.studentService.deleteStudent(student).subscribe(
+            this.studentService.deleteStudent(student).then(
               data => {
+                this.courseService.unregisterStudentFromAllCourses(student._id).subscribe()
                 let index = this.students.indexOf(student);
                 if (index > -1) this.students.splice(index, 1);
                 this.toastService.showToast('Löschen erfolgreich'); }
@@ -143,7 +148,7 @@ export class StudentsListPage {
     if (this.selected_course) this.courseService.updateCourse(this.selected_course).subscribe(courses => this.courses = courses);
   }
 
-  toggleRegisterMode(RegisterModeOn) {
+  toggleRegisterMode(RegisterModeOn) { 
     if (RegisterModeOn) {
       //turn off register mode
       this.registerMode = !this.registerMode;
@@ -151,6 +156,13 @@ export class StudentsListPage {
       this.deleteTmpData();
     } else {
       //if register mode is OFF turn it on
+      this.courseService.getCourses().subscribe(
+        courses => {
+          if (this.courses !== courses) this.courses = courses;
+          if(!this.selected_course && this.courses && this.courses[0]) this.selected_course = this.courses[0]
+          //if registerMode is ON and the courses are deleted/updated in the meantime, weired behavior would result. therefore this is needed:
+          if (!courses) this.registerMode = false;
+        });   
       this.registerMode = !this.registerMode;
     }
   }

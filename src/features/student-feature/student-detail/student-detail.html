@@ -3,11 +3,11 @@
         <ion-title>{{student.firstname}} {{student.lastname}} </ion-title>
         <ion-buttons end>
             <button ion-button icon-only (click)="presentStudentUpdateModal()">
-            <ion-icon name="create"></ion-icon>
-          </button>
-          <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
-            <ion-icon name="information-circle"></ion-icon>
-        </button>
+                <ion-icon name="create"></ion-icon>
+            </button>
+            <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+                <ion-icon name="information-circle"></ion-icon>
+            </button>
         </ion-buttons>
     </ion-navbar>
     <ion-toolbar no-border-top class="segment-bar">
@@ -34,7 +34,8 @@
             <ion-list>
                 <ion-item *ngIf="courses && courses.length > 0">
                     <ion-label>Kurs</ion-label>
-                    <ion-select [compareWith]="compareFn" [(ngModel)]="selected_course" multiple="false" (ngModelChange)="onCourseSelect(selected_course)" cancelText="Abbrechen" okText="Ok">
+                    <ion-select [compareWith]="compareFn" [(ngModel)]="selected_course" multiple="false"
+                        (ngModelChange)="onCourseSelect(selected_course)" cancelText="Abbrechen" okText="Ok">
                         <div *ngFor="let course of courses | orderBy : ['name']">
                             <ion-option *ngIf="studentRegistered(course)" [value]="course">{{course.name}}</ion-option>
                         </div>
@@ -46,26 +47,37 @@
             </ion-list>
             <ion-list *ngIf="selected_course && selected_course.performanceCategories">
 
-                <ion-item  *ngIf="settings && settings.GRADE_CALCULATION_FEATURE" no-lines>
+                <ion-item *ngIf="settings && settings.GRADE_CALCULATION_FEATURE" no-lines>
                     <ion-label class="total-points">Kurs{{calculateGrade()}}</ion-label>
                 </ion-item>
                 <div *ngFor="let category of selected_course.performanceCategories | orderBy : 'name'">
-                    <button class="toplevel-button" *ngIf="category.type != 'group'" (click)="addNewRating(category._id, category.name)" ion-button full>{{category.name}}: {{getStudentsRatingInACat(category._id, student._id)}}{{getCategoryInfo(category)}}</button>
+                    <button class="toplevel-button" *ngIf="category.type != 'group'"
+                        (click)="addNewRating(category._id, category.name)" ion-button full>{{category.name}}:
+                        {{getStudentsRatingInACat(category._id, student._id)}}{{getCategoryInfo(category)}}</button>
                     <ion-item no-lines class="toplevel-grouplabel" *ngIf="category.type == 'group'">
                         <ion-label>{{category.name}}{{calculateGrade(category.children)}}</ion-label>
                     </ion-item>
                     <div class="toplevel-group" *ngFor="let subgroup of category.children | orderBy : 'name'">
-                        <button class="subgroup-button" *ngIf="subgroup.type != 'group'" (click)="addNewRating(subgroup._id, subgroup.name)" ion-button full>{{subgroup.name}}: {{getStudentsRatingInACat(subgroup._id, student._id)}}{{getCategoryInfo(subgroup)}}</button>
-                        <ion-item no-lines  class="subgroup-grouplabel" *ngIf="subgroup.type == 'group'">
+                        <button class="subgroup-button" *ngIf="subgroup.type != 'group'"
+                            (click)="addNewRating(subgroup._id, subgroup.name)" ion-button full>{{subgroup.name}}:
+                            {{getStudentsRatingInACat(subgroup._id, student._id)}}{{getCategoryInfo(subgroup)}}</button>
+                        <ion-item no-lines class="subgroup-grouplabel" *ngIf="subgroup.type == 'group'">
                             <ion-label>{{subgroup.name}}{{calculateGrade(subgroup.children)}}</ion-label>
                         </ion-item>
                         <div class="sublevel-group" *ngFor="let subsubgroup of subgroup.children | orderBy : 'name'">
-                            <button class="subsubgroup-button" *ngIf="subsubgroup.type != 'group'" (click)="addNewRating(subsubgroup._id, subsubgroup.name)" ion-button full>{{subsubgroup.name}}: {{getStudentsRatingInACat(subsubgroup._id, student._id)}}{{getCategoryInfo(subsubgroup)}}</button>
+                            <button class="subsubgroup-button" *ngIf="subsubgroup.type != 'group'"
+                                (click)="addNewRating(subsubgroup._id, subsubgroup.name)" ion-button
+                                full>{{subsubgroup.name}}:
+                                {{getStudentsRatingInACat(subsubgroup._id, student._id)}}{{getCategoryInfo(subsubgroup)}}</button>
                             <ion-item no-lines class="subsubgroup-grouplabel" *ngIf="subsubgroup.type == 'group'">
                                 <ion-label>{{subsubgroup.name}}{{calculateGrade(subsubgroup.children)}}</ion-label>
                             </ion-item>
-                            <div  class="subsublevel-group" *ngFor="let subsubsubgroup of subsubgroup.children | orderBy : 'name'">
-                                <button class="subsubsubgroup-button" (click)="addNewRating(subsubsubgroup._id, subsubsubgroup.name)" ion-button full>{{subsubsubgroup.name}}: {{getStudentsRatingInACat(subsubsubgroup._id, student._id)}}{{getCategoryInfo(subsubsubgroup)}}</button>
+                            <div class="subsublevel-group"
+                                *ngFor="let subsubsubgroup of subsubgroup.children | orderBy : 'name'">
+                                <button class="subsubsubgroup-button"
+                                    (click)="addNewRating(subsubsubgroup._id, subsubsubgroup.name)" ion-button
+                                    full>{{subsubsubgroup.name}}:
+                                    {{getStudentsRatingInACat(subsubsubgroup._id, student._id)}}{{getCategoryInfo(subsubsubgroup)}}</button>
                             </div>
                         </div>
                     </div>
@@ -73,31 +85,42 @@
             </ion-list>
         </ion-list>
         <ion-list *ngSwitchCase="'notes'">
-            <div *ngFor="let note of student.notes | orderBy : date : true">
-                <ion-card *ngIf="note.course_id == selected_course.course_id">
-                    <ion-card-header class="header">
-                        <div float-left class="title">
-                            <strong>{{note.header}}</strong>
-                        </div>
-                        <div float-right class="right">
-                            <ion-icon (click)="deleteNote(note)" name="close"></ion-icon>
-                        </div>
-                    </ion-card-header>
-                    <ion-card-content>
-                        {{note.content}}
-                    </ion-card-content>
-                    <ion-row>
-                        <ion-col *ngIf="note.date">
-                            <button ion-button icon-left clear small float-right>
-                              <ion-icon name="clock"></ion-icon>
-                              <div>{{convertToReadableDate(note.date)}}</div>
-                            </button>
-                        </ion-col>
-                    </ion-row>
-                </ion-card>
+            <div *ngIf="student.newnotes">
+                <div *ngFor="let note_id of getKeys(student.newnotes)">
+                    <!-- Before 1.0.5 only Student Notes related to the course where displayed. Make this maybe optional -->
+                    <!-- <ion-card *ngIf="student.newnotes[note_id].course_id == selected_course.course_id"> -->
+                    <ion-card>
+                        <ion-card-header class="header">
+                            <div float-left class="title">
+                                <strong>{{student.newnotes[note_id].header}}</strong>
+                            </div>
+                            <div float-right class="right">
+                                <button ion-button icon-only (click)="updateNote(note_id)">
+                                    <ion-icon name="create"></ion-icon>
+                                </button>
+                                <button ion-button icon-only (click)="deleteNote(note_id)">
+                                    <ion-icon name="close-circle"></ion-icon>
+                                </button>
+                            </div>
+                        </ion-card-header>
+                        <ion-card-content>
+                            {{student.newnotes[note_id].content}}
+                        </ion-card-content>
+                        <ion-row>
+                            <ion-col *ngIf="student.newnotes[note_id].date">
+                                <button ion-button icon-left clear small float-right>
+                                    <ion-icon name="clock"></ion-icon>
+                                    <div>{{convertToReadableDate(student.newnotes[note_id].date)}}</div>
+                                </button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-card>
+                </div>
             </div>
             <ion-fab bottom right>
-                <button (click)="addNewNote()" ion-fab color="light" color="secondary"><ion-icon name="add"></ion-icon></button>
+                <button (click)="addNewNote()" ion-fab color="light" color="secondary">
+                    <ion-icon name="add"></ion-icon>
+                </button>
             </ion-fab>
         </ion-list>
         <ion-list *ngSwitchCase="'ratings'">
@@ -118,22 +141,24 @@
                     <ion-row>
                         <ion-col>
                             <button ion-button icon-left clear small>
-                                  <span style="display:flex; align-items:center;justify-content:center;color:green" *ngIf="grading.points >= 0">
-                                      <ion-icon name="thumbs-up" ></ion-icon>
-                                      <span *ngIf="grading.points == 0 || grading.points > 1">{{grading.points}} Punkte</span>
-                                      <span *ngIf="grading.points == 1">{{grading.points}} Punkt</span>
-                                  </span>
-                                  <span style="display:flex; align-items:center;color:red" *ngIf="grading.points <= -1">
-                                      <ion-icon name="thumbs-down"></ion-icon>
-                                      <span *ngIf="grading.points < -1">{{grading.points}} Punkte</span>
-                                      <span *ngIf="grading.points == -1">{{grading.points}} Punkt</span>
-                                  </span>
+                                <span style="display:flex; align-items:center;justify-content:center;color:green"
+                                    *ngIf="grading.points >= 0">
+                                    <ion-icon name="thumbs-up"></ion-icon>
+                                    <span *ngIf="grading.points == 0 || grading.points > 1">{{grading.points}}
+                                        Punkte</span>
+                                    <span *ngIf="grading.points == 1">{{grading.points}} Punkt</span>
+                                </span>
+                                <span style="display:flex; align-items:center;color:red" *ngIf="grading.points <= -1">
+                                    <ion-icon name="thumbs-down"></ion-icon>
+                                    <span *ngIf="grading.points < -1">{{grading.points}} Punkte</span>
+                                    <span *ngIf="grading.points == -1">{{grading.points}} Punkt</span>
+                                </span>
                             </button>
                         </ion-col>
                         <ion-col *ngIf="grading.date || grading.date_readable">
                             <button ion-button icon-left clear small float-right>
-                              <ion-icon name="clock"></ion-icon>
-                              <div>{{convertToReadableDate(grading.date)}}</div>
+                                <ion-icon name="clock"></ion-icon>
+                                <div>{{convertToReadableDate(grading.date)}}</div>
                             </button>
                         </ion-col>
                     </ion-row>

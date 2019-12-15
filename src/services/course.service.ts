@@ -9,11 +9,13 @@ import 'rxjs/add/observable/from';
 //import 'rxjs/add/observable/fromPromise';
 //import { fromPromise } from 'rxjs/observable/fromPromise';
 import { Course } from '../app/models/course';
+import { StudentService } from './student-service';
 
 @Injectable()
 export class CourseService {
   constructor(
-    private storage: Storage) {
+    private storage: Storage,
+    private studentService: StudentService) {
   }
 
   //
@@ -34,7 +36,7 @@ export class CourseService {
     return Observable.from(this.storage.get('courses')
       .then(courses => {
         if (!courses) courses = [];
-        if(courses_to_add && courses_to_add.length > 0){
+        if (courses_to_add && courses_to_add.length > 0) {
           courses_to_add.forEach(course => {
             courses.push(course);
           });
@@ -52,11 +54,11 @@ export class CourseService {
     return Observable.from(this.storage.get('courses'));
   }
 
-  getCourseById(course_id): Observable<Course[]> {
+  getCourseById(course_id): Observable<Course> {
     return Observable.from(this.storage.get('courses')
       .then(courses => {
         if (courses) {
-          return courses.filter(course => {
+          return courses.find(course => {
             return course._id == course_id;
           })
         }
@@ -76,38 +78,93 @@ export class CourseService {
       }));
   }
 
+  unregisterStudentFromAllCourses(student_to_delete_id) {
+    return Observable.from(this.storage.get('courses'))
+      .map(courses => {
+        courses.forEach(course => {
+          let index = course.participants.indexOf(student_to_delete_id);
+          if (index > -1) course.participants.splice(index, 1)
+        })
+        return courses;
+      })
+      .map(courses => {
+        this.storage.set('courses',courses)
+      })
+  }
 
   //
   // ─── DELETE ─────────────────────────────────────────────────────────────────────
   //
 
-  deleteCourse(course_id_to_delete): Observable<Course[]> {
-    return Observable.from(this.storage.get('courses')
-      .then(courses => {
-        return courses.filter(course => {
-          return course._id != course_id_to_delete
+  deleteCourse(course_to_delete): Observable<Course[]> {
+    return Observable.from(
+      this.storage.get('courses')
+        .then(courses => {
+          if (course_to_delete.participants.length > 0) this.studentService.unregisterAllStudentsFromCourse(course_to_delete._id);
+          return courses.filter(course => {
+            return course._id != course_to_delete._id
+          })
         })
-      })
-      .then(value => { return this.storage.set('courses', value) }
-      ));
+        .then(courses => {
+          return this.storage.set('courses', courses)
+        }
+        )
+    );
   }
 
   removeCourses(): Promise<any> {
     return this.storage.remove('courses');
   }
 
+  deletePerformanceCategory(category, parent, child, isTopLevel, course) {
+    let deletion_array = this.initializeDeletionArray(child);
+    this.studentService.deleteAllGradingsInPerfcatsFromAllStudents(deletion_array)
+    // if it is a top-level-category, the whole course gets updated
+    if (isTopLevel) {
+      let index = course.performanceCategories.indexOf(category);
+      if (index > -1) course.performanceCategories.splice(index, 1);
+      //if it is not a top level category, the performanceCategories array of the course must be updated
+    } else {
+      let index = parent.children.indexOf(child);
+      if (index > -1) parent.children.splice(index, 1);
+    }
+    //in any case, we update the course (with the new performance categories)
+    return this.updateCourse(course)
+  }
   //
   // ─── HELPER ─────────────────────────────────────────────────────────────────────
   //
+
+  initializeDeletionArray(child): String[] {
+    //returns an array of a grading_category and all of its subgroups
+    let deletion_array = []
+    deletion_array.push(child._id);
+    if (child.children && child.children.length > 0) {
+      child.children.map((subgroup) => {
+        deletion_array.push(subgroup._id);
+        if (subgroup.children && subgroup.children.length > 0) {
+          subgroup.children.map((subsubgroup) => {
+            deletion_array.push(subsubgroup._id);
+            if (subsubgroup.children && subsubgroup.children.length > 0) {
+              subsubgroup.children.map((subsubsubgroup) => {
+                deletion_array.push(subsubsubgroup._id);
+              })
+            }
+          });
+        }
+      });
+    }
+    return deletion_array;
+  }
 
   flattenCategories(course, includeGroups?) {
     //flatten the nested categories
     let resultcats: any[] = [];
     if (course.performanceCategories) {
-      if(includeGroups) resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
+      if (includeGroups) resultcats.push({ name: 'Gesamtnote', _id: 'total_grading' });
       course.performanceCategories.map((cat) => {
         if (this.isNonEmptyGroup(cat)) {
-          if(includeGroups) resultcats.push(cat);
+          if (includeGroups) resultcats.push(cat);
           this.digDeeper(cat, resultcats, includeGroups);
         } else {
           resultcats.push(cat);
@@ -117,13 +174,13 @@ export class CourseService {
     return resultcats;
   }
 
-  
+
   digDeeper(category, resultcats: any[], includeGroups?) {
     //this function searches the tree of subchildren recursively.
     return category.children.map((subgroup) => {
       //if the child is also a nonempty group, go one level deeper
       if (this.isNonEmptyGroup(subgroup)) {
-        if(includeGroups) resultcats.push(subgroup);
+        if (includeGroups) resultcats.push(subgroup);
         this.digDeeper(subgroup, resultcats)
       } else {
         return resultcats.push(subgroup);

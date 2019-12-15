@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController, AlertController } 
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { ToastService } from '../../../services/toast.service';
 import { CourseService } from '../../../services/course.service';
+import { MongoIdService } from '../../../services/mongo-id.service';
 
 /**
  * Generated class for the CourseNewnoteModalPage page.
@@ -30,7 +31,8 @@ export class CourseNewnoteModalPage {
     private formBuilder: FormBuilder,
     public alertCtrl: AlertController,
     public toastService: ToastService,
-    public courseService: CourseService) {
+    public courseService: CourseService,
+    public mongoIdService: MongoIdService, ) {
 
     this.course = this.navParams.get('course');
 
@@ -43,8 +45,8 @@ export class CourseNewnoteModalPage {
       this.isReadyToSave = this.form.valid;
     });
   }
-  cancel(){
-  this.viewCtrl.dismiss()
+  cancel() {
+    this.viewCtrl.dismiss()
   }
   done() {
     this.form.value.date = new Date;
@@ -67,10 +69,13 @@ export class CourseNewnoteModalPage {
         {
           text: 'Ok',
           handler: () => {
-            this.course.notes.push(this.form.value);
+            //attention this: this.course.newnotes[_id] = this.form.value; works only with string type of ID not with String type
+            let _id: string = this.mongoIdService.newObjectIdstring();
+            if (!this.course.newnotes) this.course.newnotes = {};
+            this.course.newnotes[_id] = this.form.value;
             this.courseService.updateCourse(this.course).subscribe(
               data => {
-                this.toastService.showToast('Notiz eingetragen');
+                this.toastService.showToast('Notiz eingetragen'); 
                 this.viewCtrl.dismiss();
               },
               error => {

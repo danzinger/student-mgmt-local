@@ -3,12 +3,14 @@ import { Storage } from '@ionic/storage';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
+import 'rxjs/add/operator/map';
 import { Student } from '../app/models/student';
 
 @Injectable()
 export class StudentService {
 
-  constructor(private storage: Storage) {
+  constructor(
+    private storage: Storage) {
   }
 
   //
@@ -19,7 +21,7 @@ export class StudentService {
     return Observable.from(this.storage.get('students')
       .then(students_in_database => {
         if (!students_in_database) students_in_database = [];
-        if(students && students.length > 0){
+        if (students && students.length > 0) {
           students.forEach(student => {
             students_in_database.push(student)
           });
@@ -62,6 +64,16 @@ export class StudentService {
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
 
+  unregisterAllStudentsFromCourse(course_id) {
+    this.getParticipants(course_id).map((participants) => {
+      participants.forEach(participant => {
+        let index = participant.course_registrations.indexOf(course_id);
+        participant.course_registrations.splice(index, 1)
+      })
+      return participants;
+    }).map(particiants => { return this.updateManyStudents(particiants) }).subscribe()
+  }
+
   updateStudentOLD(student): Observable<Student[]> {
     return Observable.from(this.storage.get('students').then(students => {
       let res = students.find(c => c._id == student._id);
@@ -83,7 +95,7 @@ export class StudentService {
       }));
   }
 
-  updateManyStudents(updated_students): Promise<Student> {
+  updateManyStudents(updated_students): Promise<Student[]> {
     this.storage.get('students')
       .then(students => {
         updated_students.forEach(updated_student => {
@@ -91,14 +103,15 @@ export class StudentService {
           let index = students.indexOf(res);
           students[index] = updated_student
         });
-        this.storage.set('students',students)
+        this.storage.set('students', students)
       });
-      this.storage.get('students').then(s=>console.log(s));
-      return this.storage.get('students');
+    this.storage.get('students');
+    return this.storage.get('students');
   }
 
   updateAllStudents(students): Observable<Student[]> {
-    return Observable.from(this.storage.set('students',students))
+    console.log(students[29])
+    return Observable.from(this.storage.set('students', students))
   }
 
   // ADD GRADING TO STUDENT
@@ -112,7 +125,7 @@ export class StudentService {
   addToComputedGradings(student, rating) {
     //adds a grading to the computed gradings. if no computed_gradings object exists it creates one and inserts the first value.
     //if the grading sum is 0 the computed gradings objects gets removed from the array
-    return new Promise(resolve=>{
+    return new Promise(resolve => {
       this.tmp_index = -1;
       if (!student.computed_gradings || student.computed_gradings.length == 0) {
         //if this is the first rating in this category
@@ -166,19 +179,40 @@ export class StudentService {
       ));
   }
 
-  deleteStudent(student_to_delete): Observable<any> {
-    return Observable.from(this.storage.get('students')
-      .then(students => {
-        return students.filter(student => {
-          return student._id != student_to_delete._id
-        })
+  deleteStudent(student_to_delete): Promise<Student[]> {
+    return this.storage.get('students').then(students => {
+      return students.filter(student => {
+        return student._id != student_to_delete._id
       })
-      .then(value => { return this.storage.set('students', value) }
-      ));
+    }).then(students => { return this.storage.set('students', students) })
   }
 
   removeStudents(): Promise<any> {
     return this.storage.remove('students');
   }
 
+
+  deleteAllGradingsInPerfcatsFromAllStudents(deletion_array) {
+    //delete all gradings from all students in all categories enlisted in the deletion_array
+    //we not only fetch the registered students because: 1) students is registered for course 2) grading is entered 3) student is unregistered from course 4) grading category is deleted => if only the registered students would be updated, then this grading would remain in the students gradings & computed_gradings array(s)    
+
+    this.getStudents().map(
+      students => {
+        let students_to_update = [];
+        if (students) {
+          students.forEach((student) => {
+            //for all entries in the deletion array, filter the student.gradings and the student.computed_gradings array, to delete the gradings in the category which gets deleted
+            deletion_array.forEach(deletion_array_category_id => {
+              if (student.gradings) { student.gradings = student.gradings.filter(grading => grading.category_id != deletion_array_category_id) };
+              if (student.computed_gradings) { student.computed_gradings = student.computed_gradings.filter(computed_grading => computed_grading.category_id != deletion_array_category_id) };
+            });
+            students_to_update.push(student);
+          });
+
+          //TODO MAKE THIS WORK: 
+          //- Gradings not deleted when course is deleted
+          return students_to_update;
+        }
+      }).map(students_to_update => this.storage.set('students', students_to_update)).subscribe()
+  }
 }

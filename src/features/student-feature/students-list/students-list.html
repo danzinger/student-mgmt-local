@@ -3,7 +3,7 @@
         <ion-title *ngIf="!registerMode">Studenten</ion-title>
         <ion-title *ngIf="registerMode">Registrierung aktiv</ion-title>
         <ion-buttons end>
-            <button *ngIf="!registerMode && students && courses && courses.length > 0" ion-button icon-only (click)="toggleRegisterMode(registerMode)">
+            <button *ngIf="!registerMode && students" ion-button icon-only (click)="toggleRegisterMode(registerMode)">
                 <ion-icon name="clipboard"></ion-icon>
             </button>
             <button *ngIf="registerMode" ion-button icon-only (click)="toggleRegisterMode(registerMode)">
@@ -12,9 +12,9 @@
             <button *ngIf="!registerMode" ion-button icon-only (click)="addStudents()">
                 <ion-icon name="add"></ion-icon>
             </button>
-            <button *ngIf="ENV == 'dev'" ion-button icon-only (click)="printInfo()">
-                <ion-icon name="information-circle"></ion-icon>
-            </button>
+            <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+              <ion-icon name="information-circle"></ion-icon>
+          </button>
         </ion-buttons>
     </ion-navbar>
 </ion-header>

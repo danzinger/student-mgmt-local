@@ -5,14 +5,13 @@ import { StudentService } from '../../../services/student-service';
 import { CourseService } from '../../../services/course.service';
 import { ToastService } from '../../../services/toast.service';
 
-import { Course } from '../../../app/models/course'; 
+import { Course } from '../../../app/models/course';
 import { Student } from '../../../app/models/student';
 import { SettingsService } from '../../../services/settings.service';
 import { PapaParseService } from 'ngx-papaparse';
 
 import { File } from '@ionic-native/file';
 
-//import { OrderPipe } from 'ngx-order-pipe';
 import { Settings } from '../../../app/models/settings';
 import { GradeCalculationService } from '../../../services/gradeCalculation.service';
 
@@ -53,17 +52,15 @@ export class CourseDetailPage {
     this.courses = navParams.get('courses');
     this.course = navParams.get('course');
     this.course_id = this.course._id;
-
-
   }
+
   ionViewWillEnter() {
     this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
     this.getParticipants().then((participants) => {
       this.participants = participants;
     });
   }
-
-  ionViewDidEnter(){
+  ionViewDidEnter() {
     //for easy sorting, we generate a 2-Dimensional dataTable here. We use this table - not the original array of participants - to display the students in the view.
     // However, we need the original participants in this view to pass a selected participant to the next view and of course to generate the dataTable
     // If this table would be needed elsewhere, it might be useful to outsource this work to the student-service.
@@ -213,16 +210,17 @@ export class CourseDetailPage {
         {
           text: 'Löschen',
           handler: () => {
-            this.studentService.deleteStudent(participant).subscribe(
+            this.studentService.deleteStudent(participant).then(
               data => {
-                let index = this.dataTable.indexOf(participant);
-                if (index > -1) this.dataTable.splice(index, 1);
+                this.participants = data;
+                this.dataTable = this.generateGradingTable(data);
+              }).then(() => {
+                this.courseService.unregisterStudentFromAllCourses(participant._id).subscribe()
+              }).then(() => {
                 this.toastService.showToast('Löschen erfolgreich');
-              },
-              error => {
+              }).catch(error => {
                 this.toastService.showToast('Löschen fehlgeschlagen');
-              }
-            )
+              })
           }
         }
       ]
@@ -257,16 +255,19 @@ export class CourseDetailPage {
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
 
-
+  updateNote(note_id) {
+    let updateNoteModal = this.modalCtrl.create('CourseNoteUpdateModalPage', { note_id: note_id, course: this.course });
+    updateNoteModal.present();
+  }
 
   //
   // ─── DELETE ─────────────────────────────────────────────────────────────────────
   //
-  deleteNote(note) {
-    this.presentNoteDeleteConfirm(note)
+  deleteNote(_id) {
+    this.presentNoteDeleteConfirm(_id)
   }
 
-  presentNoteDeleteConfirm(note) {
+  presentNoteDeleteConfirm(_id) {
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
       message: 'Notiz löschen?',
@@ -280,9 +281,7 @@ export class CourseDetailPage {
         {
           text: 'Ok',
           handler: () => {
-            let notes = this.course.notes;
-            let index = notes.indexOf(note);
-            if (index > -1) notes.splice(index, 1);
+            delete this.course.newnotes[_id]
             this.courseService.updateCourse(this.course).subscribe(
               data => {
                 this.toastService.showToast('Löschen erfolgreich!');
@@ -360,51 +359,7 @@ export class CourseDetailPage {
 
   initializeDeletionArray(child): String[] {
     //returns an array of a grading_category and all of its subgroups
-    let deletion_array = []
-    deletion_array.push(child._id);
-    if (child.children && child.children.length > 0) {
-      child.children.map((subgroup) => {
-        deletion_array.push(subgroup._id);
-        if (subgroup.children && subgroup.children.length > 0) {
-          subgroup.children.map((subsubgroup) => {
-            deletion_array.push(subsubgroup._id);
-            if (subsubgroup.children && subsubgroup.children.length > 0) {
-              subsubgroup.children.map((subsubsubgroup) => {
-                deletion_array.push(subsubsubgroup._id);
-              })
-            }
-          });
-        }
-      });
-    }
-    return deletion_array;
-  }
-
-  deleteAllGradingsInPerfcatsFromAllStudents(deletion_array) {
-    //delete all gradings from all students in all categories enlisted in the deletion_array
-    //we not only fetch the registered students because: 1) students is registered for course 2) grading is entered 3) student is unregistered from course 4) grading category is deleted => if only the registered students would be updated, then this grading would remain in the students gradings & computed_gradings array(s)    
-    let students_to_update = [];
-    this.studentService.getStudents().subscribe(
-      students => {
-        if (students) {
-          students.forEach((student) => {
-            //for all entries in the deletion array, filter the student.gradings and the student.computed_gradings array, to delete the gradings in the category which gets deleted
-            deletion_array.forEach(deletion_array_category_id => {
-              if (student.gradings) { student.gradings = student.gradings.filter(grading => grading.category_id != deletion_array_category_id) };
-              if (student.computed_gradings) { student.computed_gradings = student.computed_gradings.filter(computed_grading => computed_grading.category_id != deletion_array_category_id) };
-            });
-            students_to_update.push(student);
-          });
-          this.studentService.updateAllStudents(students_to_update).subscribe(() => {
-            this.getParticipants().then((participants) => {
-              this.participants = participants;
-            });
-          })
-        }
-      },
-      error => {
-        this.toastService.showToast('Fehler beim Löschen der Bewertungen. Konsistenzcheck der Daten empfohlen!');
-      })
+    return this.courseService.initializeDeletionArray(child);
   }
 
   presentPerfCatDeleteConfirm(category, parent, child, isTopLevel) {
@@ -430,27 +385,21 @@ export class CourseDetailPage {
   }
 
   deletePerformanceCategory(category, parent, child, isTopLevel) {
-    let deletion_array = this.initializeDeletionArray(child);
-    // if it is a top-level-category, the whole course gets updated
-    if (isTopLevel) {
-      let index = this.course.performanceCategories.indexOf(category);
-      if (index > -1) this.course.performanceCategories.splice(index, 1);
-      //if it is not a top level category, the performanceCategories array of the course must be updated
-    } else {
-      let index = parent.children.indexOf(child);
-      if (index > -1) parent.children.splice(index, 1);
-    }
-    //in any case, we update the course (with the new performance categories)
-    this.courseService.updateCourse(this.course).subscribe(
+    this.courseService.deletePerformanceCategory(category, parent, child, isTopLevel, this.course).subscribe(
       data => {
-        this.deleteAllGradingsInPerfcatsFromAllStudents(deletion_array);
+        this.courseService.getCourseById(this.course._id).subscribe((course) => {
+          this.course = course;
+          this.studentService.getParticipants(this.course._id).subscribe((participants) => {
+            this.participants = participants;
+          })
+        })
+
         this.toastService.showToast('Löschen erfolgreich!');
       },
       error => {
         this.toastService.showToast('Fehler beim Löschen der Kategorie.');
       });
   }
-
 
   //
   // ────────────────────────────────────────────────────────────────────────────── IV ──────────
@@ -465,7 +414,7 @@ export class CourseDetailPage {
   ...,...,TOTAL_POINTS_IN_CAT_1, ...
   
   need:
-  array von Objekten der Form:
+  array of Objects like:
   [{
   lastname: LASTNAME
   firstname:FIRSTNAME
@@ -481,7 +430,6 @@ export class CourseDetailPage {
   exportCourseData() {
     let resultcats = this.flattenCategories();
     let exportData = this.generateExportData(resultcats);
-    //this.parseAndDownloadGradingsOnDesktop(exportData);
     this.parseAndDownloadGradingsOnAndroid(exportData).then(() => {
       this.toastService.showToast('Datenexport erfolgreich!');
     }).catch(err => this.toastService.showToast('Datenexport fehlgeschlagen! Grund: ' + JSON.stringify(err)))
@@ -553,7 +501,6 @@ export class CourseDetailPage {
         let time = new Date().toJSON().slice(0, 10);
         let filename: string = 'StudentMgmt/csv-export/kurs-csv/' + this.course.name + '-' + time + '-' + Math.round(new Date().getTime() / 1000).toString().substr(-4) + '.csv';
         this.file.writeFile(this.file.externalRootDirectory, filename, csv_string).then(() => {
-          //this.listDir();
           resolve();
         }).catch(err => {
           this.toastService.showToast('Fehler beim Anlegen des Backups! Dateisystem meldet: ' + JSON.stringify(err));
@@ -595,6 +542,14 @@ export class CourseDetailPage {
   }
 
   //
+  // ─── GET KEYS OF AN OBJECT AS ARRAY
+  //
+
+  getKeys(obj) {
+    return Object.keys(obj).length > 0 ? Object.keys(obj) : []
+  }
+
+  //
   // ─── GET STUDENTS RATING IN A CATEGORY FROM COMPUTED GRADINGS ARRAY IN THE STUDENT OBJECT ──────────
   //
 
@@ -619,50 +574,21 @@ export class CourseDetailPage {
     return this.settings.GRADE_CALCULATION_FEATURE ? this.courseService.flattenCategories(this.course, true) : this.courseService.flattenCategories(this.course, false)
   }
 
-  // flattenCategories2() {
-  //   //flatten the nested categories
-  //   let resultcats: any[] = [];
-  //   if (this.course.performanceCategories) {
-  //     if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push({name: 'Gesamtnote',_id:'total_grading'});
-  //     this.course.performanceCategories.map((cat) => {
-  //       if (this.isNonEmptyGroup(cat)) {
-  //         if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(cat);
-  //         this.digDeeper(cat, resultcats);
-  //       } else {
-  //         resultcats.push(cat);
-  //       }
-  //     });
-  //   }
-  //   return resultcats;
-  // }
-
-  // digDeeper(category, resultcats: any[]) {
-  //   //this function searches the tree of subchildren recursively.
-  //   return category.children.map((subgroup) => {
-  //     //if the child is also a nonempty group, go one level deeper
-  //     if (this.isNonEmptyGroup(subgroup)) {
-  //       if(this.settings.GRADE_CALCULATION_FEATURE) resultcats.push(subgroup);
-  //       this.digDeeper(subgroup, resultcats)
-  //     } else {
-  //       return resultcats.push(subgroup);
-  //     }
-  //   })
-  // }
-
-  // isNonEmptyGroup(category) {
-  //   return category.children && category.children.length > 0 && category.type == "group"
-  // }
-
   printInfo() {
-    console.log('this.course: ', this.course, '\nthis.courses: ', this.courses, '\nthis.participants: ', this.participants)
+    console.log(
+      'this.course: ', this.course,
+      '\nthis.courses: ', this.courses,
+      '\nthis.participants: ', this.participants,
+      '\ndataTable: ', this.dataTable)
   }
 
   precisionRound(number, precision) {
     var factor = Math.pow(10, precision);
     return Math.round(number * factor) / factor;
   }
-  convertToReadableDate(dateObject){
-    var utc = typeof(dateObject) == "object" ? dateObject.toJSON().slice(0, 10).replace(/-/g, '/') : dateObject;
+
+  convertToReadableDate(dateObject) {
+    var utc = typeof (dateObject) == "object" ? dateObject.toJSON().slice(0, 10).replace(/-/g, '/') : dateObject.slice(0, 10).replace(/-/g, '/');
     return utc;
   }
 

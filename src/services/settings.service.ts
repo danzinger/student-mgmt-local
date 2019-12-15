@@ -12,6 +12,7 @@ export class SettingsService {
   SETTINGS_KEY = '_settings';
 
   default_settings = {
+    APP_VERSION: 105,
     ENVIRONMENT_IS_DEV: false,
     AUTOBACKUP_ON_RESTORE: false,
     GRADE_CALCULATION_FEATURE: true,

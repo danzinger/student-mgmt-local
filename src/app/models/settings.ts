@@ -9,4 +9,5 @@ export class Settings {
     MARK_STRING:string;
     PLATFORM:string;
     SHOWDEVSWITCH:boolean;
+    APP_VERSION:number;
   }

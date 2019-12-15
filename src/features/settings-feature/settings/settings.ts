@@ -13,6 +13,7 @@ import { SettingsService } from '../../../services/settings.service';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
 import { Settings } from '../../../app/models/settings';
+import { MongoIdService } from '../../../services/mongo-id.service';
 
 @IonicPage()
 @Component({
@@ -43,18 +44,19 @@ export class SettingsPage {
     public file: File,
     private fileChooser: FileChooser,
     public filePath: FilePath,
-    public alertCtrl: AlertController, ) {
+    public alertCtrl: AlertController,
+    public mongoIdService: MongoIdService, ) {
 
   }
 
-  ionViewWillEnter() {
-    this.settingsService.getAllSettings().subscribe((s) =>{
-       this.settings = s;
-       if(this.settings.PLATFORM == 'android') this.listDir();
-      });
+  ionViewDidEnter() {
+    this.settingsService.getAllSettings().subscribe((s) => {
+      this.settings = s;
+      if (this.settings.PLATFORM == 'android') this.listDir();
+    });
     this.courseService.getCourses().subscribe(data => this.courses = data);
     this.studentService.getStudents().subscribe(data => this.students = data);
-    
+
   }
 
   updateSetting(set_value, key) {
@@ -129,7 +131,7 @@ export class SettingsPage {
       this.courseService.getCourses().subscribe(courses => {
         this.studentService.getStudents().subscribe(students => {
           backupData = {
-            meta: { date: new Date().toLocaleDateString('de-DE'), time: new Date().toLocaleTimeString('de-DE')},
+            meta: { date: new Date().toLocaleDateString('de-DE'), time: new Date().toLocaleTimeString('de-DE'), appversion: this.settings.APP_VERSION },
             students: students,
             courses: courses,
           }
@@ -151,17 +153,17 @@ export class SettingsPage {
                 resolve();
               })
             })
-          }).catch(err=>this.handleError(err));
-        }).catch(err=>this.handleError(err));
-      }).catch(err=>this.handleError(err));
+          }).catch(err => this.handleError(err));
+        }).catch(err => this.handleError(err));
+      }).catch(err => this.handleError(err));
     })
   }
 
   checkData(backup_data) {
-    return new Promise((resolve,reject) => {
-      if(backup_data.meta){
+    return new Promise((resolve, reject) => {
+      if (backup_data.meta) {
         resolve();
-      }else{
+      } else {
         reject('Daten nicht im richtigen Format');
       }
     })
@@ -419,13 +421,57 @@ export class SettingsPage {
     });
   }
 
+  checkAndUpdateData() {
+    // Update Student and Course Notes to new format with ID. Because otherwise it would not be possible to update Notes
+    // Also check if no non-existing-students are registered for a course
+    //
+    // TODO: ***Also check if no gradings exist in a non-existant category
+    let student_ids = []
+    let flattened_categories = []
+
+
+    if (this.students) this.students.forEach(student => {
+      if (!student.newnotes) student.newnotes = {};
+      if (student.notes && student.notes.length > 0) student.notes.forEach(note => {
+        note._id = this.mongoIdService.newObjectId();
+        student.newnotes[note._id] = { header: note.header, content: note.content, date: note.date };
+      });
+      delete student.notes
+      student_ids.push(student._id);
+    });
+
+    if (this.courses) this.courses.forEach(course => {
+      //***flattened_categories = this.courseService.flattenCategories(course,false)
+
+      if (!course.newnotes) course.newnotes = {};
+      if (course.notes && course.notes.length > 0) course.notes.forEach(note => {
+        note._id = this.mongoIdService.newObjectId();
+        course.newnotes[note._id] = { header: note.header, content: note.content, date: note.date };
+      });
+      delete course.notes
+      course.participants = course.participants.filter(participant => student_ids.includes(participant));
+    });
+
+
+    this.courseService.removeCourses().then(() => {
+      this.courseService.createCourses(this.courses).subscribe()
+    }).then(() => {
+      this.studentService.removeStudents().then(() => {
+        this.studentService.addStudents(this.students).subscribe(() => {
+          this.toastService.showToast('Update der Datenstruktur auf 1.0.5 erfolgreich!')
+        })
+      })
+    }).catch(err => this.toastService.showToast('Fehler beim Update der Studenten'))
+
+  }
+
   //
   // ──────────────────────────────────────────────────────────────────────── III ──────────
   //   :::::: B R O W S E R   F E A T U R E S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
   // 
 
- 
+
   presentRestoreFromBackupOnBrowserConfirm(ev) {
     let message = 'Backup wiederherstellen?<br><br><strong>ACHTUNG</strong>: Dadurch werden alle derzeitigen Daten gelöscht!';
     let alert = this.alertCtrl.create({

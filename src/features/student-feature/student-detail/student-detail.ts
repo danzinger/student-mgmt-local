@@ -195,16 +195,19 @@ export class StudentDetailPage {
   // ─── UPDATE ─────────────────────────────────────────────────────────────────────
   //
 
-
+  updateNote(note_id){
+    let updateNoteModal = this.modalCtrl.create('StudentNoteUpdateModalPage', { note_id: note_id, student: this.student });
+    updateNoteModal.present();
+  }
 
   //
   // ─── DELETE ─────────────────────────────────────────────────────────────────────
   //
 
-  deleteNote(note) {
-    this.presentNoteDeleteConfirm(note)
+  deleteNote(note_id) {
+    this.presentNoteDeleteConfirm(note_id)
   }
-  presentNoteDeleteConfirm(note) {
+  presentNoteDeleteConfirm(note_id) {
     let alert = this.alertCtrl.create({
       title: 'Bestätigen',
       message: 'Notiz löschen?',
@@ -218,8 +221,7 @@ export class StudentDetailPage {
         {
           text: 'Ok',
           handler: () => {
-            let index = this.student.notes.indexOf(note);
-            if (index > -1) this.student.notes.splice(index, 1);
+            delete this.student.newnotes[note_id]
             this.studentService.updateStudent(this.student).subscribe(
               data => {
                 this.toastService.showToast('Löschen erfolgreich!');
@@ -285,6 +287,15 @@ export class StudentDetailPage {
   //   :::::: H E L P E R   F U N C T I O N S : :  :   :    :     :        :          :
   // ──────────────────────────────────────────────────────────────────────────────────
   //
+
+
+  //
+  // ─── GET KEYS OF AN OBJECT AS ARRAY
+  //
+
+  getKeys(obj){
+    return Object.keys(obj).length > 0 ? Object.keys(obj) : [];
+  }
 
   //
   // ─── GET STUDENTS RATING IN A CATEGORY FROM COMPUTED GRADINGS ARRAY IN THE STUDENT OBJECT ──────────
