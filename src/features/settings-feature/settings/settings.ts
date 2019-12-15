@@ -427,9 +427,6 @@ export class SettingsPage {
     //
     // TODO: ***Also check if no gradings exist in a non-existant category
     let student_ids = []
-    let flattened_categories = []
-
-
     if (this.students) this.students.forEach(student => {
       if (!student.newnotes) student.newnotes = {};
       if (student.notes && student.notes.length > 0) student.notes.forEach(note => {
