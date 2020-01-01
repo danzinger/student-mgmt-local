@@ -9,7 +9,6 @@ export class GradeCalculationService {
   }
 
   calculateGrade(performanceCategories, computed_gradings, settings, partialGradingForGroup?, show_colon?) {
-
     /*
     This Function computes the overall grade and the partial gradings for a student.
     If a subgroup is passed, a partial grading will be returned and if not, the overall grade is computed.
@@ -51,15 +50,32 @@ export class GradeCalculationService {
       }
     })
 
-    //then the grade is computed
-    computed_gradings.map((grading) => {
-      if (table[grading.category_id] && table[grading.category_id][1] == "max_and_weight") {
-        submarks.push(table[grading.category_id][0] * (grading.total_points / table[grading.category_id][2]))
+
+
+    // 2020-01-01 v1.0.6 update: 
+    // A problem with the grade calculation is that if a student has 0% on an exam this has a very huge mathematical impact in the calculation of the overall grade.
+    // Consider the Austrian Grading system with marks 1-5 where with 1-4 student passes and with 5 student fails. Usually a 5 is given when student has less than 50%.
+    // It is now possible to define a "minimum" value. An "max_and_weight" exam with 0% will count as "minimum_value". 
+    // Each point between "minimum_value" and "threshold_value" increases the mark, but nevertheless a student stays below "threshold_value" if his points on that exam are below the "threshold_value"
+
+
+    // Problem with this.adjustGrading when there is no computed grading in this category. so in this case add it with 0 points.
+
+    let simplyfied_computed_gradings = {}
+    computed_gradings.forEach(grading => {
+      simplyfied_computed_gradings[grading.category_id] = grading.total_points;
+    });
+
+    Object.keys(table).forEach(id => {
+      if (table[id][1] == 'max_and_weight') {
+        let total_points = simplyfied_computed_gradings[id] ? simplyfied_computed_gradings[id] : 0;
+        submarks.push(table[id][0] * this.adjustPercentage(total_points / table[id][2], settings))
       }
-      if (table[grading.category_id] && table[grading.category_id][1] == "incremental") {
-        submarks.push(table[grading.category_id][0] * grading.total_points * table[grading.category_id][3])
+      if (simplyfied_computed_gradings[id] && table[id] && table[id][1] == "incremental") {
+        submarks.push(table[id][0] * simplyfied_computed_gradings[id] * table[id][3])
       }
     })
+
     grade = (submarks.length > 0) ? submarks.reduce((a, b) => { return a + b; }) : 0;
 
     let grade_object = {
@@ -90,6 +106,19 @@ export class GradeCalculationService {
   //
   // ─── HELPER FUNCTIONS ────────────────────────────────────────────
   //
+
+  adjustPercentage(percentage, settings) {
+    //return (0 <= percentage && percentage < 0.5) ? 0.375 + (0.125 / 0.5) * percentage : percentage;
+    return (settings.MINIMUM_THRESHOLD && 0 <= percentage && percentage < settings.THRESHOLD_VALUE) ? settings.MINIMUM_VALUE + ((settings.THRESHOLD_VALUE - settings.MINIMUM_VALUE) / settings.THRESHOLD_VALUE) * percentage : percentage;
+  }
+
+  studentHasGradingInCat(computed_gradings_to_check, cat_id) {
+    let computed_gradings_ids = []
+    computed_gradings_to_check.forEach(grading => {
+      computed_gradings_ids.push(grading.category_id)
+    });
+    return computed_gradings_ids.includes(cat_id);
+  }
 
   getMarkFromPercentage(percentage_value, settings) {
     let mark;

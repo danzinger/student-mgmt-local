@@ -28,7 +28,7 @@
             <button ion-button color="primary" block (click)="getAllSettings()">getAllSettings</button>
         </ion-item>
     </div>
-    <ion-item *ngIf="settings && settings.SHOWDEVSWITCH"> 
+    <ion-item *ngIf="settings && settings.SHOWDEVSWITCH">
         <ion-label>Entwicklungsmodus</ion-label>
         <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'ENVIRONMENT_IS_DEV')"
             [(ngModel)]="settings.ENVIRONMENT_IS_DEV" color="secondary"></ion-toggle>
@@ -37,6 +37,11 @@
         <ion-label>Autobackup beim Wiederherstellen</ion-label>
         <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'AUTOBACKUP_ON_RESTORE')"
             [(ngModel)]="settings.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item>
+        <ion-label>Verbesserte Performance</ion-label>
+        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'ENHANCED_PERFORMANCE')"
+            [(ngModel)]="settings.ENHANCED_PERFORMANCE" color="secondary"></ion-toggle>
     </ion-item>
     <ion-item>
         <ion-label>Leistungsberechnung aktivieren</ion-label>
@@ -49,6 +54,23 @@
             <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'SHOW_PERCENT_SIGN')"
                 [(ngModel)]="settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
         </ion-item>
+        <ion-item>
+            <ion-label>Leistungsberechnung mit Schwelle</ion-label>
+            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'MINIMUM_THRESHOLD')"
+                [(ngModel)]="settings.MINIMUM_THRESHOLD" color="secondary"></ion-toggle>
+        </ion-item>
+        <div *ngIf="settings && settings.MINIMUM_THRESHOLD">
+            <ion-item>
+                <ion-label>Minimum</ion-label>
+                <ion-input (ngModelChange)="updateSetting($event, 'MINIMUM_VALUE')" [(ngModel)]="settings.MINIMUM_VALUE"
+                    color="secondary"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Schwellenwert</ion-label>
+                <ion-input (ngModelChange)="updateSetting($event, 'THRESHOLD_VALUE')"
+                    [(ngModel)]="settings.THRESHOLD_VALUE" color="secondary"></ion-input>
+            </ion-item>
+        </div>
         <ion-item>
             <ion-label>Gesamtbewertung in Note umwandeln</ion-label>
             <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'SHOW_MARK')"

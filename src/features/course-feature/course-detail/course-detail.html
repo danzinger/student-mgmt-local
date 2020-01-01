@@ -47,35 +47,63 @@
 <ion-content>
     <div [ngSwitch]="view">
         <ion-list *ngSwitchCase="'students'">
-            <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche">
-            </ion-searchbar>
-            <ion-item-sliding #slidingItem
-                *ngFor="let participant of dataTable | orderBy : listOrderBy : reverse | filter:term">
-                <button ion-item (click)="goToStudentDetail(participant)">
-                    <text-avatar [text]="participant.firstname" item-left></text-avatar>
-                    <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
-                    <!-- Previously the Notes where displayed. But they are not part of the Data-Table for some reasons. Therefore this feature is not avalible now... -->
-                    <!-- <ion-badge *ngIf="participant.notes && participant.notes.length == 1" item-end>1 Notiz</ion-badge>
+            <!-- 
+            2020-01-01 - v1.0.6: Displaying the students only from the dataTable had huge impact on performance since gradings where computed for each student before the students where displayed. 
+              Now, the template logic checks if the dataTable exists. If not, the students are displayed "normally" from the normal data. If the dataTable exists, then the dataTable 
+              is used to disply the students. The dataTable is only generated, when user wants to display and sort the students by their gradings.
+            -->
+            <div *ngIf="dataTable && dataTable.length == 0">
+                <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="termy" placeholder="Suche">
+                </ion-searchbar>
+                <ion-item-sliding #slidingItem
+                    *ngFor="let participant of participants | orderBy : 'lastname' : reverse | filter:term">
+                    <button ion-item (click)="goToStudentDetail(participant)">
+                        <text-avatar [text]="participant.firstname" item-left></text-avatar>
+                        <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
+                    </button>
+                    <ion-item-options>
+                        <button large style="width:75px;" ion-button color="danger"
+                            (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                        <button large style="width:75px;" ion-button color="primary"
+                            (click)="presentStudentUpdateModal(participant); closeSlidingItem(slidingItem)">
+                            <ion-icon name="create"></ion-icon>
+                        </button>
+                    </ion-item-options>
+                </ion-item-sliding>
+            </div>
+            <div *ngIf="dataTable && dataTable.length > 0">
+                <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche">
+                </ion-searchbar>
+                <ion-item-sliding #slidingItem
+                    *ngFor="let participant of dataTable | orderBy : listOrderBy : reverse | filter:term">
+                    <button ion-item (click)="goToStudentDetail(participant)">
+                        <text-avatar [text]="participant.firstname" item-left></text-avatar>
+                        <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
+                        <!-- Previously the Notes where displayed. But they are not part of the Data-Table for some reasons. Therefore this feature is not avalible now... -->
+                        <!-- <ion-badge *ngIf="participant.notes && participant.notes.length == 1" item-end>1 Notiz</ion-badge>
                   <ion-badge *ngIf="participant.notes && participant.notes.length > 1" item-end>{{participant.notes.length}}&nbsp;Notizen</ion-badge> -->
-                    <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>
-                        {{participant[listOrderBy]}}</ion-badge>
-                </button>
-                <ion-item-options>
-                    <button large style="width:75px;" ion-button color="danger"
-                        (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
-                        <ion-icon name="trash"></ion-icon>
+                        <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>
+                            {{participant[listOrderBy]}}</ion-badge>
                     </button>
-                    <button large style="width:75px;" ion-button color="primary"
-                        (click)="presentStudentUpdateModal(participant); closeSlidingItem(slidingItem)">
-                        <ion-icon name="create"></ion-icon>
-                    </button>
-                </ion-item-options>
-            </ion-item-sliding>
+                    <ion-item-options>
+                        <button large style="width:75px;" ion-button color="danger"
+                            (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
+                            <ion-icon name="trash"></ion-icon>
+                        </button>
+                        <button large style="width:75px;" ion-button color="primary"
+                            (click)="presentStudentUpdateModal(participant); closeSlidingItem(slidingItem)">
+                            <ion-icon name="create"></ion-icon>
+                        </button>
+                    </ion-item-options>
+                </ion-item-sliding>
+            </div>
         </ion-list>
         <ion-list *ngSwitchCase="'notes'">
             <!-- GetKeys returns array of the _ids in course.newnotes. Use this array to get the correct keys-->
             <div *ngIf="course.newnotes">
-                <ng-container *ngFor="let note_id of getKeys(course.newnotes)"> 
+                <ng-container *ngFor="let note_id of getKeys(course.newnotes)">
                     <ion-card>
                         <ion-card-header class="header">
                             <div float-left class="title">
