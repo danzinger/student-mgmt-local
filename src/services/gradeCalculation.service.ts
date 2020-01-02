@@ -9,6 +9,7 @@ export class GradeCalculationService {
   }
 
   calculateGrade(performanceCategories, computed_gradings, settings, partialGradingForGroup?, show_colon?) {
+    if(!settings.GRADE_CALCULATION_FEATURE) return;
     /*
     This Function computes the overall grade and the partial gradings for a student.
     If a subgroup is passed, a partial grading will be returned and if not, the overall grade is computed.
@@ -109,7 +110,9 @@ export class GradeCalculationService {
 
   adjustPercentage(percentage, settings) {
     //return (0 <= percentage && percentage < 0.5) ? 0.375 + (0.125 / 0.5) * percentage : percentage;
-    return (settings.MINIMUM_THRESHOLD && 0 <= percentage && percentage < settings.THRESHOLD_VALUE) ? settings.MINIMUM_VALUE + ((settings.THRESHOLD_VALUE - settings.MINIMUM_VALUE) / settings.THRESHOLD_VALUE) * percentage : percentage;
+    let minimum_value = Number(settings.MINIMUM_VALUE);
+    let threshold_value = Number(settings.THRESHOLD_VALUE);
+    return (settings.MINIMUM_THRESHOLD_CALCULATION && 0 <= percentage && percentage < threshold_value) ? minimum_value + ((threshold_value - minimum_value) / threshold_value) * percentage : percentage;
   }
 
   studentHasGradingInCat(computed_gradings_to_check, cat_id) {

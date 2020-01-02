@@ -15,7 +15,7 @@ import { FilePath } from '@ionic-native/file-path';
 import { Settings } from '../../../app/models/settings';
 import { MongoIdService } from '../../../services/mongo-id.service';
 
-@IonicPage()
+@IonicPage() 
 @Component({
   selector: 'page-settings',
   templateUrl: 'settings.html',
@@ -59,6 +59,10 @@ export class SettingsPage {
 
   }
 
+  resetSettings(){
+   this.settingsService.getAndSetDefaultSettings().then(settings => {this.settings = settings});
+  }
+
   updateSetting(set_value, key) {
     this.settingsService.updateSetting(key, set_value).subscribe(s => this.settings = s)
   }
@@ -67,21 +71,6 @@ export class SettingsPage {
     slidingItem.close();
   }
 
-  getSetting() {
-    this.settingsService.getSetting('GRADE_CALCULATION_FEATURE').subscribe((s) => {
-      console.log(s);
-    })
-  }
-
-  setSetting() {
-    this.settingsService.updateSetting('ENVIRONMENT_IS_DEV', true).subscribe(() => {
-      console.log('ok');
-    })
-  }
-
-  getAllSettings() {
-    this.settingsService.getAllSettings().subscribe((s) => console.log(s))
-  }
 
   //
   // ────────────────────────────────────────────────────────────────────── I ───────

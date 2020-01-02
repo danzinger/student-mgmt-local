@@ -10,7 +10,7 @@ export class Settings {
     PLATFORM:string;
     SHOWDEVSWITCH:boolean;
     APP_VERSION:number;
-    ENHANCED_PERFORMANCE:boolean;
+    AUTOSORT:boolean;
     MINIMUM_THRESHOLD_CALCULATION:boolean;
     MINIMUM_VALUE:number;
     THRESHOLD_VALUE:number;

@@ -14,20 +14,6 @@
 
 <ion-content padding>
     <ion-title>Einstellungen</ion-title>
-    <div *ngIf="settings && settings.ENVIRONMENT_IS_DEV">
-        <ion-item>
-            <button ion-button color="primary" block (click)="setSetting()">setSetting()</button>
-        </ion-item>
-        <ion-item>
-            <button ion-button color="primary" block (click)="getSetting()">getSetting()</button>
-        </ion-item>
-        <ion-item>
-            <button ion-button color="primary" block (click)="settingsService.deleteSettings()">delete</button>
-        </ion-item>
-        <ion-item>
-            <button ion-button color="primary" block (click)="getAllSettings()">getAllSettings</button>
-        </ion-item>
-    </div>
     <ion-item *ngIf="settings && settings.SHOWDEVSWITCH">
         <ion-label>Entwicklungsmodus</ion-label>
         <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'ENVIRONMENT_IS_DEV')"
@@ -38,16 +24,11 @@
         <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'AUTOBACKUP_ON_RESTORE')"
             [(ngModel)]="settings.AUTOBACKUP_ON_RESTORE" color="secondary"></ion-toggle>
     </ion-item>
-    <ion-item>
-        <ion-label>Verbesserte Performance</ion-label>
-        <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'ENHANCED_PERFORMANCE')"
-            [(ngModel)]="settings.ENHANCED_PERFORMANCE" color="secondary"></ion-toggle>
-    </ion-item>
-    <ion-item>
+    <!-- <ion-item>
         <ion-label>Leistungsberechnung aktivieren</ion-label>
         <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'GRADE_CALCULATION_FEATURE')"
             [(ngModel)]="settings.GRADE_CALCULATION_FEATURE" color="secondary"></ion-toggle>
-    </ion-item>
+    </ion-item> -->
     <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
         <ion-item>
             <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
@@ -55,11 +36,16 @@
                 [(ngModel)]="settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
         </ion-item>
         <ion-item>
-            <ion-label>Leistungsberechnung mit Schwelle</ion-label>
-            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'MINIMUM_THRESHOLD')"
-                [(ngModel)]="settings.MINIMUM_THRESHOLD" color="secondary"></ion-toggle>
+            <ion-label>Kursliste nach Leistung ordnen</ion-label>
+            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'AUTOSORT')"
+                [(ngModel)]="settings.AUTOSORT" color="secondary"></ion-toggle>
         </ion-item>
-        <div *ngIf="settings && settings.MINIMUM_THRESHOLD">
+        <ion-item>
+            <ion-label>Leistungsberechnung mit Schwelle</ion-label>
+            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'MINIMUM_THRESHOLD_CALCULATION')"
+                [(ngModel)]="settings.MINIMUM_THRESHOLD_CALCULATION" color="secondary"></ion-toggle>
+        </ion-item>
+        <div *ngIf="settings && settings.MINIMUM_THRESHOLD_CALCULATION">
             <ion-item>
                 <ion-label>Minimum</ion-label>
                 <ion-input (ngModelChange)="updateSetting($event, 'MINIMUM_VALUE')" [(ngModel)]="settings.MINIMUM_VALUE"
@@ -95,14 +81,6 @@
             [(ngModel)]="settings.TEST_FEATURES" color="secondary"></ion-toggle>
     </ion-item>
     <div *ngIf="settings && settings.ENVIRONMENT_IS_DEV">
-        <ion-item>
-            <ion-label>Android Features</ion-label>
-            <ion-toggle [(ngModel)]="show_android_features" color="secondary"></ion-toggle>
-        </ion-item>
-        <ion-item>
-            <ion-label>Desktop Features</ion-label>
-            <ion-toggle [(ngModel)]="show_desktop_features" color="secondary"></ion-toggle>
-        </ion-item>
         <ion-list *ngIf="settings && settings.ENVIRONMENT_IS_DEV && settings.PLATFORM == 'android'">
             <h3>Android Debug Functions</h3>
             <button ion-button color="primary" block (click)="createDirManually()">createDir</button>
@@ -114,6 +92,7 @@
     <div *ngIf="settings && settings.TEST_FEATURES">
         <ion-list>
             <button ion-button color="primary" block (click)="checkAndUpdateData()">Daten Prüfen</button>
+            <button ion-button color="primary" block (click)="resetSettings()">Einstellungen zurücksetzen</button>
             <button ion-button color="primary" block (click)="addMockData()">Testdaten hinzufügen</button>
             <button ion-button color="primary" block (click)="removeStudents()">Studenten Löschen</button>
             <button ion-button color="primary" block (click)="removeCourses()">Kurse Löschen</button>

@@ -47,58 +47,27 @@
 <ion-content>
     <div [ngSwitch]="view">
         <ion-list *ngSwitchCase="'students'">
-            <!-- 
-            2020-01-01 - v1.0.6: Displaying the students only from the dataTable had huge impact on performance since gradings where computed for each student before the students where displayed. 
-              Now, the template logic checks if the dataTable exists. If not, the students are displayed "normally" from the normal data. If the dataTable exists, then the dataTable 
-              is used to disply the students. The dataTable is only generated, when user wants to display and sort the students by their gradings.
-            -->
-            <div *ngIf="dataTable && dataTable.length == 0">
-                <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="termy" placeholder="Suche">
-                </ion-searchbar>
-                <ion-item-sliding #slidingItem
-                    *ngFor="let participant of participants | orderBy : 'lastname' : reverse | filter:term">
-                    <button ion-item (click)="goToStudentDetail(participant)">
-                        <text-avatar [text]="participant.firstname" item-left></text-avatar>
-                        <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
+            <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche">
+            </ion-searchbar>
+            <ion-item-sliding #slidingItem
+                *ngFor="let participant of dataTable | orderBy : listOrderBy : reverse | filter:term">
+                <button ion-item (click)="goToStudentDetail(participant)">
+                    <text-avatar [text]="participant.firstname" item-left></text-avatar>
+                    <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
+                    <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>
+                        {{participant[listOrderBy]}}</ion-badge>
+                </button>
+                <ion-item-options>
+                    <button large style="width:75px;" ion-button color="danger"
+                        (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
+                        <ion-icon name="trash"></ion-icon>
                     </button>
-                    <ion-item-options>
-                        <button large style="width:75px;" ion-button color="danger"
-                            (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
-                            <ion-icon name="trash"></ion-icon>
-                        </button>
-                        <button large style="width:75px;" ion-button color="primary"
-                            (click)="presentStudentUpdateModal(participant); closeSlidingItem(slidingItem)">
-                            <ion-icon name="create"></ion-icon>
-                        </button>
-                    </ion-item-options>
-                </ion-item-sliding>
-            </div>
-            <div *ngIf="dataTable && dataTable.length > 0">
-                <ion-searchbar no-border-top class="course-searchbar" [(ngModel)]="term" placeholder="Suche">
-                </ion-searchbar>
-                <ion-item-sliding #slidingItem
-                    *ngFor="let participant of dataTable | orderBy : listOrderBy : reverse | filter:term">
-                    <button ion-item (click)="goToStudentDetail(participant)">
-                        <text-avatar [text]="participant.firstname" item-left></text-avatar>
-                        <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
-                        <!-- Previously the Notes where displayed. But they are not part of the Data-Table for some reasons. Therefore this feature is not avalible now... -->
-                        <!-- <ion-badge *ngIf="participant.notes && participant.notes.length == 1" item-end>1 Notiz</ion-badge>
-                  <ion-badge *ngIf="participant.notes && participant.notes.length > 1" item-end>{{participant.notes.length}}&nbsp;Notizen</ion-badge> -->
-                        <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>
-                            {{participant[listOrderBy]}}</ion-badge>
+                    <button large style="width:75px;" ion-button color="primary"
+                        (click)="presentStudentUpdateModal(participant); closeSlidingItem(slidingItem)">
+                        <ion-icon name="create"></ion-icon>
                     </button>
-                    <ion-item-options>
-                        <button large style="width:75px;" ion-button color="danger"
-                            (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">
-                            <ion-icon name="trash"></ion-icon>
-                        </button>
-                        <button large style="width:75px;" ion-button color="primary"
-                            (click)="presentStudentUpdateModal(participant); closeSlidingItem(slidingItem)">
-                            <ion-icon name="create"></ion-icon>
-                        </button>
-                    </ion-item-options>
-                </ion-item-sliding>
-            </div>
+                </ion-item-options>
+            </ion-item-sliding>
         </ion-list>
         <ion-list *ngSwitchCase="'notes'">
             <!-- GetKeys returns array of the _ids in course.newnotes. Use this array to get the correct keys-->
@@ -132,11 +101,6 @@
                     </ion-card>
                 </ng-container>
             </div>
-            <!-- <ion-fab right bottom>
-                <button (click)="addNewNote()" ion-fab color="light" color="secondary">
-                    <ion-icon name="add"></ion-icon>
-                </button>
-            </ion-fab> -->
         </ion-list>
         <ion-list *ngSwitchCase="'categories'">
             <div *ngFor="let category of course.performanceCategories | orderBy : 'name'">

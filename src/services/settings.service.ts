@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
+import { Settings } from '../app/models/settings';
 
 @Injectable()
 export class SettingsService {
@@ -12,20 +13,20 @@ export class SettingsService {
   SETTINGS_KEY = '_settings';
 
   default_settings = {
-    APP_VERSION: 106,
+    APP_VERSION: 107,
     ENVIRONMENT_IS_DEV: false,
+    SHOWDEVSWITCH: false,
+    PLATFORM: "android",
     AUTOBACKUP_ON_RESTORE: false,
     GRADE_CALCULATION_FEATURE: true,
     SHOW_PERCENT_SIGN: false,
     SHOW_MARK: false,
     TEST_FEATURES: false,
     MARK_STRING: "-9999,0.5000,5|0.5000,0.5416,4-|0.5416,0.5833,4|0.5833,0.6250,4+|0.6250,0.6666,3-|0.6666,0.7083,3|0.7083,0.7500,3+|0.7500,0.7916,2-|0.7916,0.8333,2|0.8333,0.8750,2+|0.8750,9999,1",
-    PLATFORM: "android",
-    SHOWDEVSWITCH: false,
-    ENHANCED_PERFORMANCE: false,
-    MINIMUM_THRESHOLD: true,
+    AUTOSORT: true,
+    MINIMUM_THRESHOLD_CALCULATION: true,
     MINIMUM_VALUE: 0.375,
-    THRESHOLD_VALUE: 0.5
+    THRESHOLD_VALUE: 0.5 
   };
 
   //
@@ -42,6 +43,12 @@ export class SettingsService {
       this.storage.get(this.SETTINGS_KEY).then((s) => {
         return s ? s : this.default_settings;
       }))
+  }
+
+  getAllSettingsPromise(): Promise<Settings> {
+      return this.storage.get(this.SETTINGS_KEY).then((s) => {
+        return s ? s : this.default_settings;
+      })
   }
 
   getSetting(key): Observable<any> {
@@ -69,7 +76,11 @@ export class SettingsService {
   //
 
   deleteSettings() {
-    this.storage.remove(this.SETTINGS_KEY).then((c) => console.log(c));
+    this.storage.remove(this.SETTINGS_KEY);
+  }
+
+  getAndSetDefaultSettings(){
+    return this.storage.set(this.SETTINGS_KEY, this.default_settings);
   }
 
   //

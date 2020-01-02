@@ -27,7 +27,7 @@ export class CourseDetailPage {
   view = 'students';
 
   course_id
-  listOrderBy = 'lastname'
+  listOrderBy;
 
   dataTable;
   reverse = false;
@@ -55,26 +55,19 @@ export class CourseDetailPage {
   }
 
   ionViewWillEnter() {
-    this.settingsService.getAllSettings().subscribe((s) => this.settings = s);
-    this.getParticipants().then((participants) => {
-      this.participants = participants;
-    });
-    //for easy sorting, we generate a 2-Dimensional dataTable here. We use this table - not the original array of participants - to display the students in the view.
-    // However, we need the original participants in this view to pass a selected participant to the next view and of course to generate the dataTable
-    // If this table would be needed elsewhere, it might be useful to outsource this work to the student-service.
-
-    //2020-01-01 - v1.0.6: This had a huge impact on performance since the Gradings where computed for each student before the students where displayed. 
-    //  Now, the template logic checks if the dataTable exists. If not, the students are displayed "normally" from the normal data. If the dataTable exists, then the dataTable 
-    //  is used to disply the students. The dataTable is only generated, when user wants to display and sort the students by their gradings.
-
-    // If Gradings are displayed in this view and user goes to StudentDetailPage and changes something, the dataTable would still be present, but these changed would not be reflected. 
-    // Therefore the Table needs to be updated in this case. However, a setting controlls this behavoir. If "ENHANCED_PERFORMANCE_MODE" is true, then the Table is deleted. Maybe better on slow devices.
-    // We update the Table also only if we come from the StudentDetailView (because only there changes can be made that need to be reflected in the table)
-    // Also we check if the this.listOrderBy Variable has changed. If it is the default value 'lastname' then no gradings are displayed anyway
-    //this.dataTable = (this.navCtrl.last().id == "StudentDetailPage" && !this.settings.ENHANCED_PERFORMANCE && this.listOrderBy != 'lastname') ? this.generateGradingTable(this.participants) : [];
-
-    this.dataTable = (this.navCtrl.last().id == "StudentDetailPage" && !this.settings.ENHANCED_PERFORMANCE && this.listOrderBy != 'lastname') ? this.generateGradingTable(this.participants) : [];
-
+    this.settingsService.getAllSettingsPromise()
+      .then(s => {this.settings = s})
+      .then(()=>{
+        this.getParticipants().then((participants) => {
+          this.participants = participants;
+        })
+      .then(()=>{
+        if(!this.listOrderBy){
+          this.listOrderBy = this.settings.AUTOSORT ? 'total_grading' : 'lastname'
+        }        
+        this.dataTable = this.generateGradingTable(this.participants);
+        })
+      })
   }
 
   //
@@ -344,7 +337,7 @@ export class CourseDetailPage {
     CoursePerfcatEditModal.present();
     CoursePerfcatEditModal.onDidDismiss(() => {
       //since user can make changes that need to be reflected in the table we need to update it
-      this.dataTable = (!this.settings.ENHANCED_PERFORMANCE) ? this.generateGradingTable(this.participants) : []
+      this.dataTable = this.generateGradingTable(this.participants)
     })
   }
 
@@ -361,7 +354,7 @@ export class CourseDetailPage {
     CoursePerfcatUpdateModal.present();
     CoursePerfcatUpdateModal.onDidDismiss(() => {
       //since user can make changes that need to be reflected in the table we need to update it
-      this.dataTable = (!this.settings.ENHANCED_PERFORMANCE) ? this.generateGradingTable(this.participants) : []
+      this.dataTable = this.generateGradingTable(this.participants)
     })
   }
 
@@ -407,7 +400,7 @@ export class CourseDetailPage {
           })
         })
         //since changes need to be reflected in the table we need to update it
-        this.dataTable = (!this.settings.ENHANCED_PERFORMANCE) ? this.generateGradingTable(this.participants) : []
+        this.dataTable = this.generateGradingTable(this.participants);
         this.toastService.showToast('Löschen erfolgreich!');
       },
       error => {
@@ -596,7 +589,8 @@ export class CourseDetailPage {
       'this.course: ', this.course,
       '\nthis.courses: ', this.courses,
       '\nthis.participants: ', this.participants,
-      '\ndataTable: ', this.dataTable)
+      '\ndataTable: ', this.dataTable,
+      '\nlistOrderBy: ', this.listOrderBy)
   }
 
   precisionRound(number, precision) {
