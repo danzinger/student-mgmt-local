@@ -1,0 +1,83 @@
+<!--
+  Generated template for the CourseSettingsModalPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar color="stdt-mgmt-theme">
+    <ion-title>Kurseinstellungen</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="cancel()" strong>
+        <span color="primary" showWhen="ios">
+          Cancel
+        </span>
+        <ion-icon style="font-size:25px" name="close" showWhen="core,android,windows"></ion-icon>
+      </button>
+      <button ion-button (click)="done(performanceCategory)" strong>
+        <span color="primary" showWhen="ios">
+          Done
+        </span>
+        <ion-icon style="font-size:25px" name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+      </button>
+      <button *ngIf="settings_from_coursedetail && settings_from_coursedetail.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
+        <ion-icon name="information-circle"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-title>Einstellungen</ion-title>
+  <ion-item>
+    <ion-label>Kursspezifische Einstellungen</ion-label>
+    <ion-toggle (ngModelChange)="toggleCourseSettings($event, 'COURSE_SPECIFIC_SETTINGS')"
+      [(ngModel)]="course_specific_settings_exist" color="secondary"></ion-toggle>
+  </ion-item>
+  <div *ngIf="course_specific_settings_exist">
+    <ion-item>
+      <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
+      <ion-toggle *ngIf="course.course_settings" (ngModelChange)="updateSetting($event, 'SHOW_PERCENT_SIGN')"
+        [(ngModel)]="course.course_settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label>Kursliste nach Leistung ordnen</ion-label>
+      <ion-toggle *ngIf="course.course_settings" (ngModelChange)="updateSetting($event, 'AUTOSORT')" [(ngModel)]="course.course_settings.AUTOSORT"
+        color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label>Leistungsberechnung mit Schwelle</ion-label>
+      <ion-toggle *ngIf="course.course_settings" (ngModelChange)="updateSetting($event, 'MINIMUM_THRESHOLD_CALCULATION')"
+        [(ngModel)]="course.course_settings.MINIMUM_THRESHOLD_CALCULATION" color="secondary"></ion-toggle>
+    </ion-item>
+    <div *ngIf="course.course_settings && course.course_settings.MINIMUM_THRESHOLD_CALCULATION">
+      <ion-item>
+        <ion-label>Minimum</ion-label>
+        <ion-input (ngModelChange)="updateSetting($event, 'MINIMUM_VALUE')" [(ngModel)]="course.course_settings.MINIMUM_VALUE"
+          color="secondary"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Schwellenwert</ion-label>
+        <ion-input (ngModelChange)="updateSetting($event, 'THRESHOLD_VALUE')" [(ngModel)]="course.course_settings.THRESHOLD_VALUE"
+          color="secondary"></ion-input>
+      </ion-item>
+    </div>
+    <ion-item>
+      <ion-label>Gesamtbewertung in Note umwandeln</ion-label>
+      <ion-toggle *ngIf="course.course_settings" (ngModelChange)="updateSetting($event, 'SHOW_MARK')" [(ngModel)]="course.course_settings.SHOW_MARK"
+        color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="course.course_settings && course.course_settings.SHOW_MARK">
+      <ion-label>Notendefinition bearbeiten</ion-label>
+      <ion-toggle [(ngModel)]="set_custom_mark_string" color="secondary"></ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="course.course_settings && course.course_settings.SHOW_MARK && set_custom_mark_string">
+      <ion-label>Notendefinition:</ion-label>
+      <ion-input *ngIf="course.course_settings" (ngModelChange)="updateSetting($event, 'MARK_STRING')"
+        [(ngModel)]="course.course_settings.MARK_STRING" color="secondary"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="course.course_settings && course.course_settings.SHOW_MARK && set_custom_mark_string">
+      <button ion-button color="primary" block (click)="checkMarkString()">Notendefinition prüfen</button>
+    </ion-item>
+  </div>
+</ion-content>

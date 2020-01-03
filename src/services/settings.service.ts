@@ -13,7 +13,7 @@ export class SettingsService {
   SETTINGS_KEY = '_settings';
 
   default_settings = {
-    APP_VERSION: 107,
+    APP_VERSION: 108,
     ENVIRONMENT_IS_DEV: false,
     SHOWDEVSWITCH: false,
     PLATFORM: "android",

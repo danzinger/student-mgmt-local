@@ -1,8 +1,7 @@
 <ion-header>
 
     <ion-navbar color="stdt-mgmt-theme">
-        <ion-title small>{{course.name}} <span *ngIf="currentSortingCategoryName">|</span>
-            {{currentSortingCategoryName}}</ion-title>
+        <ion-title small>{{course.name}}&nbsp;<sup *ngIf="course.course_settings"><ion-icon style="font-size:14px" name="settings"></ion-icon></sup></ion-title>
         <ion-buttons end>
             <button *ngIf="view=='students'" ion-button icon-only (click)="createAndregisterStudents()">
                 <ion-icon name="add"></ion-icon>
@@ -24,6 +23,9 @@
             </button>
             <button *ngIf="view=='categories'" ion-button icon-only (click)="presentAddNewPerfCatModal()">
                 <ion-icon name="add"></ion-icon>
+            </button>
+            <button *ngIf="view=='categories'" ion-button icon-only (click)="presentCourseSettingsModal()">
+                <ion-icon name="settings"></ion-icon>
             </button>
             <button *ngIf="settings && settings.ENVIRONMENT_IS_DEV" ion-button icon-only (click)="printInfo()">
                 <ion-icon name="information-circle"></ion-icon>
