@@ -50,15 +50,23 @@ export class StudentDetailPage {
   }
 
   ionViewWillEnter() {
-    //this.final_grade = this.calculateGrade(this.selected_course.performanceCategories[0].children);
-    this.settingsService.getAllSettings().subscribe(s => this.settings = s);
+    this.settingsService.getAllSettingsPromise()
+      .then(s => {this.mergeSettings(s)})
+  }
+
+  mergeSettings(settings_from_service){
+    if(this.selected_course && this.selected_course.course_settings){
+      this.settings = this.settingsService.mergeCourseSettings(settings_from_service, this.selected_course.course_settings)
+    }else{
+      this.settings = settings_from_service;
+    }
   }
 
   getCourses() {
     this.courseService.getCourses().subscribe((courses) => {
       this.courses = courses;
       if (!this.selected_course && this.courses && this.courses[0]) {
-        //if user comes from student-list-view no course is preselected. 
+        //if user comes from student-list-view no course is preselected. We autoselect the first course we find in which student is registered.
         for (let course of this.courses) {
           if (this.studentRegistered(course)) this.selected_course = course;
         }

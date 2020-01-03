@@ -58,7 +58,9 @@
                     <ion-label>{{participant.firstname}} {{participant.lastname}}</ion-label>
                     <ion-badge *ngIf="!(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>
                         {{participant[listOrderBy]}}</ion-badge>
-                </button>
+                    <ion-badge *ngIf="settings.SHOW_MARK && !(listOrderBy == 'firstname' || listOrderBy == 'lastname')" item-end>
+                        {{gradeCalculationService.getMarkFromPercentage(participant[listOrderBy]/100, settings, listOrderBy)}}</ion-badge>
+                </button> 
                 <ion-item-options>
                     <button large style="width:75px;" ion-button color="danger"
                         (click)="deleteParticipant(participant); closeSlidingItem(slidingItem)">

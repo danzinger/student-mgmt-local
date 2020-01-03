@@ -8,8 +8,8 @@ export class GradeCalculationService {
   constructor() {
   }
 
-  calculateGrade(performanceCategories, computed_gradings, settings, partialGradingForGroup?, show_colon?) {
-    if(!settings.GRADE_CALCULATION_FEATURE) return;
+  calculateGrade(performanceCategories, computed_gradings, settings, partialGradingForGroup?, on_student_detail_view?) {
+    if (!settings.GRADE_CALCULATION_FEATURE) return;
     /*
     This Function computes the overall grade and the partial gradings for a student.
     If a subgroup is passed, a partial grading will be returned and if not, the overall grade is computed.
@@ -86,20 +86,11 @@ export class GradeCalculationService {
     grade_object.grade = this.precisionRound(grade * 100, 2);
     grade_object.mark = this.getMarkFromPercentage(grade, settings);
 
-    //this is pure lazyness. show_colon is only used in the student-detail-view to have a colon after the category-name
-    if (show_colon) {
-      if (settings && settings.SHOW_MARK) {
-        returnvalue = (settings && settings.SHOW_PERCENT_SIGN) ? ": " + grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : ": " + grade_object.grade + ' ' + '(' + grade_object.mark + ')';
-      } else {
-        returnvalue = (settings && settings.SHOW_PERCENT_SIGN) ? ": " + grade_object.grade + ' %' : ": " + grade_object.grade;
-      }
+    if (on_student_detail_view) {
+      //on student detail view a colon ":" is needed between the categories and the grade and the mark is directly returned as a string. This makes things a little easier in the templates.
+      returnvalue = (settings && settings.SHOW_MARK) ? `: ${grade_object.grade} (${grade_object.mark})` : `: ${grade_object.grade}`;
     } else {
-      if (settings && settings.SHOW_MARK) {
-        returnvalue = (settings && settings.SHOW_PERCENT_SIGN) ? grade_object.grade + ' % ' + '(' + grade_object.mark + ')' : + grade_object.grade + ' ' + '(' + grade_object.mark + ')';
-      } else {
-        returnvalue = (settings && settings.SHOW_PERCENT_SIGN) ? grade_object.grade + ' %' : + grade_object.grade;
-      }
-
+      returnvalue = grade_object.grade;
     }
     return returnvalue
   }
@@ -124,15 +115,17 @@ export class GradeCalculationService {
   }
 
   getMarkFromPercentage(percentage_value, settings) {
+
     let mark;
     let mark_string = settings.MARK_STRING;
     let array = mark_string.split("|")
     for (let mark_range of array) {
       let sub = mark_range.split(",")
-      if (percentage_value >= Number(sub[0]) && percentage_value < Number(sub[1])) {
+      if (Number(percentage_value) >= Number(sub[0]) && percentage_value < Number(sub[1])) {
         mark = sub[2];
       }
     }
+
     return mark;
   }
 

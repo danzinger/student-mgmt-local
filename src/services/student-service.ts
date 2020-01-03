@@ -86,7 +86,6 @@ export class StudentService {
   }
 
   updateStudent(updated_student): Observable<Student[]> {
-    //console.log("update to: "+JSON.stringify(updated_student.gradings));
     return Observable.from(this.storage.get('students')
       .then(students => {
         let arr = students.filter(student => student._id != updated_student._id)
@@ -110,7 +109,6 @@ export class StudentService {
   }
 
   updateAllStudents(students): Observable<Student[]> {
-    console.log(students[29])
     return Observable.from(this.storage.set('students', students))
   }
 

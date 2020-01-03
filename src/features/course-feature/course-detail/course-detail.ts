@@ -56,17 +56,17 @@ export class CourseDetailPage {
 
   ionViewWillEnter() {
     this.settingsService.getAllSettingsPromise()
-      .then(s => {this.mergeSettings(s)})
-      .then(()=>{
+      .then(s => { this.mergeSettings(s) })
+      .then(() => {
         this.getParticipants().then((participants) => {
           this.participants = participants;
         })
-      .then(()=>{
-        if(!this.listOrderBy){
-          this.listOrderBy = this.settings.AUTOSORT ? 'total_grading' : 'lastname'
-        }        
-        this.dataTable = this.generateGradingTable(this.participants);
-        })
+          .then(() => {
+            if (!this.listOrderBy) {
+              this.listOrderBy = this.settings.AUTOSORT ? 'total_grading' : 'lastname'
+            }
+            this.dataTable = this.generateGradingTable(this.participants);
+          })
       })
   }
 
@@ -415,29 +415,25 @@ export class CourseDetailPage {
   // ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
   //
 
-  presentCourseSettingsModal(){
+  presentCourseSettingsModal() {
     let CourseSettingsModal = this.modalCtrl.create('CourseSettingsModalPage', { course: this.course, settings_from_coursedetail: this.settings });
     CourseSettingsModal.present();
-    CourseSettingsModal.onDidDismiss((data)=>{
-      if(data){
+    CourseSettingsModal.onDidDismiss((data) => {
+      if (data) {
         this.course = data.course;
         this.settings = data.settings;
-        this.dataTable = this.generateGradingTable(this.participants)
+        if (this.listOrderBy == 'lastname' || this.listOrderBy == 'total_grading') {
+          this.listOrderBy = this.settings.AUTOSORT ? 'total_grading' : 'lastname';
+        }
+        this.dataTable = this.generateGradingTable(this.participants);
       }
     })
   }
 
-  mergeSettings(settings_from_service){
+  mergeSettings(settings_from_service) {
     this.settings = settings_from_service;
-    if(this.course.course_settings){
-            // merge course.course_settings into settings_from_coursedetail
-            this.settings.SHOW_PERCENT_SIGN = this.course.course_settings.SHOW_PERCENT_SIGN;
-            this.settings.SHOW_MARK = this.course.course_settings.SHOW_MARK;
-            this.settings.MARK_STRING = this.course.course_settings.MARK_STRING;
-            this.settings.AUTOSORT = this.course.course_settings.AUTOSORT;
-            this.settings.MINIMUM_THRESHOLD_CALCULATION = this.course.course_settings.MINIMUM_THRESHOLD_CALCULATION;
-            this.settings.MINIMUM_VALUE = this.course.course_settings.MINIMUM_VALUE;
-            this.settings.THRESHOLD_VALUE = this.course.course_settings.THRESHOLD_VALUE;
+    if (this.course.course_settings) {
+      this.settings = this.settingsService.mergeCourseSettings(this.settings, this.course.course_settings)
     }
   }
 

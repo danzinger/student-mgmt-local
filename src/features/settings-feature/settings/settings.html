@@ -31,11 +31,6 @@
     </ion-item> -->
     <div *ngIf="settings && settings.GRADE_CALCULATION_FEATURE">
         <ion-item>
-            <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
-            <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'SHOW_PERCENT_SIGN')"
-                [(ngModel)]="settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
-        </ion-item>
-        <ion-item>
             <ion-label>Kursliste nach Leistung ordnen</ion-label>
             <ion-toggle *ngIf="settings" (ngModelChange)="updateSetting($event, 'AUTOSORT')"
                 [(ngModel)]="settings.AUTOSORT" color="secondary"></ion-toggle>

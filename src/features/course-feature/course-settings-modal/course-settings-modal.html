@@ -30,16 +30,11 @@
 <ion-content padding>
   <ion-title>Einstellungen</ion-title>
   <ion-item>
-    <ion-label>Kursspezifische Einstellungen</ion-label>
+    <ion-label>Kursspezifische Einstellungen verwenden</ion-label>
     <ion-toggle (ngModelChange)="toggleCourseSettings($event, 'COURSE_SPECIFIC_SETTINGS')"
       [(ngModel)]="course_specific_settings_exist" color="secondary"></ion-toggle>
   </ion-item>
   <div *ngIf="course_specific_settings_exist">
-    <ion-item>
-      <ion-label>Gesamtbewertung mit Prozentzeichen</ion-label>
-      <ion-toggle *ngIf="course.course_settings" (ngModelChange)="updateSetting($event, 'SHOW_PERCENT_SIGN')"
-        [(ngModel)]="course.course_settings.SHOW_PERCENT_SIGN" color="secondary"></ion-toggle>
-    </ion-item>
     <ion-item>
       <ion-label>Kursliste nach Leistung ordnen</ion-label>
       <ion-toggle *ngIf="course.course_settings" (ngModelChange)="updateSetting($event, 'AUTOSORT')" [(ngModel)]="course.course_settings.AUTOSORT"

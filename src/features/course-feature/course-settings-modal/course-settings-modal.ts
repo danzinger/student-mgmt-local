@@ -51,14 +51,7 @@ settings_from_coursedetail = new Settings;
 
   done(){
     if(this.course_specific_settings_exist){
-      // merge course.course_settings into settings_from_coursedetail
-      this.settings_from_coursedetail.SHOW_PERCENT_SIGN = this.course.course_settings.SHOW_PERCENT_SIGN;
-      this.settings_from_coursedetail.SHOW_MARK = this.course.course_settings.SHOW_MARK;
-      this.settings_from_coursedetail.MARK_STRING = this.course.course_settings.MARK_STRING;
-      this.settings_from_coursedetail.AUTOSORT = this.course.course_settings.AUTOSORT;
-      this.settings_from_coursedetail.MINIMUM_THRESHOLD_CALCULATION = this.course.course_settings.MINIMUM_THRESHOLD_CALCULATION;
-      this.settings_from_coursedetail.MINIMUM_VALUE = this.course.course_settings.MINIMUM_VALUE;
-      this.settings_from_coursedetail.THRESHOLD_VALUE = this.course.course_settings.THRESHOLD_VALUE;
+      this.settings_from_coursedetail = this.settingsService.mergeCourseSettings(this.settings_from_coursedetail,this.course.course_settings)
     }
     this.courseService.updateCourse(this.course).subscribe(
       data => {
@@ -73,7 +66,6 @@ settings_from_coursedetail = new Settings;
   toggleCourseSettings(set_value, key) {
     if(set_value == true){
       this.course.course_settings = {
-        SHOW_PERCENT_SIGN: this.settings_from_coursedetail.SHOW_PERCENT_SIGN,
         SHOW_MARK: this.settings_from_coursedetail.SHOW_MARK,
         MARK_STRING: this.settings_from_coursedetail.MARK_STRING,
         AUTOSORT: this.settings_from_coursedetail.AUTOSORT,
