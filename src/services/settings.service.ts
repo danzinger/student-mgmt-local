@@ -14,9 +14,9 @@ export class SettingsService {
 
   default_settings = {
     APP_VERSION: 109,
-    ENVIRONMENT_IS_DEV: true,
-    SHOWDEVSWITCH: true,
-    PLATFORM: "desktop",
+    ENVIRONMENT_IS_DEV: false,
+    SHOWDEVSWITCH: false,
+    PLATFORM: "android",
     AUTOBACKUP_ON_RESTORE: false,
     GRADE_CALCULATION_FEATURE: true,
     SHOW_PERCENT_SIGN: false,
